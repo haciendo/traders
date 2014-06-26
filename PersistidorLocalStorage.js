@@ -11,54 +11,39 @@ var PersistidorLocalStorage = function(opt){
 	
 	if(!this.contacto_id){
 		this.contacto_id = this.usuario_id
-	}
+	}	
 	
-	vx.pedirMensajes({
-		filtro: {
+	if(typeof(localStorage)=="undefined") return; //no existe el storage local, me voy
+	
+	this.objetoGuardado = localStorage.getItem(_this.usuario_id);	
+	
+	vx.when({
 				tipoDeMensaje: "vortex.persistencia.guardarDatos",
 				de: _this.contacto_id,
 				para: _this.usuario_id
-			},
-		callback: function(mensaje){
+			}, function(mensaje){
+				_this.objetoGuardado = mensaje.datoSeguro.valor;				
+				localStorage.setItem(_this.contacto_id, _this.objetoGuardado);
 
-			var estado = 'ERROR';
-
-			//estado = 'DENEGADO';
-
-			if(typeof(Storage)!=="undefined"){
-				localStorage.setItem(_this.contacto_id, mensaje.datoSeguro);
-				estado = 'OK';
-			}
-
-			vx.send({
-				responseTo: mensaje.idRequest,
-				de: _this.usuario_id,
-				para: _this.contacto_id,
-				descripcion: 'LocalStorage',
-				estado: estado
+				vx.send({
+					responseTo: mensaje.idRequest,
+					de: _this.usuario_id,
+					para: _this.contacto_id,
+					descripcion: 'LocalStorage',
+					estado: 'OK'
+				});
 			});
-		}
-	});
 	
 	
-	vx.pedirMensajesSeguros({
-		filtro: {
+	vx.when({
 			tipoDeMensaje:"vortex.persistencia.obtenerDatos",
 			de: _this.contacto_id,
 			para: _this.usuario_id
-		},
-		callback: function(mensaje){
-
+		},function(mensaje){
 			var estado = 'ERROR';
-			//estado = 'DENEGADO';
 
-			var datos;
-
-			if(typeof(Storage)!=="undefined"){
-				datos = localStorage.getItem(_this.usuario_id);
-				if(datos){
-					estado = 'OK';
-				}
+			if(_this.objetoGuardado){
+				estado = 'OK';
 			}
 
 			var obj = {
@@ -67,9 +52,8 @@ var PersistidorLocalStorage = function(opt){
 				para: _this.contacto_id,
 				descripcion: 'LocalStorage',
 				estado: estado,
-				datoSeguro: datos														
+				datoSeguro: _this.objetoGuardado														
 			};
-			vx.enviarMensaje(obj);
-		}
-	});	
+			vx.send(obj);
+		});	
 };

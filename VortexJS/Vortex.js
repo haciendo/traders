@@ -102,28 +102,29 @@ var Vortex = Vx = vX = vx = {
 				var su_clave_publica = _this.clavePublicaComun;
 				
 				if(mensaje.para) mi_clave_privada = claveRSA;
-				if(mensaje.de) su_clave_publica = mensaje.de;
+				if(mensaje.de) su_clave_publica = mensaje.de;				
 				
-				
-				if(mensaje.datoSeguro){
-					
-					var desencriptado = cryptico.decrypt(mensaje.datoSeguro, mi_clave_privada);
-					
-					if(desencriptado.status == "success"){
-						mensaje.datoSeguro = JSON.parse(desencriptado.plaintext);
-						
-						if(desencriptado.signature == "verified"){
-							if(su_clave_publica == desencriptado.publicKeyString){
-								p.callback(mensaje);
-							}
-						}
-					}
+				if(mensaje.datoSeguro){					
+					mensaje.datoSeguro = _this.desencriptarYValidar(mensaje.datoSeguro, mi_clave_privada, su_clave_publica);
+					if(mensaje.datoSeguro == "ERROR") return;
+					p.callback(mensaje);					
 				} else {
 					p.callback(mensaje);
 				}
             }
         });
     },
+	desencriptarYValidar: function(texto_encriptado, mi_clave_privada, su_clave_publica){
+		var desencriptado = cryptico.decrypt(texto_encriptado, mi_clave_privada);
+		if(desencriptado.status == "success"){
+			if(desencriptado.signature == "verified"){
+				if(su_clave_publica == desencriptado.publicKeyString){
+					return JSON.parse(desencriptado.plaintext);
+				}
+			}
+		}
+		return "ERROR";
+	},
     enviarMensaje:function(mensaje){
         this.router.recibirMensaje(mensaje);
     },
@@ -236,6 +237,48 @@ var Vortex = Vx = vX = vx = {
 		});
 		
 		
+	},
+	
+	save: function(de, clave, valor){
+		var claveRSA = this.keys[de];
+		vx.send({
+			tipoDeMensaje:"vortex.persistencia.guardarDatos",
+			de: de,
+			para: de,
+			datoSeguro: {
+				clave: this.encriptarClave(clave, claveRSA, de),
+				valor: cryptico.encrypt(JSON.stringify(valor), de, claveRSA).cipher
+			}
+		});
+	},
+	
+	get: function(de, clave, onSuccess){
+		var _this = this;		
+		var claveRSA = this.keys[de];
+		
+		vx.send({
+			tipoDeMensaje:"vortex.persistencia.obtenerDatos",
+			de: de,
+			para: de,
+			datoSeguro:{
+				clave: this.encriptarClave(clave, claveRSA, de)
+			}
+		}, function(mensaje){		
+			if(mensaje.estado != 'OK') return;
+			var valor_desencriptado = _this.desencriptarYValidar(mensaje.datoSeguro, claveRSA, de);
+			if(valor_desencriptado=="ERROR") return;
+			onSuccess(valor_desencriptado);
+		});
+	},	
+	
+	encriptarClave: function(clave, clave_privada, clave_publica){
+		var clave_encriptada = "";
+		_.each(clave.split('.'), function(clavecita){
+			clave_encriptada += cryptico.encrypt(clavecita, clave_publica, clave_privada).cipher;
+			clave_encriptada += ".";
+		});		
+		if(clave_encriptada.length>0) clave_encriptada = clave_encriptada.slice(0, - 1);
+		return clave_encriptada;
 	}
 };
 

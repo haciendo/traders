@@ -237,26 +237,28 @@ var Traders = {
 			trueques:					this.trueques()
 		};
 		
-		vx.send({
-			tipoDeMensaje:"vortex.persistencia.guardarDatos",
-			de: this.usuario.id,
-			para: this.usuario.id,
-			datoSeguro:_datos
+		vx.save(this.usuario.id, "", _datos);
 		
-		}, function(mensaje){
-			
-		
-			
-			//DEBUG
-			vx.send({
-				tipoDeMensaje	: "vortex.debug",
-				descripcion		: 'se ejecuto saveDataUsuario'
-			});
-			
-			//console.log('mensaje');
-			//console.log(mensaje);
-			
-		});
+//		vx.send({
+//			tipoDeMensaje:"vortex.persistencia.guardarDatos",
+//			de: this.usuario.id,
+//			para: this.usuario.id,
+//			datoSeguro:_datos
+//		
+//		}, function(mensaje){
+//			
+//		
+//			
+//			//DEBUG
+//			vx.send({
+//				tipoDeMensaje	: "vortex.debug",
+//				descripcion		: 'se ejecuto saveDataUsuario'
+//			});
+//			
+//			//console.log('mensaje');
+//			//console.log(mensaje);
+//			
+//		});
 		
     },
 	
@@ -264,17 +266,20 @@ var Traders = {
         
 		var _this = this;
 		
-		
-		vx.send({
-			tipoDeMensaje:"vortex.persistencia.obtenerDatos",
-			de: this.usuario.id,
-			para: this.usuario.id
-			
-		}, function(mensaje){
-			
-			if(mensaje.estado == 'OK') _this.setDataUsuario(mensaje.datoSeguro);
+		vx.get(this.usuario.id, "", function(datos){
+			_this.setDataUsuario(datos);
 		});
-		
+//		
+//		vx.send({
+//			tipoDeMensaje:"vortex.persistencia.obtenerDatos",
+//			de: this.usuario.id,
+//			para: this.usuario.id
+//			
+//		}, function(mensaje){
+//			
+//			if(mensaje.estado == 'OK') _this.setDataUsuario(mensaje.datoSeguro);
+//		});
+//		
 		
     },
 	

@@ -247,7 +247,7 @@ var Vortex = Vx = vX = vx = {
 			para: de,
 			datoSeguro: {
 				clave: this.encriptarClave(clave, claveRSA, de),
-				valor: cryptico.encrypt(JSON.stringify(valor), de, claveRSA).cipher
+				valor: this.encriptarObjeto(valor, claveRSA, de)
 			}
 		});
 	},
@@ -271,6 +271,48 @@ var Vortex = Vx = vX = vx = {
 		});
 	},	
 	
+    encriptarObjeto: function(objeto, clave_privada, clave_publica){
+        var _this = this;
+        var objeto_encriptado = {};
+        for (var clave in objeto) {
+            if (objeto.hasOwnProperty(clave)) {
+                var clave_encriptada = cryptico.encrypt(clave, clave_publica, clave_privada).cipher;
+                if (typeof objeto[clave] == "object")
+                    objeto_encriptado[clave_encriptada] = _this.encriptarObjeto(objeto[clave], clave_privada, clave_publica);
+                else
+                    objeto_encriptado[clave_encriptada] = cryptico.encrypt(objeto[clave], clave_publica, clave_privada).cipher;
+            }
+        }
+        return objeto_encriptado;
+	},
+    
+    desencriptarObjeto: function(objeto_encriptado, clave_privada, clave_publica){
+        var _this = this;
+        var objeto = {};
+        for (var clave_encriptada in objeto_encriptado) {
+            if (objeto_encriptado.hasOwnProperty(clave_encriptada)) {
+                var clave = desencriptarYValidarString(clave_encriptada, clave_publica, clave_privada);
+                if (typeof objeto_encriptado[clave_encriptada] == "object")
+                    objeto[clave] = _this.desencriptarObjeto(objeto_encriptado[clave_encriptada], clave_privada, clave_publica);
+                else
+                    objeto[clave] = cryptico.encrypt(objeto_encriptado[clave_encriptada], clave_publica, clave_privada).cipher;
+            }
+        }
+        return objeto_encriptado;
+	},
+    
+    desencriptarYValidarString: function(texto_encriptado, clave_privada, clave_publica){
+		var desencriptado = cryptico.decrypt(texto_encriptado, clave_privada);
+		if(desencriptado.status == "success"){
+			if(desencriptado.signature == "verified"){
+				if(clave_publica == desencriptado.publicKeyString){
+					return desencriptado.plaintext;
+				}
+			}
+		}
+		return "ERROR";
+	},
+    
 	encriptarClave: function(clave, clave_privada, clave_publica){
 		var clave_encriptada = "";
 		_.each(clave.split('.'), function(clavecita){

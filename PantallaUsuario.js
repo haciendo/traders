@@ -114,66 +114,11 @@ var PantallaUsuario = {
     },
     render: function(){
         this.lbl_nombre_usuario.text(Traders.usuario.nombre);
+		
 		if(Traders.usuario.avatar!="") this.img_avatar_usuario.attr("src", Traders.usuario.avatar);
-
-/*
-        this.panel_inventario.empty();
-        this.panel_me_deben.empty();
-        this.panel_debo.empty();
-        var _this = this;
-		
-		///// panel_inventario
-		_.each(Traders.usuario.inventario, function(producto){
-			var vista = new VistaDeUnProductoEnInventario({
-				producto: producto, 
-				alEliminar: function(){
-					Traders.quitarProducto(producto);
-				},
-				alClickear: function(){
-					PantallaEdicionProducto.mostrar(producto);
-				}
-			});
-			vista.dibujarEn(_this.panel_inventario);
-		});
-		
-		///// panel_me_deben
-		if(Traders.usuario.me_deben.length > 0){
-			_this.panel_me_deben.closest('.seccion_container').closest('li').show();
-			
-			_.each(Traders.usuario.me_deben, function(producto){
-				var vista = new VistaDeUnProductoEnInventario({
-					producto: producto
-				});
-				vista.dibujarEn(_this.panel_me_deben);
-			});
-		}else{
-			_this.panel_me_deben.closest('.seccion_container').closest('li').hide();
-		}
-			
-		///// panel_debo
-		if(Traders.usuario.debo.length > 0){
-			_this.panel_debo.closest('.seccion_container').closest('li').show();
-			_.each(Traders.usuario.debo, function(producto){
-				var vista = new VistaDeUnProductoEnInventario({
-					producto: producto,
-					alEliminar: function(){
-						Traders.quitarProducto(producto);
-					}
-				});
-				vista.dibujarEn(_this.panel_debo);
-			});
-		}else{
-			_this.panel_debo.closest('.seccion_container').closest('li').hide();
-		}
-		
-*/
 		else this.img_avatar_usuario.attr("src", "avatar_default.png");
-
 		
-        var _this = this;
-		
-        this.inventario_usuario.render();
-       
+        this.inventario_usuario.render();       
         this.ui.show();      
     }
 };

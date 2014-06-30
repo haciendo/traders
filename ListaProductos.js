@@ -62,7 +62,7 @@ ListaProductos.prototype.renderSelector = function(){
 	var _this = this;	
 	
     if(!this.selector.propietario){
-        _.each(Traders.usuario.inventario, function(producto){
+        _.each(_.values(Traders.usuario.inventario), function(producto){
 			if(_this.selector.idNotIn){
 				if(_this.selector.idNotIn.indexOf(producto.id)>=0) return;
 			}
@@ -84,7 +84,7 @@ ListaProductos.prototype.renderSelector = function(){
         });
     } else {
         if(this.selector.propietario.id == Traders.usuario.id){
-            _.each(Traders.usuario.inventario, function(producto){
+            _.each(_.values(Traders.usuario.inventario), function(producto){
 				if(_this.selector.idNotIn){
 					if(_this.selector.idNotIn.indexOf(producto.id)>=0) return;
 				}

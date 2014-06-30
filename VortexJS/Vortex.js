@@ -105,8 +105,9 @@ var Vortex = Vx = vX = vx = {
 				if(mensaje.de) su_clave_publica = mensaje.de;				
 				
 				if(mensaje.datoSeguro){					
-					mensaje.datoSeguro = _this.desencriptarYValidar(mensaje.datoSeguro, mi_clave_privada, su_clave_publica);
-					if(mensaje.datoSeguro == "ERROR") return;
+					var dato_desencriptado = Encriptador.desEncriptarString(mensaje.datoSeguro, su_clave_publica, mi_clave_privada);
+					if(dato_desencriptado === undefined) return;
+					mensaje.datoSeguro = JSON.parse(dato_desencriptado);
 					p.callback(mensaje);					
 				} else {
 					p.callback(mensaje);
@@ -114,17 +115,6 @@ var Vortex = Vx = vX = vx = {
             }
         });
     },
-	desencriptarYValidar: function(texto_encriptado, mi_clave_privada, su_clave_publica){
-		var desencriptado = cryptico.decrypt(texto_encriptado, mi_clave_privada);
-		if(desencriptado.status == "success"){
-			if(desencriptado.signature == "verified"){
-				if(su_clave_publica == desencriptado.publicKeyString){
-					return JSON.parse(desencriptado.plaintext);
-				}
-			}
-		}
-		return "ERROR";
-	},
     enviarMensaje:function(mensaje){
         this.router.recibirMensaje(mensaje);
     },
@@ -136,7 +126,7 @@ var Vortex = Vx = vX = vx = {
         if(mensaje.para) su_clave_publica = mensaje.para;
 		
 		if(mensaje.datoSeguro){
-			mensaje.datoSeguro = cryptico.encrypt(JSON.stringify(mensaje.datoSeguro), su_clave_publica, mi_clave_privada).cipher;
+			mensaje.datoSeguro = Encriptador.encriptarString(JSON.stringify(mensaje.datoSeguro), su_clave_publica, mi_clave_privada);
 		}
         
         this.router.recibirMensaje(mensaje);
@@ -239,20 +229,20 @@ var Vortex = Vx = vX = vx = {
 		
 	},
 	
-	save: function(de, clave, valor){
+	set: function(de, ruta, valor){
 		var claveRSA = this.keys[de];
 		vx.send({
 			tipoDeMensaje:"vortex.persistencia.guardarDatos",
 			de: de,
 			para: de,
 			datoSeguro: {
-				clave: this.encriptarClave(clave, claveRSA, de),
-				valor: this.encriptarObjeto(valor, claveRSA, de)
+				ruta: ruta,
+				valor: Encriptador.encriptarObjeto(valor, de, claveRSA)
 			}
 		});
 	},
 	
-	get: function(de, clave, onSuccess){
+	get: function(de, ruta, onSuccess){
 		var _this = this;		
 		var claveRSA = this.keys[de];
 		
@@ -261,66 +251,27 @@ var Vortex = Vx = vX = vx = {
 			de: de,
 			para: de,
 			datoSeguro:{
-				clave: this.encriptarClave(clave, claveRSA, de)
+				ruta: ruta
 			}
 		}, function(mensaje){		
 			if(mensaje.estado != 'OK') return;
-			var valor_desencriptado = _this.desencriptarYValidar(mensaje.datoSeguro, claveRSA, de);
-			if(valor_desencriptado=="ERROR") return;
+			var valor_desencriptado = Encriptador.desencriptarObjeto(mensaje.datoSeguro, de, claveRSA);
 			onSuccess(valor_desencriptado);
 		});
-	},	
+	},
 	
-    encriptarObjeto: function(objeto, clave_privada, clave_publica){
-        var _this = this;
-        var objeto_encriptado = {};
-        for (var clave in objeto) {
-            if (objeto.hasOwnProperty(clave)) {
-                var clave_encriptada = cryptico.encrypt(clave, clave_publica, clave_privada).cipher;
-                if (typeof objeto[clave] == "object")
-                    objeto_encriptado[clave_encriptada] = _this.encriptarObjeto(objeto[clave], clave_privada, clave_publica);
-                else
-                    objeto_encriptado[clave_encriptada] = cryptico.encrypt(objeto[clave], clave_publica, clave_privada).cipher;
-            }
-        }
-        return objeto_encriptado;
-	},
-    
-    desencriptarObjeto: function(objeto_encriptado, clave_privada, clave_publica){
-        var _this = this;
-        var objeto = {};
-        for (var clave_encriptada in objeto_encriptado) {
-            if (objeto_encriptado.hasOwnProperty(clave_encriptada)) {
-                var clave = desencriptarYValidarString(clave_encriptada, clave_publica, clave_privada);
-                if (typeof objeto_encriptado[clave_encriptada] == "object")
-                    objeto[clave] = _this.desencriptarObjeto(objeto_encriptado[clave_encriptada], clave_privada, clave_publica);
-                else
-                    objeto[clave] = cryptico.encrypt(objeto_encriptado[clave_encriptada], clave_publica, clave_privada).cipher;
-            }
-        }
-        return objeto_encriptado;
-	},
-    
-    desencriptarYValidarString: function(texto_encriptado, clave_privada, clave_publica){
-		var desencriptado = cryptico.decrypt(texto_encriptado, clave_privada);
-		if(desencriptado.status == "success"){
-			if(desencriptado.signature == "verified"){
-				if(clave_publica == desencriptado.publicKeyString){
-					return desencriptado.plaintext;
-				}
+	delete: function(de, ruta){
+		var _this = this;		
+		var claveRSA = this.keys[de];
+		
+		vx.send({
+			tipoDeMensaje:"vortex.persistencia.eliminarDatos",
+			de: de,
+			para: de,
+			datoSeguro:{
+				ruta: ruta
 			}
-		}
-		return "ERROR";
-	},
-    
-	encriptarClave: function(clave, clave_privada, clave_publica){
-		var clave_encriptada = "";
-		_.each(clave.split('.'), function(clavecita){
-			clave_encriptada += cryptico.encrypt(clavecita, clave_publica, clave_privada).cipher;
-			clave_encriptada += ".";
-		});		
-		if(clave_encriptada.length>0) clave_encriptada = clave_encriptada.slice(0, - 1);
-		return clave_encriptada;
+		});
 	}
 };
 

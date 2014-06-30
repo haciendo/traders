@@ -1,18 +1,15 @@
 var Traders = {
-	nextProductoId: function(){
-		
+	nextId: function(coleccion){		
 		var maxValue = -1;
 		
-		_.each(this.usuario.inventario, function(producto){
-			if(producto.id > maxValue){
-				maxValue = producto.id;
+		for(var id in coleccion){
+			if(parseInt(id)> maxValue){
+				maxValue = parseInt(id);
 			}
-		});
+		}
 		
-		maxValue++;
-		
-		return maxValue;
-		
+		maxValue++;		
+		return maxValue.toString();		
 	},
 	
     usuario: {},
@@ -28,7 +25,7 @@ var Traders = {
 			this._onNovedades.push(arguments[0]);
 			
 		}else{
-			this.saveDataUsuario();
+			//this.saveDataUsuario();
 			
 			_.each(this._onNovedades, function(evento){
 				evento();
@@ -40,51 +37,31 @@ var Traders = {
     onUsuarioLogueado:function(callback){
         this._onUsuarioLogueado = callback;
     },
-	
-	
-	nextTruequeId: function(){
-		
-		var maxValue = -1;
-		
-		_.each(this.trueques(), function(_trueque){
-			if(_trueque.id > maxValue){
-				maxValue = _trueque.id;
-			}
-		});
-		
-		maxValue++;
-		
-		return maxValue;
-		
-	},
-	
-	
-	_contactos:[],
+
+	_contactos:{},
     contactos:function(p){
         if(!p) return this._contactos;
-        if(p.id) return _.findWhere(this._contactos, {id:p.id});
+        if(p.id) return this._contactos[p.id];
         if(p.query){
             if(p.query == "") 
                 return this._contactos;
             else 
-                return _.filter(this._contactos, function(contacto){
+                return _.filter(_.values(this._contactos), function(contacto){
                     return contacto.nombre.indexOf(p.query)>=0 || contacto.id == p.query;
                 });  
         }
     },
 	
 	reset: function(){
-		this._contactos = [];
-		this._trueques = [];
-		this.usuario.inventario = [];
+		this._contactos = {};
+		this._trueques = {};
+		this.usuario.inventario = {};
 		
 		this.saveDataUsuario();
 	},
 	
 	login: function(_nombre, password){
         var _this = this;
-		
-		
 		var _id = vx.addKey(_nombre + password);
 		
 		this.claveRSA = vx.keys[_id];
@@ -93,13 +70,10 @@ var Traders = {
         this.usuario = {
             id: _id,
             nombre: _nombre,
-            inventario: [],
-			me_deben: [], 
-			debo: [],
+            inventario: {},
             avatar:""
         };
-		
-		
+
 		RepositorioDeConexiones.start(this.usuario.id);
 		
 		////parche para atajar las respuestas
@@ -150,10 +124,11 @@ var Traders = {
     agregarProducto: function(p){
 		var producto = _.clone(p);
         
-		producto.id = this.nextProductoId();
+		producto.id = this.nextId(this.usuario.inventario);
 		
-		this.usuario.inventario.push(producto);
+		this.usuario.inventario[producto.id] = producto;
 		
+		vx.set(this.usuario.id, "usuario.inventario." + producto.id, producto);
 		
         vx.send({
             tipoDeMensaje:"traders.avisoDeNuevoProducto",
@@ -166,10 +141,12 @@ var Traders = {
         this.onNovedades();
     },
 	modificarProducto: function(p){		
-		var producto = _.findWhere(this.usuario.inventario, {id: p.id});
+		var producto = this.usuario.inventario[p.id];
 		producto = ClonadorDeObjetos.extend(producto, p);
 		
-        vx.send({
+        vx.set(this.usuario.id, "usuario.inventario." + producto.id, producto);
+		
+		vx.send({
             tipoDeMensaje:"traders.avisoDeProductoModificado",
             de: this.usuario.id,
             datoSeguro: {
@@ -180,12 +157,8 @@ var Traders = {
         this.onNovedades();
     },
     quitarProducto: function(producto){
-        
-		this.usuario.inventario = $.grep(this.usuario.inventario, function(prod){
-            return prod.id != producto.id;
-        });
-		
-		
+        delete this.usuario.inventario[producto.id];
+		vx.delete(this.usuario.id, "usuario.inventario." + producto.id);	
 		vx.send({
             tipoDeMensaje:"traders.avisoDeBajaDeProducto",
             de: this.usuario.id,
@@ -203,14 +176,13 @@ var Traders = {
 			this.usuario = ClonadorDeObjetos.extend(this.usuario, datos.usuario);
 		
 			this._trueques = datos.trueques;
-		
-			$.each(datos.contactos, function(index, item){
-				_this.agregarContacto(item);
+			
+			_.each(_.values(datos.contactos), function(contacto){
+				_this.agregarContacto(contacto);
 			});
 		}
 		else{
-			this._trueques = [];
-			
+			this._trueques = {};
 		}
 
 		vx.send({
@@ -221,75 +193,34 @@ var Traders = {
 			}
 		});
 		
-		/*
-		setTimeout(function(){
-		}, 200);
-		*/
 		this.onNovedades();
 	},
 	
 	
-    saveDataUsuario: function(){
-		
+    saveDataUsuario: function(){		
 		var _datos = {
 			usuario: 					this.usuario,
 			contactos:					this.contactos(),
 			trueques:					this.trueques()
 		};
 		
-		vx.save(this.usuario.id, "", _datos);
-		
-//		vx.send({
-//			tipoDeMensaje:"vortex.persistencia.guardarDatos",
-//			de: this.usuario.id,
-//			para: this.usuario.id,
-//			datoSeguro:_datos
-//		
-//		}, function(mensaje){
-//			
-//		
-//			
-//			//DEBUG
-//			vx.send({
-//				tipoDeMensaje	: "vortex.debug",
-//				descripcion		: 'se ejecuto saveDataUsuario'
-//			});
-//			
-//			//console.log('mensaje');
-//			//console.log(mensaje);
-//			
-//		});
-		
+		vx.set(this.usuario.id, "", _datos);		
     },
 	
-    loadDataUsuario: function(){
-        
+    loadDataUsuario: function(){        
 		var _this = this;
 		
 		vx.get(this.usuario.id, "", function(datos){
 			_this.setDataUsuario(datos);
-		});
-//		
-//		vx.send({
-//			tipoDeMensaje:"vortex.persistencia.obtenerDatos",
-//			de: this.usuario.id,
-//			para: this.usuario.id
-//			
-//		}, function(mensaje){
-//			
-//			if(mensaje.estado == 'OK') _this.setDataUsuario(mensaje.datoSeguro);
-//		});
-//		
-		
+		});	
     },
 	
-	_trueques:[],
-    trueques:function(p){
-        
+	_trueques:{},
+    trueques:function(p){        
 		if(!p){
 			return this._trueques;
 		} else {
-			return _.where(this._trueques, p);
+			return _.where(_.values(this._trueques), p);
 		}
     },
 	
@@ -298,7 +229,7 @@ var Traders = {
 		
 		
 		if(!opt.id){
-			opt.id = this.nextTruequeId()
+			opt.id = this.nextId(this._trueques);
 		}
 		
 		
@@ -311,35 +242,23 @@ var Traders = {
 				{
 					ofertante: 'USUARIO',
 					estado: 'SIN_ENVIAR',
-					doy: [],
-					recibo: []
+					doy: {},
+					recibo: {}
 				}
 			]
 		};
 		
-		this._trueques.push(trueque);
-		
-		
-		
-		
-		this.onNovedades();
-		
-		
-		return trueque;
-		
+		this._trueques[trueque.id] = trueque;	
+		this.onNovedades();		
+		return trueque;		
 	},
 	
 	agregarProductoTrueque: function(trueque, producto, recibo_doy){
 		var _this = this;
-		
-		
-		
-		
-		var oferta = trueque.ofertas[trueque.ofertas.length - 1];
-		
-		
+		var oferta = _.last(_.values(trueque.ofertas));
+
 		if(oferta.ofertante == 'USUARIO'){
-			oferta[recibo_doy].push(producto.id);
+			oferta[recibo_doy][_this.nextId(oferta[recibo_doy])]=producto.id;
 		}else{
 			
 			var nuevaOferta = $.extend(true, {}, oferta);
@@ -347,11 +266,10 @@ var Traders = {
 			nuevaOferta.ofertante = 'USUARIO';
 			nuevaOferta.estado = 'SIN_ENVIAR';
 			
-			nuevaOferta[recibo_doy].push(producto.id);
-			trueque.ofertas.push(nuevaOferta);
+			nuevaOferta[recibo_doy][_this.nextId(oferta[recibo_doy])]=producto.id;
+			trueque.ofertas[_this.nextId(trueque.ofertas)]=nuevaOferta;
 		}
-		
-		
+
 		this.onNovedades();
     },
 	
@@ -436,11 +354,11 @@ var Traders = {
 		
 		
 		_.each(trueque.ofertaDetallada.doy, function(id_producto, index){
-			trueque.ofertaDetallada.doy[index] = _.findWhere(Traders.usuario.inventario, {id: id_producto});
+			trueque.ofertaDetallada.doy[index] = Traders.usuario.inventario[id_producto];
 		});
 		
 		_.each(trueque.ofertaDetallada.recibo, function(id_producto, index){
-			trueque.ofertaDetallada.recibo[index] = _.findWhere(trueque.contacto.inventario, {id: id_producto});
+			trueque.ofertaDetallada.recibo[index] = trueque.contacto.inventario[id_producto];
 		});
        
 		
@@ -515,7 +433,7 @@ var Traders = {
 					id: arguments[0],
 					estado: 'SIN_CONFIRMAR',
 					nombre: null,
-					inventario: [],
+					inventario: {},
 					avatar:""
 				};
 				this._contactos.push(contacto);
@@ -600,7 +518,7 @@ var Traders = {
 			tipoDeMensaje:"traders.avisoDeProductoModificado",
 			de: contacto.id
 		}, function(mensaje){
-			var producto = _.findWhere(contacto.inventario, {id: mensaje.datoSeguro.producto.id});
+			var producto = contacto.inventario[mensaje.datoSeguro.producto.id];
 			if(producto === undefined) return;			
 			producto = ClonadorDeObjetos.extend(producto, mensaje.datoSeguro.producto);
 				
@@ -611,14 +529,7 @@ var Traders = {
 			tipoDeMensaje:"traders.avisoDeNuevoProducto",
 			de: contacto.id
 		}, function(mensaje){
-			
-			//_this._agregarProductoAlInventarioDe(mensaje.datoSeguro.producto, contacto);
-			
-			
-			if(_.findWhere(contacto.inventario, {id: mensaje.datoSeguro.producto.id})!== undefined) return;
-			
-			
-			contacto.inventario.push(mensaje.datoSeguro.producto);
+			contacto.inventario[mensaje.datoSeguro.producto.id] = mensaje.datoSeguro.producto;
 			
 			_this.onNovedades();
 		});
@@ -626,12 +537,8 @@ var Traders = {
         vx.when({
             tipoDeMensaje:"traders.avisoDeBajaDeProducto",
 			de: contacto.id
-		}, function(mensaje){
-			
-			contacto.inventario = $.grep(contacto.inventario, function(prod){
-				return prod.id != mensaje.datoSeguro.id_producto;
-			});
-			
+		}, function(mensaje){			
+			delete contacto.inventario[mensaje.datoSeguro.id_producto];			
 			_this.onNovedades();
 		});
 		
@@ -739,22 +646,8 @@ var Traders = {
 			_this.onNovedades();
 		});
 		
-		
-		
-		
-		
-
-		
-		
-		
-		
-		
-		
 		_this.onNovedades();
-		
-		
 		return contacto;
-		
     },
 	quitarTrueque: function(id){
 		this._trueques = $.grep(this._trueques, function(item){

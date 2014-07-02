@@ -30,7 +30,19 @@ NodoPortalBidi.prototype.enviarMensaje = function(un_mensaje){
     this._pata.recibirMensaje(un_mensaje);
 };
 
-NodoPortalBidi.prototype.pedirMensajes = function( filtro, callback){
+NodoPortalBidi.prototype.pedirMensajes = function(){
+	var filtro;
+	var callback; 
+	if(arguments.length == 2){
+		filtro = arguments[0];
+		callback = arguments[1];
+	}
+	if(arguments.length == 1){
+		filtro = arguments[0].filtro;
+		callback = arguments[1].callback;
+	}	
+	if(filtro.evaluarMensaje === undefined) filtro = new FiltroXEjemplo(filtro);    //si no tiene el método evaluarMensaje, no es un filtro. creo uno usando ese objeto como ejemplo
+     
     this._listaPedidos.push({ "filtro": filtro, "callback": callback});
     this.publicarFiltros();
 };

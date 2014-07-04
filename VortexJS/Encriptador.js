@@ -1,4 +1,21 @@
 var Encriptador = {
+	start:function(){
+		this.keys = [];
+		this.claveAnonima = this.addKey("_CLAVE_USUARIOS_ANONIMOS_");		
+	},
+	addKey: function(clave){		
+		var claveRSA = null;
+		if(typeof(clave) == 'object'){
+			claveRSA = clave;
+		}else if(typeof(clave) == 'string'){
+			claveRSA = cryptico.generateRSAKey(clave, 1024);
+		}		
+		
+		var clavePublica = cryptico.publicKeyString(claveRSA);
+		this.keys[clavePublica] = claveRSA;
+		
+		return clavePublica;
+	},
 	encriptarString: function(texto, rsa_publica, rsa_privada){
 		return cryptico.encrypt(texto, rsa_publica, rsa_privada).cipher;
 	},

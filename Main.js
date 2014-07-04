@@ -24,8 +24,7 @@ var onDeviceReady = function() {
     BarraSuperior.start();
     
     Traders.onUsuarioLogueado(function(){
-		
-		
+		Encriptador.start();
 		PantallaUsuario.start();		
 		PantallaContactos.start();		
 		PantallaTrueques.start();		

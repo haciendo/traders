@@ -32,6 +32,7 @@ var Vortex = Vx = vX = vx = {
     start:function(opt){
         this.verbose = opt.verbose;
         this.router = new NodoRouter();
+        Encriptador.start();
         this.claveRSAComun = cryptico.generateRSAKey("VORTEXCAPO", 1024);                               //ATA
 		
         this.clavePublicaComun = cryptico.publicKeyString(this.claveRSAComun);                          //PINGO

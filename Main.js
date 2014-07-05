@@ -21,10 +21,10 @@ var onDeviceReady = function() {
 	// url:'http://localhost:3000',
 	
     PantallaInicio.start();
-    BarraSuperior.start();
+    BarraSuperior.start();    
     
     Traders.onUsuarioLogueado(function(){
-		Encriptador.start();
+		
 		PantallaUsuario.start();		
 		PantallaContactos.start();		
 		PantallaTrueques.start();		

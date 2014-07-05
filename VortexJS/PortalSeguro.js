@@ -1,12 +1,28 @@
+/*
+Vortex by Vortex Group is licensed under a Creative Commons Reconocimiento 3.0 Unported License.
+To view a copy of this licence, visit: http://creativecommons.org/licenses/by/3.0/
+Project URL: https://sourceforge.net/p/vortexnet
+*/
+
+
 var PortalSeguro = function(opt){
-	this.id = opt.id;
-	this.claveLocal = opt.claveLocal;
-	this.claveForanea = opt.claveForanea;
+	this.id = this._lastIdPortal;
+    PortalSeguro.prototype._lastIdPortal+=1;
+    
+    if(opt){
+	   this.claveLocal = opt.claveLocal;
+	   this.claveForanea = opt.claveForanea;
+    }
 	this.lastRequest = 0;
 	
-	this.portal = new NodoPortalBidi();
-	vx.router.conectarBidireccionalmenteCon(this.portal);
+    NodoPortalBidi.apply(this, [this.id.toString()]);
+    
+	vx.router.conectarBidireccionalmenteCon(this);
 };
+
+PortalSeguro.prototype = new NodoPortalBidi();
+
+PortalSeguro.prototype._lastIdPortal = 0;
 
 PortalSeguro.prototype.send = function(mensaje, callback){
 	var _this = this; 
@@ -21,7 +37,7 @@ PortalSeguro.prototype.send = function(mensaje, callback){
 		mensaje.datoSeguro = Encriptador.encriptarString(JSON.stringify(mensaje.datoSeguro), clave_encriptacion, clave_firma);
 	}
 	
-	this.portal.enviarMensaje(mensaje);
+	this.enviarMensaje(mensaje);
 	
 	if(callback){
 		mensaje.idRequest = this.id.toString() + "_" +(++this.lastRequest).toString();
@@ -30,17 +46,28 @@ PortalSeguro.prototype.send = function(mensaje, callback){
 			para: mensaje.de
 		},function(objRespuesta){
 			callback(objRespuesta);
-			_this.portal.quitarPedido(id_pedido);
+			_this.quitarPedido(id_pedido);
 		});
 	}		
 };
 
-PortalSeguro.prototype.when = function(p){	
-	if(this.claveLocal) p.filtro.para = p.filtro.para || this.claveLocal;
-	if(this.claveForanea) p.filtro.de = p.filtro.de || this.claveForanea;
+PortalSeguro.prototype.when = function(){	
+    var filtro;
+	var callback; 
+	if(arguments.length == 2){
+		filtro = arguments[0];
+		callback = arguments[1];
+	}
+	if(arguments.length == 1){
+		filtro = arguments[0].filtro;
+		callback = arguments[0].callback;
+	}	
+    
+	if(this.claveLocal) filtro.para = filtro.para || this.claveLocal;
+	if(this.claveForanea) filtro.de = filtro.de || this.claveForanea;
 	
-	this.portal.pedirMensajes({
-		filtro: p.filtro,
+	this.pedirMensajes({
+		filtro: filtro,
 		callback: function(mensaje){			
 			if(mensaje.datoSeguro){	
 				var clave_desencriptado = Encriptador.keys[mensaje.para];
@@ -49,9 +76,9 @@ PortalSeguro.prototype.when = function(p){
 				var dato_desencriptado = Encriptador.desEncriptarString(mensaje.datoSeguro, clave_validacion_firma, clave_desencriptado);
 				if(dato_desencriptado === undefined) return;
 				mensaje.datoSeguro = JSON.parse(dato_desencriptado);
-				p.callback(mensaje);					
+				callback(mensaje);					
 			} else {
-				p.callback(mensaje);
+				callback(mensaje);
 			}
 		}
 	}); 

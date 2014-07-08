@@ -32,7 +32,7 @@ var Vortex = Vx = vX = vx = {
         this.verbose = opt.verbose;
         this.router = new NodoRouter();
 		Encriptador.start();
-        this.portales = [];
+        this.portalesEntrada = [];
 
 		this.portalSalida = new PortalSeguro();
 		this.lastRequest = 0;
@@ -80,11 +80,11 @@ var Vortex = Vx = vX = vx = {
     pedirMensajes: function(p){
         var filtro = p.filtro;
         if(p.filtro.evaluarMensaje === undefined) filtro = new FiltroXEjemplo(p.filtro);    //si no tiene el método evaluarMensaje, no es un filtro. creo uno usando ese objeto como ejemplo
-        var portal = new NodoPortalBidi("portal" + this.portales.length);
+        var portal = new NodoPortalBidi("portal" + this.portalesEntrada.length);
         portal.conectarBidireccionalmenteCon(this.router);        
         portal.pedirMensajes(filtro, p.callback); 
-        this.portales.push(portal);
-        return this.portales.length - 1; //devuelvo id del portal/pedido para que el cliente pueda darlos de baja
+        this.portalesEntrada.push(portal);
+        return this.portalesEntrada.length - 1; //devuelvo id del portal/pedido para que el cliente pueda darlos de baja
     },
     pedirMensajesSeguros: function(p, desencriptarCon){
         var _this = this;
@@ -130,25 +130,17 @@ var Vortex = Vx = vX = vx = {
 //	send: function(){
 //		this.portalSalida.send(arguments);
 //	},
-	send: function(){
-		
+	send: function(){		
 		var _this = this;
-		
-		
-		
-		var obj = null;
-		
+		var obj = null;	
 		
 		var callback = null;
-		var claveRSA = null;
-		
+		var claveRSA = null;		
 		obj = arguments[0];
 		
 		if(arguments.length==2){
 			callback = arguments[1];
 		}
-		//////////
-		
 		
 		if(callback && obj.de){
 			
@@ -159,11 +151,9 @@ var Vortex = Vx = vX = vx = {
 				para: obj.de
 			},function(objRespuesta){
 				callback(objRespuesta);
-				_this.portales.splice(idPortal, 1);
+				_this.portalesEntrada.splice(idPortal, 1);
 			});
 		}
-		
-		
 		
 		if(obj.de){
 			this.enviarMensajeSeguro(obj, obj.de);
@@ -175,12 +165,25 @@ var Vortex = Vx = vX = vx = {
 			return;
 		}
 		
-		this.enviarMensaje(obj);
-		
+		this.enviarMensaje(obj);		
 	},
-	
-	when: function(){
-		
+//    when: function(){
+//        var portal = new PortalSeguro();
+//        this.portalesEntrada.push(portal);
+//        
+//        var filtro;
+//        var callback; 
+//        if(arguments.length == 2){
+//            filtro = arguments[0];
+//            callback = arguments[1];
+//        }
+//        if(arguments.length == 1){
+//            filtro = arguments[0].filtro;
+//            callback = arguments[0].callback;
+//        }	
+//        portal.when(filtro, callback);
+//    },
+	when: function(){		
 		var _filtro = arguments[0];
 		var _callback = arguments[1];
 		
@@ -191,16 +194,13 @@ var Vortex = Vx = vX = vx = {
 			}, _filtro.para);
 		}
 		
-		
 		if(_filtro.de && !_filtro.para){
 			return this.pedirMensajesSeguros({
 				filtro: _filtro,
 				callback: _callback
-			});
-			
+			});			
 		}
-		
-		
+
 		return this.pedirMensajes({
 			filtro: _filtro,
 			callback: _callback

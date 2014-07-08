@@ -34,9 +34,19 @@ PortalSeguro.prototype.send = function(mensaje, callback){
 	}		
 };
 
-PortalSeguro.prototype.when = function(p){	
+PortalSeguro.prototype.when = function(){	
+    var filtro;
+	var callback; 
+	if(arguments.length == 2){
+		filtro = arguments[0];
+		callback = arguments[1];
+	}
+	if(arguments.length == 1){
+		filtro = arguments[0].filtro;
+		callback = arguments[0].callback;
+	}	
 	this.portal.pedirMensajes({
-		filtro: p.filtro,
+		filtro: filtro,
 		callback: function(mensaje){			
 			if(mensaje.datoSeguro){	
 				var desencriptarCon = (mensaje.para || this.desencriptarCon) || Encriptador.claveAnonima;
@@ -45,9 +55,9 @@ PortalSeguro.prototype.when = function(p){
 				var dato_desencriptado = Encriptador.desEncriptarString(mensaje.datoSeguro, validarCon, desencriptarCon);
 				if(dato_desencriptado === undefined) return;
 				mensaje.datoSeguro = JSON.parse(dato_desencriptado);
-				p.callback(mensaje);					
+				callback(mensaje);					
 			} else {
-				p.callback(mensaje);
+				callback(mensaje);
 			}
 		}
 	}); 

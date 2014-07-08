@@ -24,7 +24,6 @@ if(typeof(require) != "undefined"){
     exports.NodoConectorSocket = NodoConectorSocket;    
     //exports.NodoClienteHTTP = NodoClienteHTTP;    
     exports.NodoConectorHttpServer = require("./NodoConectorHttpServer").clase;   
-    
 }
 
 
@@ -102,22 +101,13 @@ var Vortex = Vx = vX = vx = {
 				var su_clave_publica = _this.clavePublicaComun;
 				
 				if(mensaje.para) mi_clave_privada = claveRSA;
-				if(mensaje.de) su_clave_publica = mensaje.de;
+				if(mensaje.de) su_clave_publica = mensaje.de;				
 				
-				
-				if(mensaje.datoSeguro){
-					
-					var desencriptado = cryptico.decrypt(mensaje.datoSeguro, mi_clave_privada);
-					
-					if(desencriptado.status == "success"){
-						mensaje.datoSeguro = JSON.parse(desencriptado.plaintext);
-						
-						if(desencriptado.signature == "verified"){
-							if(su_clave_publica == desencriptado.publicKeyString){
-								p.callback(mensaje);
-							}
-						}
-					}
+				if(mensaje.datoSeguro){					
+					var dato_desencriptado = Encriptador.desEncriptarString(mensaje.datoSeguro, su_clave_publica, mi_clave_privada);
+					if(dato_desencriptado === undefined) return;
+					mensaje.datoSeguro = JSON.parse(dato_desencriptado);
+					p.callback(mensaje);					
 				} else {
 					p.callback(mensaje);
 				}
@@ -135,7 +125,7 @@ var Vortex = Vx = vX = vx = {
         if(mensaje.para) su_clave_publica = mensaje.para;
 		
 		if(mensaje.datoSeguro){
-			mensaje.datoSeguro = cryptico.encrypt(JSON.stringify(mensaje.datoSeguro), su_clave_publica, mi_clave_privada).cipher;
+			mensaje.datoSeguro = Encriptador.encriptarString(JSON.stringify(mensaje.datoSeguro), su_clave_publica, mi_clave_privada);
 		}
         
         this.router.recibirMensaje(mensaje);
@@ -234,8 +224,6 @@ var Vortex = Vx = vX = vx = {
 			filtro: _filtro,
 			callback: _callback
 		});
-		
-		
 	}
 };
 

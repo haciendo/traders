@@ -15,6 +15,7 @@ var NodoPortalBidi = function(aliasPortal){
     this._listaPedidos = [];
     this._pata = new PataConectora(0, new GeneradorDeIdMensaje());
     this._alias_portal = "portal " + aliasPortal;
+	this._ultimo_id_pedido = 0;
 };
 
 NodoPortalBidi.prototype.publicarFiltros = function(){
@@ -30,9 +31,33 @@ NodoPortalBidi.prototype.enviarMensaje = function(un_mensaje){
     this._pata.recibirMensaje(un_mensaje);
 };
 
-NodoPortalBidi.prototype.pedirMensajes = function( filtro, callback){
-    this._listaPedidos.push({ "filtro": filtro, "callback": callback});
+NodoPortalBidi.prototype.pedirMensajes = function(){
+	var filtro;
+	var callback; 
+	if(arguments.length == 2){
+		filtro = arguments[0];
+		callback = arguments[1];
+	}
+	if(arguments.length == 1){
+		filtro = arguments[0].filtro;
+		callback = arguments[0].callback;
+	}	
+	if(filtro.evaluarMensaje === undefined) filtro = new FiltroXEjemplo(filtro);    //si no tiene el método evaluarMensaje, no es un filtro. creo uno usando ese objeto como ejemplo
+     
+    this._listaPedidos.push({ 
+		id: ++this._ultimo_id_pedido,
+		filtro: filtro, 
+		callback: callback
+	});
     this.publicarFiltros();
+};
+
+NodoPortalBidi.prototype.quitarPedido = function(id_pedido){
+	var index_pedido;
+	this._listaPedidos.forEach(function(pedido, index){
+        if(pedido.id == id_pedido) index_pedido = index; 
+    });
+	this._listaPedidos(index_pedido, 1);
 };
 
 NodoPortalBidi.prototype.recibirMensaje = function(un_mensaje) {
@@ -45,7 +70,7 @@ NodoPortalBidi.prototype.recibirMensaje = function(un_mensaje) {
 	}
     this._listaPedidos.forEach(function (pedido) {					
         if(pedido.filtro.evaluarMensaje(un_mensaje)){
-            pedido.callback(un_mensaje);
+            pedido.callback(ClonadorDeObjetos.clonarObjeto(un_mensaje));
         }
     });	        
 };

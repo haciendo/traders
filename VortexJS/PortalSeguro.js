@@ -1,9 +1,11 @@
 var PortalSeguro = function(opt){
-	this.id = opt.id;
-	this.claveLocal = opt.claveLocal;
-	this.claveForanea = opt.claveForanea;
+	opt = opt||{};
+	this.id = opt.id||"";
+	this.firmarCon = opt.firmarCon;
+	this.encriptarCon = opt.encriptarCon;
+	this.validarCon = opt.validarCon;
+	this.desencriptarCon = opt.desencriptarCon;
 	this.lastRequest = 0;
-	
 	this.portal = new NodoPortalBidi();
 	vx.router.conectarBidireccionalmenteCon(this.portal);
 };
@@ -11,14 +13,11 @@ var PortalSeguro = function(opt){
 PortalSeguro.prototype.send = function(mensaje, callback){
 	var _this = this; 
 	
-	mensaje.de = (mensaje.de || this.claveLocal) || Encriptador.claveAnonima;
-	mensaje.para = (mensaje.para || this.claveForanea) || Encriptador.claveAnonima;
-	
-	var clave_firma = Encriptador.keys[mensaje.de];// || Encriptador.keys[Encriptador.claveAnonima];
-	var clave_encriptacion = mensaje.para;
+	mensaje.de = (mensaje.de || this.firmarCon) || Encriptador.claveAnonima;
+	mensaje.para = (mensaje.para || this.encriptarCon) || Encriptador.claveAnonima;
 	
 	if(mensaje.datoSeguro){
-		mensaje.datoSeguro = Encriptador.encriptarString(JSON.stringify(mensaje.datoSeguro), clave_encriptacion, clave_firma);
+		mensaje.datoSeguro = Encriptador.encriptarString(JSON.stringify(mensaje.datoSeguro), mensaje.para, mensaje.de);
 	}
 	
 	this.portal.enviarMensaje(mensaje);
@@ -36,17 +35,14 @@ PortalSeguro.prototype.send = function(mensaje, callback){
 };
 
 PortalSeguro.prototype.when = function(p){	
-	if(this.claveLocal) p.filtro.para = p.filtro.para || this.claveLocal;
-	if(this.claveForanea) p.filtro.de = p.filtro.de || this.claveForanea;
-	
 	this.portal.pedirMensajes({
 		filtro: p.filtro,
 		callback: function(mensaje){			
 			if(mensaje.datoSeguro){	
-				var clave_desencriptado = Encriptador.keys[mensaje.para];
-				var clave_validacion_firma = mensaje.de;
+				var desencriptarCon = (mensaje.para || this.desencriptarCon) || Encriptador.claveAnonima;
+				var validarCon = (mensaje.de || this.validarCon) || Encriptador.claveAnonima;
 				
-				var dato_desencriptado = Encriptador.desEncriptarString(mensaje.datoSeguro, clave_validacion_firma, clave_desencriptado);
+				var dato_desencriptado = Encriptador.desEncriptarString(mensaje.datoSeguro, validarCon, desencriptarCon);
 				if(dato_desencriptado === undefined) return;
 				mensaje.datoSeguro = JSON.parse(dato_desencriptado);
 				p.callback(mensaje);					

@@ -31,12 +31,10 @@ var Vortex = Vx = vX = vx = {
     start:function(opt){
         this.verbose = opt.verbose;
         this.router = new NodoRouter();
-        this.claveRSAComun = cryptico.generateRSAKey("VORTEXCAPO", 1024);                               //ATA
-		
-        this.clavePublicaComun = cryptico.publicKeyString(this.claveRSAComun);                          //PINGO
+		Encriptador.start();
         this.portales = [];
-        this.keys = [];
-		
+
+		this.portalSalida = new PortalSeguro();
 		this.lastRequest = 0;
 		this.conexion_web;
     },
@@ -88,23 +86,22 @@ var Vortex = Vx = vX = vx = {
         this.portales.push(portal);
         return this.portales.length - 1; //devuelvo id del portal/pedido para que el cliente pueda darlos de baja
     },
-    pedirMensajesSeguros: function(p, claveRSA){
+    pedirMensajesSeguros: function(p, desencriptarCon){
         var _this = this;
 		
 		
         return this.pedirMensajes({
             filtro:p.filtro,
             callback: function(mensaje){
-			
-			
-				var mi_clave_privada = _this.claveRSAComun;
-				var su_clave_publica = _this.clavePublicaComun;
 				
-				if(mensaje.para) mi_clave_privada = claveRSA;
-				if(mensaje.de) su_clave_publica = mensaje.de;				
+				var mi_clave = Encriptador.claveAnonima;
+				var su_clave = Encriptador.claveAnonima;
+				
+				if(mensaje.para) mi_clave = desencriptarCon;
+				if(mensaje.de) su_clave = mensaje.de;				
 				
 				if(mensaje.datoSeguro){					
-					var dato_desencriptado = Encriptador.desEncriptarString(mensaje.datoSeguro, su_clave_publica, mi_clave_privada);
+					var dato_desencriptado = Encriptador.desEncriptarString(mensaje.datoSeguro, su_clave, mi_clave);
 					if(dato_desencriptado === undefined) return;
 					mensaje.datoSeguro = JSON.parse(dato_desencriptado);
 					p.callback(mensaje);					
@@ -117,36 +114,22 @@ var Vortex = Vx = vX = vx = {
     enviarMensaje:function(mensaje){
         this.router.recibirMensaje(mensaje);
     },
-    enviarMensajeSeguro:function(mensaje, claveRSA){
+    enviarMensajeSeguro:function(mensaje, firmarCon){
         //var mi_clave_privada = undefined;
-        var mi_clave_privada = this.claveRSAComun;
-        var su_clave_publica = this.clavePublicaComun;
-        if(mensaje.de) mi_clave_privada = claveRSA;
-        if(mensaje.para) su_clave_publica = mensaje.para;
+        var mi_clave = Encriptador.claveAnonima;
+        var su_clave = Encriptador.claveAnonima;
+        if(mensaje.de) mi_clave = firmarCon;
+        if(mensaje.para) su_clave = mensaje.para;
 		
 		if(mensaje.datoSeguro){
-			mensaje.datoSeguro = Encriptador.encriptarString(JSON.stringify(mensaje.datoSeguro), su_clave_publica, mi_clave_privada);
+			mensaje.datoSeguro = Encriptador.encriptarString(JSON.stringify(mensaje.datoSeguro), su_clave, mi_clave);
 		}
         
         this.router.recibirMensaje(mensaje);
     },
-	
-	addKey: function(){
-		
-		var claveRSA = null;
-		if(typeof(arguments[0]) == 'object'){
-			claveRSA = arguments[0];
-		}else if(typeof(arguments[0]) == 'string'){
-			claveRSA = cryptico.generateRSAKey(arguments[0], 1024);
-		}
-		
-		
-		var clavePublica = cryptico.publicKeyString(claveRSA);
-		this.keys[clavePublica] = claveRSA;
-		
-		return clavePublica;
-	},
-	
+//	send: function(){
+//		this.portalSalida.send(arguments);
+//	},
 	send: function(){
 		
 		var _this = this;
@@ -183,9 +166,7 @@ var Vortex = Vx = vX = vx = {
 		
 		
 		if(obj.de){
-			claveRSA = this.keys[obj.de];
-			
-			this.enviarMensajeSeguro(obj, claveRSA);
+			this.enviarMensajeSeguro(obj, obj.de);
 			return;
 		}
 		
@@ -207,7 +188,7 @@ var Vortex = Vx = vX = vx = {
 			return this.pedirMensajesSeguros({
 				filtro: _filtro,
 				callback: _callback
-			}, this.keys[_filtro.para]);
+			}, _filtro.para);
 		}
 		
 		

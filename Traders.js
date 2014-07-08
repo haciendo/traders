@@ -85,9 +85,9 @@ var Traders = {
         var _this = this;
 		
 		
-		var _id = vx.addKey(_nombre + password);
+		var _id = Encriptador.addKey(_nombre + password);
 		
-		this.claveRSA = vx.keys[_id];
+		this.claveRSA = Encriptador.keys[_id];
 		
 		
         this.usuario = {

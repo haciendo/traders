@@ -150,7 +150,7 @@ var Traders = {
 			});
 			
 			
-        },20);
+        },200);
 		
         this._onUsuarioLogueado();
     },
@@ -277,7 +277,7 @@ var Traders = {
 			
 		}, function(mensaje){
 			
-			if(mensaje.estado == 'OK') _this.setDataUsuario(mensaje.datoSeguro);
+			if(mensaje.datoSeguro.estado == 'OK') _this.setDataUsuario(mensaje.datoSeguro.datos);
 		});
 		
 		
@@ -524,7 +524,7 @@ var Traders = {
 			vx.send({
 				tipoDeMensaje:"traders.claveAgregada",
 				de: this.usuario.id,
-				para: arguments[0],
+				para: contacto.id,
 				datoSeguro: {
 					contacto: {
 						id: this.usuario.id,

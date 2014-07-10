@@ -29,11 +29,16 @@ NodoPortalBidi.prototype.publicarFiltros = function(){
 
 NodoPortalBidi.prototype.enviarMensaje = function(un_mensaje){
     this._pata.recibirMensaje(un_mensaje);
+ 	this._listaPedidos.forEach(function(p){
+        if(!p.atenderMensajesPropios) return;
+		if(p.filtro.evaluarMensaje(un_mensaje)) p.callback(un_mensaje);
+    });
 };
 
 NodoPortalBidi.prototype.pedirMensajes = function(){
 	var filtro;
 	var callback; 
+	var atenderMensajesPropios = false;
 	if(arguments.length == 2){
 		filtro = arguments[0];
 		callback = arguments[1];
@@ -41,15 +46,20 @@ NodoPortalBidi.prototype.pedirMensajes = function(){
 	if(arguments.length == 1){
 		filtro = arguments[0].filtro;
 		callback = arguments[0].callback;
+		atenderMensajesPropios = arguments[0].atenderMensajesPropios;
 	}	
 	if(filtro.evaluarMensaje === undefined) filtro = new FiltroXEjemplo(filtro);    //si no tiene el método evaluarMensaje, no es un filtro. creo uno usando ese objeto como ejemplo
-     
-    this._listaPedidos.push({ 
+    
+	var pedido = { 
 		id: ++this._ultimo_id_pedido,
 		filtro: filtro, 
-		callback: callback
-	});
+		callback: callback,
+		atenderMensajesPropios: atenderMensajesPropios
+	};
+	
+    this._listaPedidos.push(pedido);
     this.publicarFiltros();
+	return pedido.id;
 };
 
 NodoPortalBidi.prototype.quitarPedido = function(id_pedido){
@@ -57,7 +67,8 @@ NodoPortalBidi.prototype.quitarPedido = function(id_pedido){
 	this._listaPedidos.forEach(function(pedido, index){
         if(pedido.id == id_pedido) index_pedido = index; 
     });
-	this._listaPedidos(index_pedido, 1);
+	this._listaPedidos.splice(index_pedido, 1);
+	this.publicarFiltros();
 };
 
 NodoPortalBidi.prototype.recibirMensaje = function(un_mensaje) {
@@ -92,5 +103,16 @@ NodoPortalBidi.prototype.conectadoBidireccionalmente = function(){
 NodoPortalBidi.prototype.filtroDeSalida = function(){
     return this._pata.filtroRecibido();
 };
+
+NodoPortalBidi.prototype.desconectar = function(){
+	if(!this._pata._receptor) return;
+	this._pata._receptor.desconectarDe(this)
+	this._pata.desconectar();
+};
+
+NodoPortalBidi.prototype.desconectarDe = function(un_nodo){
+	this.desconectar();
+};
+
 
 if(typeof(require) != "undefined"){ exports.clase = NodoPortalBidi;}

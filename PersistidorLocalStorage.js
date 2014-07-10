@@ -13,7 +13,7 @@ var PersistidorLocalStorage = function(opt){
 		this.contacto_id = this.usuario_id
 	}
 	
-	vx.pedirMensajes({
+	vx.when({
 		filtro: {
 				tipoDeMensaje: "vortex.persistencia.guardarDatos",
 				de: _this.contacto_id,
@@ -26,7 +26,7 @@ var PersistidorLocalStorage = function(opt){
 			//estado = 'DENEGADO';
 
 			if(typeof(Storage)!=="undefined"){
-				localStorage.setItem(_this.contacto_id, mensaje.datoSeguro);
+				localStorage.setItem(_this.contacto_id, JSON.stringify(mensaje.datoSeguro));
 				estado = 'OK';
 			}
 
@@ -35,13 +35,15 @@ var PersistidorLocalStorage = function(opt){
 				de: _this.usuario_id,
 				para: _this.contacto_id,
 				descripcion: 'LocalStorage',
-				estado: estado
+				datoSeguro: {
+					estado:estado
+				}
 			});
 		}
 	});
 	
 	
-	vx.pedirMensajesSeguros({
+	vx.when({
 		filtro: {
 			tipoDeMensaje:"vortex.persistencia.obtenerDatos",
 			de: _this.contacto_id,
@@ -59,6 +61,7 @@ var PersistidorLocalStorage = function(opt){
 				if(datos){
 					estado = 'OK';
 				}
+				datos = JSON.parse(datos);
 			}
 
 			var obj = {
@@ -67,9 +70,13 @@ var PersistidorLocalStorage = function(opt){
 				para: _this.contacto_id,
 				descripcion: 'LocalStorage',
 				estado: estado,
-				datoSeguro: datos														
+				datoSeguro: {
+					estado: estado,
+					datos: datos
+				}
+				
 			};
-			vx.enviarMensaje(obj);
+			vx.send(obj);
 		}
 	});	
 };

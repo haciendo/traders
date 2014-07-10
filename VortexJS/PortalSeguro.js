@@ -18,25 +18,30 @@ PortalSeguro.prototype.send = function(mensaje, callback){
 	
 	if(mensaje.datoSeguro){
 		mensaje.datoSeguro = Encriptador.encriptarString(JSON.stringify(mensaje.datoSeguro), mensaje.para, mensaje.de);
-	}
-	
-	this.portal.enviarMensaje(mensaje);
-	
+	}	
 	if(callback){
 		mensaje.idRequest = this.id.toString() + "_" +(++this.lastRequest).toString();
+		var portal_respuesta = new PortalSeguro();
 		var id_pedido = this.when({
-			responseTo: mensaje.idRequest,
-			para: mensaje.de
-		},function(objRespuesta){
-			callback(objRespuesta);
-			_this.portal.quitarPedido(id_pedido);
+			filtro: {
+				responseTo: mensaje.idRequest,
+				para: mensaje.de
+			},
+			callback: function(objRespuesta){
+				callback(objRespuesta);
+				_this.portal.quitarPedido(id_pedido);
+			},
+			atenderMensajesPropios: true
 		});
-	}		
+	}	
+	
+	this.portal.enviarMensaje(mensaje);
 };
 
 PortalSeguro.prototype.when = function(){	
     var filtro;
 	var callback; 
+	var atenderMensajesPropios = false;
 	if(arguments.length == 2){
 		filtro = arguments[0];
 		callback = arguments[1];
@@ -44,8 +49,9 @@ PortalSeguro.prototype.when = function(){
 	if(arguments.length == 1){
 		filtro = arguments[0].filtro;
 		callback = arguments[0].callback;
+		atenderMensajesPropios = arguments[0].atenderMensajesPropios;
 	}	
-	this.portal.pedirMensajes({
+	return this.portal.pedirMensajes({
 		filtro: filtro,
 		callback: function(mensaje){			
 			if(mensaje.datoSeguro){	
@@ -59,6 +65,7 @@ PortalSeguro.prototype.when = function(){
 			} else {
 				callback(mensaje);
 			}
-		}
+		},
+		atenderMensajesPropios: atenderMensajesPropios
 	}); 
 };

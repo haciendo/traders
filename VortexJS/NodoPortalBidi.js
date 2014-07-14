@@ -31,30 +31,24 @@ NodoPortalBidi.prototype.enviarMensaje = function(un_mensaje){
     this._pata.recibirMensaje(un_mensaje);
  	this._listaPedidos.forEach(function(p){
         if(!p.atenderMensajesPropios) return;
-		if(p.filtro.evaluarMensaje(un_mensaje)) p.callback(un_mensaje);
+		if(p.filtro.evaluarMensaje(un_mensaje)) p.callback(ClonadorDeObjetos.clonarObjeto(un_mensaje));
     });
 };
 
 NodoPortalBidi.prototype.pedirMensajes = function(){
-	var filtro;
-	var callback; 
-	var atenderMensajesPropios = false;
-	if(arguments.length == 2){
-		filtro = arguments[0];
-		callback = arguments[1];
-	}
-	if(arguments.length == 1){
-		filtro = arguments[0].filtro;
-		callback = arguments[0].callback;
-		atenderMensajesPropios = arguments[0].atenderMensajesPropios;
-	}	
-	if(filtro.evaluarMensaje === undefined) filtro = new FiltroXEjemplo(filtro);    //si no tiene el método evaluarMensaje, no es un filtro. creo uno usando ese objeto como ejemplo
+	var opt = getArguments(arguments, {
+		filtro:{},
+		callback: function(){},
+		atenderMensajesPropios: false
+	});
+	
+	if(opt.filtro.evaluarMensaje === undefined) opt.filtro = new FiltroXEjemplo(opt.filtro);    //si no tiene el método evaluarMensaje, no es un filtro. creo uno usando ese objeto como ejemplo
     
 	var pedido = { 
 		id: ++this._ultimo_id_pedido,
-		filtro: filtro, 
-		callback: callback,
-		atenderMensajesPropios: atenderMensajesPropios
+		filtro: opt.filtro, 
+		callback: opt.callback,
+		atenderMensajesPropios: opt.atenderMensajesPropios
 	};
 	
     this._listaPedidos.push(pedido);

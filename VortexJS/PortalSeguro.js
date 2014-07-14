@@ -39,33 +39,25 @@ PortalSeguro.prototype.send = function(mensaje, callback){
 };
 
 PortalSeguro.prototype.when = function(){	
-    var filtro;
-	var callback; 
-	var atenderMensajesPropios = false;
-	if(arguments.length == 2){
-		filtro = arguments[0];
-		callback = arguments[1];
-	}
-	if(arguments.length == 1){
-		filtro = arguments[0].filtro;
-		callback = arguments[0].callback;
-		atenderMensajesPropios = arguments[0].atenderMensajesPropios;
-	}	
-	return this.portal.pedirMensajes({
-		filtro: filtro,
-		callback: function(mensaje){			
-			if(mensaje.datoSeguro){	
-				var desencriptarCon = (mensaje.para || this.desencriptarCon) || Encriptador.claveAnonima;
-				var validarCon = (mensaje.de || this.validarCon) || Encriptador.claveAnonima;
-				
-				var dato_desencriptado = Encriptador.desEncriptarString(mensaje.datoSeguro, validarCon, desencriptarCon);
-				if(dato_desencriptado === undefined) return;
-				mensaje.datoSeguro = JSON.parse(dato_desencriptado);
-				callback(mensaje);					
-			} else {
-				callback(mensaje);
-			}
-		},
-		atenderMensajesPropios: atenderMensajesPropios
-	}); 
+	var opt = getArguments(arguments, {
+		filtro:{},
+		callback: function(){},
+		atenderMensajesPropios: false
+	});
+	var callback = opt.callback;
+	opt.callback = function(mensaje){			
+		if(mensaje.datoSeguro){	
+			var desencriptarCon = (mensaje.para || this.desencriptarCon) || Encriptador.claveAnonima;
+			var validarCon = (mensaje.de || this.validarCon) || Encriptador.claveAnonima;
+
+			var dato_desencriptado = Encriptador.desEncriptarString(mensaje.datoSeguro, validarCon, desencriptarCon);
+			if(dato_desencriptado === undefined) return;
+			mensaje.datoSeguro = JSON.parse(dato_desencriptado);
+			callback(mensaje);					
+		} else {
+			callback(mensaje);
+		}
+	};
+	
+	return this.portal.pedirMensajes(opt);
 };

@@ -201,3 +201,21 @@ var ComparadorDeObjetos = {
         return true;
     }
 };
+
+var getArguments = function(argumentos, defaults){
+	// si tengo un solo argumento podría ser un objeto con todos los argumentos en sus claves
+	if(argumentos.length == 1){
+		// para ser así deberían estar contenidas todas sus claves en el objeto defaults
+		if(_.difference(_.keys(argumentos[0]), _.keys(defaults)).length == 0){
+			return _.extend({}, defaults, argumentos[0]);
+		}
+	} 
+	// si tengo varios argumentos o uno solo pero con claves no contenidas en los defaults
+	// devuelvo los argumentos pisando a los defaults
+	var obj_args = {};
+	obj_args = _.extend(obj_args, defaults);
+	_.each(argumentos, function(arg, index){
+		obj_args[_.keys(defaults)[index]] = arg;
+	});
+	return obj_args;
+};

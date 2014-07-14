@@ -33,6 +33,7 @@ var Vortex = Vx = vX = vx = {
         this.router = new NodoRouter();
 		Encriptador.start();
 		
+		this.ultimo_id_portal = 0;
 		this.portal = new PortalSeguro();
 		this.conexion_web;
     },
@@ -85,7 +86,10 @@ var Vortex = Vx = vX = vx = {
 			atenderMensajesPropios: true
 		});
         return this.portal.when(opt);
-    }
+    },
+	portal: function(opt){
+		return new PortalSeguro(opt);
+	}
 };
 
 if(typeof(require) != "undefined"){

@@ -1,41 +1,49 @@
-var PortalSeguro = function(opt){
-	opt = opt||{};
-	this.id = opt.id||"";
-	this.firmarCon = opt.firmarCon;
-	this.encriptarCon = opt.encriptarCon;
-	this.validarCon = opt.validarCon;
-	this.desencriptarCon = opt.desencriptarCon;
+var PortalSeguro = function(){
+	var opt = getArguments(arguments, {
+		id: "",
+		firmarCon: Encriptador.claveAnonima,
+		encriptarCon: Encriptador.claveAnonima,
+		validarCon: Encriptador.claveAnonima,
+		desencriptarCon: Encriptador.claveAnonima
+	});
+	_.extend(this, opt);
+	
 	this.lastRequest = 0;
 	this.portal = new NodoPortalBidi();
 	vx.router.conectarBidireccionalmenteCon(this.portal);
 };
 
-PortalSeguro.prototype.send = function(mensaje, callback){
+PortalSeguro.prototype.send = function(){
 	var _this = this; 
 	
-	mensaje.de = (mensaje.de || this.firmarCon) || Encriptador.claveAnonima;
-	mensaje.para = (mensaje.para || this.encriptarCon) || Encriptador.claveAnonima;
+	var opt = getArguments(arguments, {
+		mensaje: {},
+		callback: undefined
+	});
 	
-	if(mensaje.datoSeguro){
-		mensaje.datoSeguro = Encriptador.encriptarString(JSON.stringify(mensaje.datoSeguro), mensaje.para, mensaje.de);
+	opt.mensaje.de = opt.mensaje.de || this.firmarCon;
+	opt.mensaje.para = opt.mensaje.para || this.encriptarCon;
+	
+	if(opt.mensaje.datoSeguro){
+		opt.mensaje.datoSeguro = Encriptador.encriptarString(JSON.stringify(opt.mensaje.datoSeguro), opt.mensaje.para, opt.mensaje.de);
 	}	
-	if(callback){
-		mensaje.idRequest = this.id.toString() + "_" +(++this.lastRequest).toString();
+	if(opt.callback){
+		opt.mensaje.idRequest = this.id.toString() + "_" +(++this.lastRequest).toString();
 		var portal_respuesta = new PortalSeguro();
 		var id_pedido = this.when({
 			filtro: {
-				responseTo: mensaje.idRequest,
-				para: mensaje.de
+				responseTo: opt.mensaje.idRequest,
+				para: opt.mensaje.de
 			},
 			callback: function(objRespuesta){
-				callback(objRespuesta);
+				opt.callback(objRespuesta);
 				_this.portal.quitarPedido(id_pedido);
 			},
 			atenderMensajesPropios: true
 		});
 	}	
 	
-	this.portal.enviarMensaje(mensaje);
+	this.portal.enviarMensaje(opt.mensaje);
 };
 
 PortalSeguro.prototype.when = function(){	
@@ -47,8 +55,8 @@ PortalSeguro.prototype.when = function(){
 	var callback = opt.callback;
 	opt.callback = function(mensaje){			
 		if(mensaje.datoSeguro){	
-			var desencriptarCon = (mensaje.para || this.desencriptarCon) || Encriptador.claveAnonima;
-			var validarCon = (mensaje.de || this.validarCon) || Encriptador.claveAnonima;
+			var desencriptarCon = mensaje.para || this.desencriptarCon;
+			var validarCon = mensaje.de || this.validarCon;
 
 			var dato_desencriptado = Encriptador.desEncriptarString(mensaje.datoSeguro, validarCon, desencriptarCon);
 			if(dato_desencriptado === undefined) return;

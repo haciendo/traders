@@ -34,7 +34,7 @@ var Vortex = Vx = vX = vx = {
 		Encriptador.start();
 		
 		this.ultimo_id_portal = 0;
-		this.portal = new PortalSeguro();
+		this._portal = new PortalSeguro(this.ultimo_id_portal.toString());
 		this.conexion_web;
     },
     conectarPorHTTP: function(p){
@@ -77,7 +77,7 @@ var Vortex = Vx = vX = vx = {
         this.router.conectarBidireccionalmenteCon(this.adaptadorArduino);
     },
 	send: function(mensaje, callback){
-		this.portal.send(mensaje, callback);
+		this._portal.send(mensaje, callback);
 	},
     when: function(){
         var opt = getArguments(arguments, {
@@ -85,10 +85,20 @@ var Vortex = Vx = vX = vx = {
 			callback: function(){},
 			atenderMensajesPropios: true
 		});
-        return this.portal.when(opt);
+        return this._portal.when(opt);
     },
-	portal: function(opt){
+	portal: function(){
+		var opt = getArguments(arguments, {
+			id: (++this.ultimo_id_portal).toString(),
+			firmarCon: Encriptador.claveAnonima,
+			encriptarCon: Encriptador.claveAnonima,
+			validarCon: Encriptador.claveAnonima,
+			desencriptarCon: Encriptador.claveAnonima
+		});
 		return new PortalSeguro(opt);
+	},
+	object: function(opt){
+		return new VxString(opt);
 	}
 };
 

@@ -41,7 +41,9 @@ var Encriptador = {
 					return desencriptado.plaintext;
 				}
 			}
+			console.log("error al validar la firma");
 		}
+		console.log("error al desencriptar");
 	},
 	desEncriptarObjeto: function(objeto_encriptado, validarCon, desencriptarCon){
         var _this = this;
@@ -56,5 +58,8 @@ var Encriptador = {
             }
         }
         return objeto;
+	},
+	tengoClavePrivadaDe: function(clave_publica){
+		return this.keys[clave_publica] !== undefined;
 	}
 };

@@ -7,8 +7,7 @@ var PortalSeguro = function(){
 		desencriptarCon: Encriptador.claveAnonima
 	});
 	_.extend(this, opt);
-	
-	this.lastRequest = 0;
+
 	this.portal = new NodoPortalBidi();
 	vx.router.conectarBidireccionalmenteCon(this.portal);
 };
@@ -28,7 +27,7 @@ PortalSeguro.prototype.send = function(){
 		opt.mensaje.datoSeguro = Encriptador.encriptarString(JSON.stringify(opt.mensaje.datoSeguro), opt.mensaje.para, opt.mensaje.de);
 	}	
 	if(opt.callback){
-		opt.mensaje.idRequest = this.id.toString() + "_" +(++this.lastRequest).toString();
+		opt.mensaje.idRequest = this.id.toString() + "_" + randomString(32);
 		var portal_respuesta = new PortalSeguro();
 		var id_pedido = this.when({
 			filtro: {

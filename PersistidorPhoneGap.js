@@ -42,7 +42,7 @@ var PersistidorPhoneGap = function(opt){
 				responseTo: mensaje.idRequest,
 				de: _this.usuario_id,
 				para: _this.contacto_id,
-				descripcion: 'LocalStorage',
+				descripcion: 'PersistidorPhoneGap',
 				estado: estado
 			});
 		}

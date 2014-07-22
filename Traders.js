@@ -132,14 +132,14 @@ var Traders = {
 		});
 		
 		
-		this.data_usuario = new VxString({
+		this.data_usuario = new VxObject({
 			idObjeto:"dataUsuario", 
 			claveEscritura: this.usuario.id, 
 			claveLectura: this.usuario.id
 		});
 		
 		this.data_usuario.change(function(){
-			_this.setDataUsuario(JSON.parse(_this.data_usuario.val()));
+			_this.setDataUsuario(_this.data_usuario.val());
 		});
 			
 		//DEBUG
@@ -193,36 +193,9 @@ var Traders = {
 			trueques:					this.trueques()
 		};
 		
-		this.data_usuario.val(JSON.stringify(datos));
-		
-//		vx.send({
-//			tipoDeMensaje:"vortex.persistencia.guardarDatos",
-//			de: this.usuario.id,
-//			para: this.usuario.id,
-//			datoSeguro:_datos
-//			
-//		}, function(mensaje){
-//			
-//			console.log('mensaje');
-//			console.log(mensaje);
-//			
-//		});		
+		this.data_usuario.val(datos);
     },
-	
-//    loadDataUsuario: function(){        
-//		var _this = this;		
-//		vx.send({
-//			tipoDeMensaje:"vortex.persistencia.obtenerDatos",
-//			de: this.usuario.id,
-//			para: this.usuario.id
-//			
-//		}, function(mensaje){
-//			
-//			if(mensaje.datoSeguro.estado == 'OK') _this.setDataUsuario(mensaje.datoSeguro.datos);
-//		});	
-//    },
-//	
-	
+
     agregarProducto: function(p){
 		var producto = _.clone(p);
         

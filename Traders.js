@@ -170,9 +170,9 @@ var Traders = {
 			if(this.usuario.avatar != datos.usuario.avatar){
 				this.cambiarAvatar(datos.usuario.avatar);
 			}
-			
-			this._trueques = datos.trueques;
-		
+			if(!_.isEqual(this._trueques, datos.trueques)){
+				this._trueques = datos.trueques;
+			}
 			$.each(datos.contactos, function(index, item){
 				_this.agregarContacto(item);
 			});

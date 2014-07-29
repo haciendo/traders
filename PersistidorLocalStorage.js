@@ -6,8 +6,7 @@ var PersistidorLocalStorage = function(opt){
 		contacto_id: null
 	};
 	
-	$.extend(true, optDefault, opt);	
-	$.extend(true, this, optDefault);	
+	_.extend(this, optDefault, opt);	
 	
 	if(!this.contacto_id){
 		this.contacto_id = this.usuario_id
@@ -19,11 +18,12 @@ var PersistidorLocalStorage = function(opt){
 		claveLectura: this.usuario_id
 	});
 
-	this.data_usuario.change(function(){
-		localStorage.setItem(_this.usuario_id, _this.data_usuario.valorEncriptado());
+	Contactos.change(function(){
+		localStorage.setItem(_this.usuario_id + "_Contactos", JSON.stringify(Contactos.resumen()));		
 	});
-	var datos = localStorage.getItem(_this.usuario_id);
-	if(datos){
-		this.data_usuario.valorEncriptado(datos);
+	
+	var datos_contactos = localStorage.getItem(_this.usuario_id + "_Contactos");
+	if(datos_contactos){
+		Contactos.resumen(JSON.parse(datos_contactos));
 	}
 };

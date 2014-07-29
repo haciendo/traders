@@ -68,3 +68,7 @@ PortalSeguro.prototype.when = function(){
 	
 	return this.portal.pedirMensajes(opt);
 };
+
+PortalSeguro.prototype.desconectar = function(){	
+	this.portal.desconectar();
+};

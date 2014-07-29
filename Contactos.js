@@ -2,18 +2,23 @@ var Contactos = {
 	_contactos:[],
 	agregar: function(){
 		var _this = this;
+		var contacto;
 		if(typeof(arguments[0]) == 'string'){
 		// es el id			
-			var contacto = this.buscar({id:arguments[0]});
+			contacto = this.buscar({id:arguments[0]});
 
 			if(contacto) return contacto;
 			
 			contacto = new Contacto({
 				id: arguments[0],
 				estado: 'SIN_CONFIRMAR',
-				nombre: 'Esperando confirmación',
+				nombre: '¿¿¿???',
 				inventario: [],
 				avatar:""
+			});
+			
+			contacto.alEliminar(function(){
+				_this.quitar(contacto.id);
 			});
 			this._contactos.push(contacto);
 			vx.send({
@@ -31,27 +36,32 @@ var Contactos = {
 
 			},function(mensaje){
 				contacto = _.extend(contacto, mensaje.datoSeguro.contacto);
-				contacto.estado = 'CONFIRMADO';			
-
-				Traders.onNovedades();			
+				contacto.estado = 'CONFIRMADO';		
+				contacto.change();
+				//Traders.onNovedades();			
 			});
-
-		}else if(typeof(arguments[0]) == 'object'){			
-
-			var contacto = this.buscar({id:arguments[0].id});
+			
+		}else if(typeof(arguments[0]) == 'object'){	
+			contacto = this.buscar({id:arguments[0].id});
 			if(contacto) return;	
 
 			contacto = new Contacto(arguments[0]);
+			contacto.alEliminar(function(){
+				_this.quitar(contacto.id);
+			});
 			this._contactos.push(contacto);		
 		}		
-		Traders.onNovedades();	
+		contacto.change(function(){
+			_this.change();
+		});
+		this.onAdd(contacto);
 	},
 	quitar: function(id){
 		this._contactos = $.grep(this._contactos, function(item){
             return item.id != id;
         });
 		
-		Traders.onNovedades();	
+		this.onRemove(id);
 	},
 	buscar: function(p){
 		if(!p) return this._contactos;
@@ -64,5 +74,46 @@ var Contactos = {
                     return contacto.nombre.indexOf(p.query)>=0 || contacto.id == p.query;
                 });  
         }
+	},
+	onAdd: function(){
+		var _this = this;
+		if(!this._onAdd) this._onAdd = new Evento();
+		if(_.isFunction(arguments[0])){		
+			return this._onAdd.addHandler(arguments[0]);			
+		}else{
+			this._onAdd.disparar(arguments[0]);
+		}		
+	},
+	onRemove: function(){
+		var _this = this;
+		if(!this._onRemove) this._onRemove = new Evento();
+		if(_.isFunction(arguments[0])){		
+			return this._onRemove.addHandler(arguments[0]);			
+		}else{
+			this._onRemove.disparar(arguments[0]);
+		}		
+	},
+	change: function(){
+		var _this = this;
+		if(!this._change) this._change = new Evento();
+		if(_.isFunction(arguments[0])){		
+			return this._change.addHandler(arguments[0]);			
+		}else{
+			this._change.disparar();
+		}		
+	},
+	resumen: function(resumen){
+		var _this = this;
+		if(resumen){
+			_.each(resumen, function(resumen_contacto){
+				_this.agregar(resumen_contacto);
+			});
+			return;
+		};
+		resumen = [];
+		_.each(this._contactos, function(contacto){
+			resumen.push(contacto.resumen());
+		});
+		return resumen;
 	}
 }

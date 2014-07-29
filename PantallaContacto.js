@@ -2,18 +2,15 @@ var PantallaContacto = {
     start: function(){
         var _this = this;
         this.ui =  $("#pantalla_contacto");     
-        
+        this.ultimo_handler = {remove: function(){}}; 
+			
 		PantallaListaContactos.onSelect(function(){
-			_this.render();
-		});
-		
-		
-        Traders.onNovedades(function(){
-			if(_this.ui.is(':visible')){
+			_this.ultimo_handler.remove();
+			_this.ultimo_handler = PantallaListaContactos.contacto_seleccionado.change(function(){
 				_this.render();
-			}
-        });
-		
+			});
+			_this.render();
+		});			
 		
         this.panel_contacto = this.ui.find("#panel_contacto");
         this.lbl_nombre_contacto = this.ui.find("#lbl_nombre_contacto");
@@ -42,26 +39,23 @@ var PantallaContacto = {
         });
 		this.inventario_contacto.dibujarEn(this.panel_inventario_contacto);
     },
-	
     render: function(){
         var _this = this;
+		
+		this._contacto = PantallaListaContactos.contacto_seleccionado;
         
-		//PantallaListaContactos.render();
-		var _contacto = PantallaListaContactos.contacto_seleccionado;
-        
-		if(_contacto.id === undefined) {
+		if(this._contacto === undefined) {
 			this.panel_contacto.hide();
 			return;
 		}
 		
-        this.lbl_nombre_contacto.text(_contacto.nombre);
+        this.lbl_nombre_contacto.text(this._contacto.nombre);
 		
-		if(_contacto.avatar!="") this.img_avatar_contacto.attr("src", _contacto.avatar);
+		if(this._contacto.avatar!="") this.img_avatar_contacto.attr("src", this._contacto.avatar);
 		else this.img_avatar_contacto.attr("src", "avatar_default.png");
 		
-		this.inventario_contacto.setSelector({propietario:_contacto});
-		this.inventario_contacto.render();
-        
+		this.inventario_contacto.setSelector({propietario:this._contacto});
+		this.inventario_contacto.render();        
         
         this.panel_contacto.show();  
         this.ui.show();

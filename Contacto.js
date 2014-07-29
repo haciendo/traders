@@ -2,15 +2,17 @@ var Contacto = function(opt){
 	var _this = this;
 	_.extend(this, opt);
 	
-	vx.when({
+	this.portal = vx.portal();
+	this.portal.when({
 		tipoDeMensaje:"traders.inventario",
 		de: this.id
 	}, function(mensaje){
 		_this.inventario = mensaje.datoSeguro.inventario;
-		Traders.onNovedades();
+		//Traders.onNovedades();
+		_this.change();
 	});
 
-	vx.when({
+	this.portal.when({
 		tipoDeMensaje:"traders.avisoDeProductoModificado",
 		de: _this.id
 	}, function(mensaje){
@@ -18,20 +20,22 @@ var Contacto = function(opt){
 		if(producto === undefined) return;			
 		producto = _.extend(producto, mensaje.datoSeguro.producto);
 
-		Traders.onNovedades();
+		//Traders.onNovedades();
+		_this.change();
 	});
 
-	vx.when({
+	this.portal.when({
 		tipoDeMensaje:"traders.avisoDeNuevoProducto",
 		de: _this.id
 	}, function(mensaje){
 		if(_.findWhere(_this.inventario, {id: mensaje.datoSeguro.producto.id})!== undefined) return;
 		_this.inventario.push(mensaje.datoSeguro.producto);
 
-		Traders.onNovedades();
+		//Traders.onNovedades();
+		_this.change();
 	});
 
-	vx.when({
+	this.portal.when({
 		tipoDeMensaje:"traders.avisoDeBajaDeProducto",
 		de: _this.id
 	}, function(mensaje){
@@ -39,11 +43,12 @@ var Contacto = function(opt){
 			return prod.id != mensaje.datoSeguro.id_producto;
 		});
 
-		Traders.onNovedades();
+		//Traders.onNovedades();
+		_this.change();
 	});
 
 
-	vx.when({
+	this.portal.when({
 		tipoDeMensaje:"traders.trueque.oferta",
 		para: Traders.usuario.id,
 		de: _this.id
@@ -78,11 +83,12 @@ var Contacto = function(opt){
 
 		trueque.ofertas.push(oferta);
 
-		Traders.onNovedades();
+		//Traders.onNovedades();
+		_this.change();
 	});
 
 
-	vx.when({
+	this.portal.when({
 		tipoDeMensaje:"traders.aceptacionDeTrueque",
 		para: Traders.usuario.id,
 		de: _this.id
@@ -114,12 +120,12 @@ var Contacto = function(opt){
 
 		Traders._concretarTrueque(trueque);
 
-		Traders.onNovedades();
+		//Traders.onNovedades();
+		_this.change();
 	});
 
 
-
-	vx.when({
+	this.portal.when({
 		tipoDeMensaje:"traders.aceptacionDeTrueque.handShake",
 		para: Traders.usuario.id,
 		de: _this.id
@@ -132,15 +138,47 @@ var Contacto = function(opt){
 
 		Traders._concretarTrueque(trueque);
 
-		Traders.onNovedades();
+		//Traders.onNovedades();
+		_this.change();
 	});
 
 
-	vx.when({
+	this.portal.when({
 		tipoDeMensaje:"traders.avisoDeCambioDeAvatar",
 		de: _this.id
 	}, function(mensaje){
 		_this.avatar = mensaje.datoSeguro.avatar;
-		Traders.onNovedades();
+		//Traders.onNovedades();
+		_this.change();
 	});
+};
+Contacto.prototype.change= function(){
+	var _this = this;
+	if(!this._change) this._change = new Evento();
+	if(_.isFunction(arguments[0])){		
+		return this._change.addHandler(arguments[0]);			
+	}else{
+		this._change.disparar();
+	}		
+};
+Contacto.prototype.alEliminar= function(){
+	var _this = this;
+	if(!this._alEliminar) this._alEliminar = new Evento();
+	if(_.isFunction(arguments[0])){		
+		return this._alEliminar.addHandler(arguments[0]);			
+	}else{
+		this._alEliminar.disparar();
+	}		
+};
+Contacto.prototype.eliminar= function(){
+	this.portal.desconectar();
+	this.alEliminar();
+};
+Contacto.prototype.resumen= function(){
+	return {
+		id:this.id,
+		nombre:this.nombre,
+		inventario:this.inventario,
+		avatar:this.avatar
+	}
 };

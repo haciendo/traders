@@ -181,7 +181,7 @@ var Traders = {
 			trueques:					this.trueques()
 		};
 		
-		this.data_usuario.val(datos);
+		//this.data_usuario.val(datos);
     },
 
     agregarProducto: function(p){

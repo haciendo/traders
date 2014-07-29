@@ -11,7 +11,7 @@ var PantallaContactos = {
 	render:function(){
 		this.ui.show();
 		PantallaContacto.render();
-		PantallaListaContactos.render();
+		PantallaListaContactos.show();
 		this.ui.animate({scrollLeft: 0}, 300);
 	}
 };

@@ -12,11 +12,11 @@ var PersistidorLocalStorage = function(opt){
 		this.contacto_id = this.usuario_id
 	}
 	
-	this.data_usuario = new VxObject({
-		idObjeto:"dataUsuario", 
-		claveEscritura: this.usuario_id, 
-		claveLectura: this.usuario_id
-	});
+//	this.data_usuario = new VxObject({
+//		idObjeto:"dataUsuario", 
+//		claveEscritura: this.usuario_id, 
+//		claveLectura: this.usuario_id
+//	});
 
 	Contactos.change(function(){
 		localStorage.setItem(_this.usuario_id + "_Contactos", JSON.stringify(Contactos.resumen()));		

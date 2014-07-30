@@ -8,7 +8,7 @@ var Contactos = {
 			var ids_contactos_guardados = JSON.parse(str_datos_guardados);
 			_.each(ids_contactos_guardados, function(un_id_contacto){
 				_this.agregar(new Contacto({
-					idContacto: un_id_contacto,
+					id: un_id_contacto,
 					idUsuario: _this.idUsuario
 				}));				
 			});
@@ -71,7 +71,7 @@ var Contactos = {
 			});
 			this._contactos.push(contacto);		
 		}		
-		contacto.change(function(){
+		contacto.alEliminar(function(){
 			_this.change();
 		});
 		

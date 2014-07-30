@@ -1,9 +1,28 @@
 var Contactos = {
 	_contactos:[],
+	start: function(opt){
+		var _this = this;
+		_.extend(this, opt);
+		var str_datos_guardados = localStorage.getItem(this.idUsuario + "_Contactos");
+		if(str_datos_guardados){
+			var ids_contactos_guardados = JSON.parse(str_datos_guardados);
+			_.each(ids_contactos_guardados, function(un_id_contacto){
+				_this.agregar(new Contacto({
+					idContacto: un_id_contacto,
+					idUsuario: _this.idUsuario
+				}));				
+			});
+		}
+		
+		this.change(function(){
+			localStorage.setItem(_this.idUsuario + "_Contactos", JSON.stringify(_this.resumenParaGuardar()));
+		});
+		this.change();
+	},
 	agregar: function(){
 		var _this = this;
 		var contacto;
-		if(typeof(arguments[0]) == 'string'){
+		if(_.isString(arguments[0])){
 		// es el id			
 			contacto = this.buscar({id:arguments[0]});
 
@@ -11,6 +30,7 @@ var Contactos = {
 			
 			contacto = new Contacto({
 				id: arguments[0],
+				idUsuario: this.idUsuario,
 				estado: 'SIN_CONFIRMAR',
 				nombre: '¿¿¿???',
 				inventario: [],
@@ -23,11 +43,11 @@ var Contactos = {
 			this._contactos.push(contacto);
 			vx.send({
 				tipoDeMensaje:"traders.claveAgregada",
-				de: Traders.usuario.id,
+				de: this.idUsuario,
 				para: contacto.id,
 				datoSeguro: {
 					contacto: {
-						id: Traders.usuario.id,
+						id: this.idUsuario,
 						nombre: Traders.usuario.nombre,
 						inventario: Traders.usuario.inventario,
 						avatar:Traders.usuario.avatar
@@ -41,7 +61,7 @@ var Contactos = {
 				//Traders.onNovedades();			
 			});
 			
-		}else if(typeof(arguments[0]) == 'object'){	
+		}else if(_.isObject(arguments[0])){	
 			contacto = this.buscar({id:arguments[0].id});
 			if(contacto) return;	
 
@@ -54,7 +74,9 @@ var Contactos = {
 		contacto.change(function(){
 			_this.change();
 		});
+		
 		this.onAdd(contacto);
+		this.change();
 	},
 	quitar: function(id){
 		this._contactos = $.grep(this._contactos, function(item){
@@ -62,6 +84,7 @@ var Contactos = {
         });
 		
 		this.onRemove(id);
+		this.change();
 	},
 	buscar: function(p){
 		if(!p) return this._contactos;
@@ -102,17 +125,10 @@ var Contactos = {
 			this._change.disparar();
 		}		
 	},
-	resumen: function(resumen){
-		var _this = this;
-		if(resumen){
-			_.each(resumen, function(resumen_contacto){
-				_this.agregar(resumen_contacto);
-			});
-			return;
-		};
+	resumenParaGuardar: function(resumen){
 		resumen = [];
 		_.each(this._contactos, function(contacto){
-			resumen.push(contacto.resumen());
+			resumen.push(contacto.id);
 		});
 		return resumen;
 	}

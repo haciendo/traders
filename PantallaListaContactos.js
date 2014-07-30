@@ -23,6 +23,9 @@ var PantallaListaContactos = {
 			_this.add(contacto);
         });
 		
+		_.each(Contactos.buscar(), function(un_contacto){
+			_this.add(un_contacto);
+		});
 		this.hide();		
     },
 	

@@ -27,8 +27,9 @@ var onDeviceReady = function() {
     BarraSuperior.start();
     
     Traders.onUsuarioLogueado(function(){
-		
-		
+		Contactos.start({
+			idUsuario: Traders.usuario.id
+		});
 		PantallaUsuario.start();		
 		PantallaContactos.start();		
 		PantallaTrueques.start();		
@@ -36,18 +37,18 @@ var onDeviceReady = function() {
 		PantallaProductos.start();
 		// PersistidorManual.start(this.usuario.id);
 		// PersistidorLocalStorage.start(this.usuario.id);
-		var PersistidorLocalStorage_Propio = new PersistidorLocalStorage({
-			usuario_id: this.usuario.id
-		});
-		
+//		var PersistidorLocalStorage_Propio = new PersistidorLocalStorage({
+//			usuario_id: this.usuario.id
+//		});
+//		
 		
 		var PersistidorPhoneGap_Propio;
 		
 		
 		//if(window.isphone){
-			PersistidorPhoneGap_Propio = new PersistidorPhoneGap({
-				usuario_id: this.usuario.id
-			});
+//			PersistidorPhoneGap_Propio = new PersistidorPhoneGap({
+//				usuario_id: this.usuario.id
+//			});
 		//}
 		
     });

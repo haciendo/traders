@@ -78,8 +78,7 @@ var Usuario = {
     quitarProducto: function(p){
         this.inventario = $.grep(this.inventario, function(prod){
             return prod.id != p.id;
-        });
-		
+        });		
 		
 		vx.send({
             tipoDeMensaje:"traders.avisoDeBajaDeProducto",
@@ -91,6 +90,18 @@ var Usuario = {
 		
         this.onProductoQuitado(p);        
         this.change();
+    },
+    cambiarAvatar: function(){
+        this.avatar=imagen_codificada;
+		vx.send({
+            tipoDeMensaje:"traders.avisoDeCambioDeAvatar",
+            de: this.id,
+            datoSeguro: {
+                avatar: imagen_codificada
+            }
+        });
+		
+		this.change();    
     },
     nextProductoId: function(){
 		

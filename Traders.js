@@ -54,20 +54,17 @@ var Traders = {
 	},
 	
 	login: function(_nombre, password){
-        var _this = this;
-		
-		
-		var _id = Encriptador.addKey(_nombre + password);
-		
+        var _this = this;		
+		var _id = Encriptador.addKey(_nombre + password);		
         Usuario.start({
             id: _id,
             nombre: _nombre
         });
-        this.usuario = Usuario;
-		
-        Usuario.change(this.onNovedades());
-		
+        Contactos.start();     
 		RepositorioDeConexiones.start(this.usuario.id);
+        
+        Contactos.change(function(){this.onNovedades()});
+        Usuario.change(function(){this.onNovedades()});		
 		
 		////parche para atajar las respuestas
 		vx.when({
@@ -75,18 +72,7 @@ var Traders = {
 		}, function(mensaje){
 			//nada-nop
         });
-		
 	
-//		this.data_usuario = new VxObject({
-//			idObjeto:"dataUsuario", 
-//			claveEscritura: this.usuario.id, 
-//			claveLectura: this.usuario.id
-//		});
-//		
-//		this.data_usuario.change(function(){
-//			_this.setDataUsuario(_this.data_usuario.val());
-//		});
-//			
 		//DEBUG
 		vx.send({
 			tipoDeMensaje	: "vortex.debug",
@@ -97,60 +83,26 @@ var Traders = {
         this._onUsuarioLogueado();
     },
 	
-	setDataUsuario: function(datos){
-//		var _this = this;
-//		
-//		if(datos) {
-//			if(!_.isEqual(this.usuario.inventario, datos.usuario.inventario)){
-//				this.usuario.inventario = datos.usuario.inventario;
-//				vx.send({
-//					tipoDeMensaje: "traders.inventario",
-//					de: _this.usuario.id,
-//					datoSeguro:{
-//						inventario:_this.usuario.inventario
-//					}
-//				});			
-//			}
-//			
-//			if(this.usuario.avatar != datos.usuario.avatar){
-//				this.cambiarAvatar(datos.usuario.avatar);
-//			}
-//			if(!_.isEqual(this._trueques, datos.trueques)){
-//				this._trueques = datos.trueques;
-//			}
-//			$.each(datos.contactos, function(index, item){
-//				_this.agregarContacto(item);
-//			});
-//		}
-//		else{
-//			this._trueques = [];			
-//		}
-//		
-//		this.onNovedades();
-	},
-	
-	
-    saveDataUsuario: function(){		
-//		var _this = this;		
-//		var datos = {
-//			usuario: 					this.usuario,
-//			contactos:					this.contactos(),
-//			trueques:					this.trueques()
-//		};
-//		
-//		//this.data_usuario.val(datos);
-    },
-
     agregarProducto: function(p){	
         Usuario.agregarProducto(p);
     },
+    
 	modificarProducto: function(p){		
 		Usuario.modificarProducto(p);
     },
+    
     quitarProducto: function(producto){        
 		Usuario.quitarProducto(producto);
     },
 	
+    agregarContacto: function(arg){
+		return Contactos.agregar(arg);
+    },
+	
+	quitarContacto: function(id){
+		return Contactos.quitar(id);
+	},
+    
 	_trueques:[],
     trueques:function(p){
         
@@ -355,16 +307,7 @@ var Traders = {
 			}
 		});
 		*/
-    },
-	
-	
-	agregarContacto: function(arg){
-		return Contactos.agregar(arg);
-    },
-	
-	quitarContacto: function(id){
-		return Contactos.quitar(id);
-	},
+    },	
 	
 	quitarTrueque: function(id){
 		this._trueques = $.grep(this._trueques, function(item){
@@ -375,15 +318,6 @@ var Traders = {
 	},
 
 	cambiarAvatar: function(imagen_codificada){
-        this.usuario.avatar=imagen_codificada;
-		vx.send({
-            tipoDeMensaje:"traders.avisoDeCambioDeAvatar",
-            de: this.usuario.id,
-            datoSeguro: {
-                avatar: imagen_codificada
-            }
-        });
-		
-		this.onNovedades();
+        Usuario.cambiarAvatar();
     }
 };

@@ -1,21 +1,5 @@
 var Traders = {
-	nextProductoId: function(){
-		
-		var maxValue = -1;
-		
-		_.each(this.usuario.inventario, function(producto){
-			if(producto.id > maxValue){
-				maxValue = producto.id;
-			}
-		});
-		
-		maxValue++;
-		
-		return maxValue;
-		
-	},
-	
-    usuario: {},
+	usuario: Usuario,
 	
     _onUsuarioLogueado:function(){},
 	
@@ -75,13 +59,13 @@ var Traders = {
 		
 		var _id = Encriptador.addKey(_nombre + password);
 		
-        this.usuario = {
+        Usuario.start({
             id: _id,
-            nombre: _nombre,
-            inventario: [],
-            avatar:""
-        };
+            nombre: _nombre
+        });
+        this.usuario = Usuario;
 		
+        Usuario.change(this.onNovedades());
 		
 		RepositorioDeConexiones.start(this.usuario.id);
 		
@@ -92,44 +76,17 @@ var Traders = {
 			//nada-nop
         });
 		
-		
-		vx.when({
-			tipoDeMensaje:"traders.claveAgregada",
-			para: this.usuario.id
-		},function(mensaje){
-			// le completo los datos
-			vx.send({
-				responseTo: mensaje.idRequest,
-				para: mensaje.de,
-				de: _this.usuario.id,
-				datoSeguro: {
-					contacto: {
-						nombre: _this.usuario.nombre,
-						inventario: _this.usuario.inventario,
-						avatar:_this.usuario.avatar
-					}
-				}
-			});
-			
-			// lo agrego
-			_this.agregarContacto(mensaje.datoSeguro.contacto);
-			
-			
-			_this.onNovedades();
-			
-		});
-		
-		
-		this.data_usuario = new VxObject({
-			idObjeto:"dataUsuario", 
-			claveEscritura: this.usuario.id, 
-			claveLectura: this.usuario.id
-		});
-		
-		this.data_usuario.change(function(){
-			_this.setDataUsuario(_this.data_usuario.val());
-		});
-			
+	
+//		this.data_usuario = new VxObject({
+//			idObjeto:"dataUsuario", 
+//			claveEscritura: this.usuario.id, 
+//			claveLectura: this.usuario.id
+//		});
+//		
+//		this.data_usuario.change(function(){
+//			_this.setDataUsuario(_this.data_usuario.val());
+//		});
+//			
 		//DEBUG
 		vx.send({
 			tipoDeMensaje	: "vortex.debug",
@@ -141,97 +98,57 @@ var Traders = {
     },
 	
 	setDataUsuario: function(datos){
-		var _this = this;
-		
-		if(datos) {
-			if(!_.isEqual(this.usuario.inventario, datos.usuario.inventario)){
-				this.usuario.inventario = datos.usuario.inventario;
-				vx.send({
-					tipoDeMensaje: "traders.inventario",
-					de: _this.usuario.id,
-					datoSeguro:{
-						inventario:_this.usuario.inventario
-					}
-				});			
-			}
-			
-			if(this.usuario.avatar != datos.usuario.avatar){
-				this.cambiarAvatar(datos.usuario.avatar);
-			}
-			if(!_.isEqual(this._trueques, datos.trueques)){
-				this._trueques = datos.trueques;
-			}
-			$.each(datos.contactos, function(index, item){
-				_this.agregarContacto(item);
-			});
-		}
-		else{
-			this._trueques = [];			
-		}
-		
-		this.onNovedades();
+//		var _this = this;
+//		
+//		if(datos) {
+//			if(!_.isEqual(this.usuario.inventario, datos.usuario.inventario)){
+//				this.usuario.inventario = datos.usuario.inventario;
+//				vx.send({
+//					tipoDeMensaje: "traders.inventario",
+//					de: _this.usuario.id,
+//					datoSeguro:{
+//						inventario:_this.usuario.inventario
+//					}
+//				});			
+//			}
+//			
+//			if(this.usuario.avatar != datos.usuario.avatar){
+//				this.cambiarAvatar(datos.usuario.avatar);
+//			}
+//			if(!_.isEqual(this._trueques, datos.trueques)){
+//				this._trueques = datos.trueques;
+//			}
+//			$.each(datos.contactos, function(index, item){
+//				_this.agregarContacto(item);
+//			});
+//		}
+//		else{
+//			this._trueques = [];			
+//		}
+//		
+//		this.onNovedades();
 	},
 	
 	
     saveDataUsuario: function(){		
-		var _this = this;		
-		var datos = {
-			usuario: 					this.usuario,
-			contactos:					this.contactos(),
-			trueques:					this.trueques()
-		};
-		
-		//this.data_usuario.val(datos);
+//		var _this = this;		
+//		var datos = {
+//			usuario: 					this.usuario,
+//			contactos:					this.contactos(),
+//			trueques:					this.trueques()
+//		};
+//		
+//		//this.data_usuario.val(datos);
     },
 
-    agregarProducto: function(p){
-		var producto = _.clone(p);
-        
-		producto.id = this.nextProductoId();
-		
-		this.usuario.inventario.push(producto);
-		
-		
-        vx.send({
-            tipoDeMensaje:"traders.avisoDeNuevoProducto",
-            de: this.usuario.id,
-            datoSeguro: {
-                producto: producto
-            }
-        });
-		
-        this.onNovedades();
+    agregarProducto: function(p){	
+        Usuario.agregarProducto(p);
     },
 	modificarProducto: function(p){		
-		var producto = _.findWhere(this.usuario.inventario, {id: p.id});
-		producto = ClonadorDeObjetos.extend(producto, p);
-		
-        vx.send({
-            tipoDeMensaje:"traders.avisoDeProductoModificado",
-            de: this.usuario.id,
-            datoSeguro: {
-                producto: producto
-            }
-        });
-		
-        this.onNovedades();
+		Usuario.modificarProducto(p);
     },
-    quitarProducto: function(producto){
-        
-		this.usuario.inventario = $.grep(this.usuario.inventario, function(prod){
-            return prod.id != producto.id;
-        });
-		
-		
-		vx.send({
-            tipoDeMensaje:"traders.avisoDeBajaDeProducto",
-            de: this.usuario.id,
-            datoSeguro:{
-                id_producto: producto.id
-            }
-        });
-		
-        this.onNovedades();
+    quitarProducto: function(producto){        
+		Usuario.quitarProducto(producto);
     },
 	
 	_trueques:[],

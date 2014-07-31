@@ -13,7 +13,7 @@ var PantallaListaContactos = {
 				placeholder: 'Id del usuario',
 				callback: function(value) {
 					if(value){
-						Traders.agregarContacto(value);
+						Contactos.solicitarAmistad(value);
 					}
 				}
 			});			

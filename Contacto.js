@@ -2,13 +2,13 @@ var Contacto = function(opt){
 	var _this = this;
 	_.extend(this, opt);
 	
-	var datos_guardados = localStorage.getItem(this.idUsuario + "_Contacto_" + this.id);	
+	var datos_guardados = localStorage.getItem(Usuario.id + "_Contacto_" + this.id);	
 	if(datos_guardados){
 		_.extend(this, JSON.parse(datos_guardados));
 	};
 	
 	this.change(function(){
-		localStorage.setItem(_this.idUsuario + "_Contacto_" + _this.id, JSON.stringify(_this.resumenParaGuardar()));		
+		localStorage.setItem(Usuario.id + "_Contacto_" + _this.id, JSON.stringify(_this.resumenParaGuardar()));		
 	});
 	
 	this.portal = vx.portal();
@@ -22,7 +22,7 @@ var Contacto = function(opt){
 
 	this.portal.when({
 		tipoDeMensaje:"traders.avisoDeProductoModificado",
-		de: _this.id
+		de: this.id
 	}, function(mensaje){
 		var producto = _.findWhere(_this.inventario, {id: mensaje.datoSeguro.producto.id});
 		if(producto === undefined) return;			
@@ -33,7 +33,7 @@ var Contacto = function(opt){
 
 	this.portal.when({
 		tipoDeMensaje:"traders.avisoDeNuevoProducto",
-		de: _this.id
+		de: this.id
 	}, function(mensaje){
 		if(_.findWhere(_this.inventario, {id: mensaje.datoSeguro.producto.id})!== undefined) return;
 		_this.inventario.push(mensaje.datoSeguro.producto);
@@ -43,7 +43,7 @@ var Contacto = function(opt){
 
 	this.portal.when({
 		tipoDeMensaje:"traders.avisoDeBajaDeProducto",
-		de: _this.id
+		de: this.id
 	}, function(mensaje){
 		_this.inventario = $.grep(_this.inventario, function(prod){
 			return prod.id != mensaje.datoSeguro.id_producto;
@@ -52,14 +52,12 @@ var Contacto = function(opt){
 		_this.change();
 	});
 
-
 	this.portal.when({
 		tipoDeMensaje:"traders.trueque.oferta",
-		para: Traders.usuario.id,
-		de: _this.id
+		para: Usuario.id,
+		de: this.id
 	}, function(mensaje){
 		// el contacto debería coincidir, me ahorro recalcularlo, aviso por las dudas
-
 		var trueque = Traders.trueques({
 			id: mensaje.datoSeguro.trueque.id,
 			contacto: _this
@@ -91,11 +89,10 @@ var Contacto = function(opt){
 		_this.change();
 	});
 
-
 	this.portal.when({
 		tipoDeMensaje:"traders.aceptacionDeTrueque",
-		para: Traders.usuario.id,
-		de: _this.id
+		para: Usuario.id,
+		de: this.id
 	}, function(mensaje){
 
 		var trueque = Traders.trueques({
@@ -109,18 +106,16 @@ var Contacto = function(opt){
 		trueque.ofertaDetallada.doy = trueque.ofertaDetallada.recibo;
 		trueque.ofertaDetallada.recibo = aux_doy;
 
-
 		trueque.estado = "CERRADO";
 
 		vx.send({
 			tipoDeMensaje:"traders.aceptacionDeTrueque.handShake",
 			para: _this.id,
-			de: Traders.usuario.id,
+			de: Usuario.id,
 			datoSeguro:{
 				trueque: {id : trueque.id}
 			}
 		});
-
 
 		Traders._concretarTrueque(trueque);
 
@@ -130,8 +125,8 @@ var Contacto = function(opt){
 
 	this.portal.when({
 		tipoDeMensaje:"traders.aceptacionDeTrueque.handShake",
-		para: Traders.usuario.id,
-		de: _this.id
+		para: Usuario.id,
+		de: this.id
 	}, function(mensaje){
 
 		var trueque = Traders.trueques({
@@ -146,14 +141,19 @@ var Contacto = function(opt){
 
 
 	this.portal.when({
-		tipoDeMensaje:"traders.avisoDeCambioDeAvatar",
-		de: _this.id
+		tipoDeMensaje: "traders.avisoDeCambioDeAvatar",
+		de: this.id
 	}, function(mensaje){
 		_this.avatar = mensaje.datoSeguro.avatar;
 		_this.change();
 	});
 	
 	this.change();
+};
+Contacto.prototype.confirmar = function(datos_contacto){
+    _.extend(this, datos_contacto);
+    this.estado = 'CONFIRMADO';		
+    this.change();
 };
 Contacto.prototype.change= function(){
 	var _this = this;
@@ -179,8 +179,6 @@ Contacto.prototype.eliminar= function(){
 };
 Contacto.prototype.resumenParaGuardar= function(){
 	return {
-		id:this.id,
-		idUsuario: this.idUsuario,
 		estado: this.estado,
 		nombre:this.nombre,
 		inventario:this.inventario,

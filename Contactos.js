@@ -3,80 +3,66 @@ var Contactos = {
 	start: function(opt){
 		var _this = this;
 		_.extend(this, opt);
-		var str_datos_guardados = localStorage.getItem(this.idUsuario + "_Contactos");
+		var str_datos_guardados = localStorage.getItem(Usuario.id + "_Contactos");
 		if(str_datos_guardados){
 			var ids_contactos_guardados = JSON.parse(str_datos_guardados);
 			_.each(ids_contactos_guardados, function(un_id_contacto){
 				_this.agregar(new Contacto({
-					idContacto: un_id_contacto,
-					idUsuario: _this.idUsuario
+					id: un_id_contacto,
+					idUsuario: Usuario.id
 				}));				
 			});
 		}
 		
 		this.change(function(){
-			localStorage.setItem(_this.idUsuario + "_Contactos", JSON.stringify(_this.resumenParaGuardar()));
+			localStorage.setItem(Usuario.id + "_Contactos", JSON.stringify(_this.resumenParaGuardar()));
 		});
 		this.change();
 	},
-	agregar: function(){
+    solicitarAmistad: function(id_contacto){
+        var contacto = this.buscar({id:id_contacto});
+        if(contacto) {
+            vex.dialog.alert("Ya sos amigo de este usuario, se llama :" +contacto.nombre);
+            return;
+        }
+        var contacto = this.agregar({
+            id: id_contacto,
+            estado: 'SIN_CONFIRMAR',
+            nombre: '¿¿¿???',
+            inventario: [],
+            avatar:""
+        });       
+        vx.send({
+            tipoDeMensaje:"traders.solicitudDeAmistad",
+            de: Usuario.id,
+            para: id_contacto,
+            datoSeguro: {
+                contacto: {
+                    id: Usuario.id,
+                    nombre: Usuario.nombre,
+                    inventario: Usuario.inventario,
+                    avatar: Usuario.avatar
+                }
+            }
+
+        },function(mensaje){
+            if(mensaje.datoSeguro.solicitudAceptada) contacto.confirmar(mensaje.datoSeguro.contacto); 
+        });
+    },
+	agregar: function(datos_contacto){
 		var _this = this;
-		var contacto;
-		if(_.isString(arguments[0])){
-		// es el id			
-			contacto = this.buscar({id:arguments[0]});
-
-			if(contacto) return contacto;
-			
-			contacto = new Contacto({
-				id: arguments[0],
-				idUsuario: this.idUsuario,
-				estado: 'SIN_CONFIRMAR',
-				nombre: '¿¿¿???',
-				inventario: [],
-				avatar:""
-			});
-			
-			contacto.alEliminar(function(){
-				_this.quitar(contacto.id);
-			});
-			this._contactos.push(contacto);
-			vx.send({
-				tipoDeMensaje:"traders.claveAgregada",
-				de: this.idUsuario,
-				para: contacto.id,
-				datoSeguro: {
-					contacto: {
-						id: this.idUsuario,
-						nombre: Traders.usuario.nombre,
-						inventario: Traders.usuario.inventario,
-						avatar:Traders.usuario.avatar
-					}
-				}
-
-			},function(mensaje){
-				contacto = _.extend(contacto, mensaje.datoSeguro.contacto);
-				contacto.estado = 'CONFIRMADO';		
-				contacto.change();
-				//Traders.onNovedades();			
-			});
-			
-		}else if(_.isObject(arguments[0])){	
-			contacto = this.buscar({id:arguments[0].id});
-			if(contacto) return;	
-
-			contacto = new Contacto(arguments[0]);
-			contacto.alEliminar(function(){
-				_this.quitar(contacto.id);
-			});
-			this._contactos.push(contacto);		
-		}		
-		contacto.change(function(){
-			_this.change();
-		});
+		var contacto = this.buscar({id:datos_contacto.id});
+        if(contacto) return;	
+        
+        contacto = new Contacto(datos_contacto);
+        contacto.alEliminar(function(){
+            _this.quitar(contacto.id);
+        });
+        this._contactos.push(contacto);		
 		
 		this.onAdd(contacto);
 		this.change();
+        return contacto;
 	},
 	quitar: function(id){
 		this._contactos = $.grep(this._contactos, function(item){

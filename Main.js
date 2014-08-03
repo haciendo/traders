@@ -27,9 +27,9 @@ var onDeviceReady = function() {
     BarraSuperior.start();
     
     Traders.onUsuarioLogueado(function(){
-		Contactos.start({
-			idUsuario: Traders.usuario.id
-		});
+//		Contactos.start({
+//			idUsuario: Traders.usuario.id
+//		});
 		PantallaUsuario.start();		
 		PantallaContactos.start();		
 		PantallaTrueques.start();		
@@ -42,7 +42,7 @@ var onDeviceReady = function() {
 //		});
 //		
 		
-		var PersistidorPhoneGap_Propio;
+//		var PersistidorPhoneGap_Propio;
 		
 		
 		//if(window.isphone){

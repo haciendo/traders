@@ -2,15 +2,7 @@ var PantallaContacto = {
     start: function(){
         var _this = this;
         this.ui =  $("#pantalla_contacto");     
-        this.ultimo_handler = {remove: function(){}}; 
-			
-		PantallaListaContactos.onSelect(function(){
-			_this.ultimo_handler.remove();
-			_this.ultimo_handler = PantallaListaContactos.contacto_seleccionado.change(function(){
-				_this.render();
-			});
-			_this.render();
-		});			
+        this.ultimo_handler = {remove: function(){}}; 			
 		
         this.panel_contacto = this.ui.find("#panel_contacto");
         this.lbl_nombre_contacto = this.ui.find("#lbl_nombre_contacto");
@@ -25,7 +17,7 @@ var PantallaContacto = {
 			// TO DO: agregar los productos seleccionados al trueque
 			
 			var trueque = Traders.nuevoTrueque({
-				contacto: PantallaListaContactos.contacto_seleccionado
+				contacto: _this.contacto
 			});
 			
 			PantallaListaTrueques.trueque_seleccionado = trueque;
@@ -39,25 +31,35 @@ var PantallaContacto = {
         });
 		this.inventario_contacto.dibujarEn(this.panel_inventario_contacto);
     },
-    render: function(){
-        var _this = this;
-		
-		this._contacto = PantallaListaContactos.contacto_seleccionado;
-        
+	show: function(){
 		if(this._contacto === undefined) {
 			this.panel_contacto.hide();
 			return;
 		}
 		
-        this.lbl_nombre_contacto.text(this._contacto.nombre);
+		this.ui.show();	
+		this.panel_contacto.show();  
+		this.render();
+	},
+	setContacto: function(contacto){
+		var _this = this;
+		this._contacto = contacto;
+		this.ultimo_handler.remove();
+		this.ultimo_handler = contacto.change(function(){
+			_this.render();
+		});
+		this.render();
+	},
+    render: function(){
+		if(!this.ui.is(':visible')) return;
 		
+        var _this = this;
+		
+        this.lbl_nombre_contacto.text(this._contacto.nombre);		
 		if(this._contacto.avatar!="") this.img_avatar_contacto.attr("src", this._contacto.avatar);
 		else this.img_avatar_contacto.attr("src", "avatar_default.png");
 		
 		this.inventario_contacto.setSelector({propietario:this._contacto});
-		this.inventario_contacto.render();        
-        
-        this.panel_contacto.show();  
-        this.ui.show();
+		this.inventario_contacto.render();              
     }
 };

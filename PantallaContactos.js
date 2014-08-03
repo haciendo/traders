@@ -6,11 +6,12 @@ var PantallaContactos = {
 		PantallaContacto.start();
 		PantallaListaContactos.onSelect(function(){
 			_this.ui.animate({scrollLeft: _this.ui.width()}, 300);
+			PantallaContacto.setContacto(PantallaListaContactos.contacto_seleccionado);
 		});
 	},
-	render:function(){
+	show:function(){
 		this.ui.show();
-		PantallaContacto.render();
+		PantallaContacto.show();
 		PantallaListaContactos.show();
 		this.ui.animate({scrollLeft: 0}, 300);
 	}

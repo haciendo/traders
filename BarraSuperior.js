@@ -27,7 +27,7 @@ var BarraSuperior = {
 		});		
 		
 		this.solapa_contactos.click(function(e) {
-			PantallaContactos.render();
+			PantallaContactos.show();
 		});	
 		
 		this.solapa_trueques.click(function(e) {

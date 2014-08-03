@@ -55,10 +55,13 @@ VistaDeUnContactoEnLista.prototype.render = function(){
 
 VistaDeUnContactoEnLista.prototype.seleccionar = function(estado_seleccion){
 	if(estado_seleccion === undefined) estado_seleccion = true;
+	if(this.seleccionado == estado_seleccion) return;
 	this.seleccionado = estado_seleccion;
-	if(this.seleccionado) this.ui.addClass("contacto_seleccionado");
-	else this.ui.removeClass("contacto_seleccionado");
-	if(estado_seleccion) this.onSelect();
+	if(this.seleccionado) {
+		this.ui.addClass("contacto_seleccionado");
+		this.onSelect();
+	}
+	else this.ui.removeClass("contacto_seleccionado");	
 };
 
 VistaDeUnContactoEnLista.prototype.dibujarEn = function(un_panel){

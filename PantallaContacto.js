@@ -32,14 +32,8 @@ var PantallaContacto = {
 		this.inventario_contacto.dibujarEn(this.panel_inventario_contacto);
     },
 	show: function(){
-		if(this._contacto === undefined) {
-			this.panel_contacto.hide();
-			return;
-		}
-		
 		this.ui.show();	
 		this.panel_contacto.show();  
-		this.render();
 	},
 	setContacto: function(contacto){
 		var _this = this;
@@ -51,8 +45,6 @@ var PantallaContacto = {
 		this.render();
 	},
     render: function(){
-		if(!this.ui.is(':visible')) return;
-		
         var _this = this;
 		
         this.lbl_nombre_contacto.text(this._contacto.nombre);		

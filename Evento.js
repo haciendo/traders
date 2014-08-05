@@ -17,6 +17,8 @@ Evento.prototype.removeHandler = function(id_handler){
 
 Evento.prototype.disparar = function(info){
 	_.each(this._handlers, function(handler){
-		handler.callback(info);
+		setTimeout(function(){
+			handler.callback(info);
+		},0);
 	});
 };

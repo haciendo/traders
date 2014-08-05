@@ -106,26 +106,23 @@ var PantallaUsuario = {
         
 		Usuario.change(function(){
             _this.render();
-        });		
-		
-        this.txt_nombre_producto_add.focus();
+        });	
+		this.render();
+		this.show();
     },
     render: function(){
         this.lbl_nombre_usuario.text(Traders.usuario.nombre);
 		if(Traders.usuario.avatar!="") this.img_avatar_usuario.attr("src", Traders.usuario.avatar);
-		
 		
 		// DEBUG
 		if(window.isphone){
 			this.lbl_nombre_usuario.text(Traders.usuario.nombre + ' es un celu carajo');
 		}
 		else this.img_avatar_usuario.attr("src", "avatar_default.png");
-
-		
-        var _this = this;
-		
         this.inventario_usuario.render();
-       
-        this.ui.show();      
-    }
+    },
+	show: function(){
+		this.txt_nombre_producto_add.focus();
+		this.ui.show();      
+	}
 };

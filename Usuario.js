@@ -44,9 +44,8 @@ var Usuario = {
 		this.change();
 	},
     agregarProducto: function(p){
-    	var producto = _.clone(p);
-        
-		producto.id = this.nextProductoId();
+		p.id = this.nextProductoId();
+    	var producto = new Producto(p);
 		
 		this.inventario.push(producto);		
 		
@@ -60,6 +59,8 @@ var Usuario = {
 		
         this.onProductoAgregado(producto);
         this.change();
+		
+		return producto;
     },
     modificarProducto: function(p){
         var producto = _.findWhere(this.inventario, {id: p.id});
@@ -103,20 +104,16 @@ var Usuario = {
 		
 		this.change();    
     },
-    nextProductoId: function(){
-		
-		var maxValue = -1;
+    nextProductoId: function(){		
+		var _this = this;
+		var id = randomString(10);
 		
 		_.each(this.inventario, function(producto){
-			if(producto.id > maxValue){
-				maxValue = producto.id;
+			if(producto.id == id){
+				id = _this.nextProductoId();
 			}
 		});
-		
-		maxValue++;
-		
-		return maxValue;
-		
+		return id;		
 	},
     onProductoAgregado: function(){
         var _this = this;

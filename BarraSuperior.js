@@ -23,7 +23,7 @@ var BarraSuperior = {
 		});
 		
 		this.solapa_yo.click(function(e) {
-			PantallaUsuario.render();
+			PantallaUsuario.show();
 		});		
 		
 		this.solapa_contactos.click(function(e) {

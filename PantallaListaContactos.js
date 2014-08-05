@@ -25,8 +25,8 @@ var PantallaListaContactos = {
 		
 		_.each(Contactos.buscar(), function(un_contacto){
 			_this.add(un_contacto);
-		});
-		this.hide();		
+		});	
+		this.show();
     },
 	
 	add: function(contacto){
@@ -44,7 +44,7 @@ var PantallaListaContactos = {
 			if(_this.vista_seleccionada) _this.vista_seleccionada.seleccionar(false);
 			_this.contacto_seleccionado = contacto;
 			_this.vista_seleccionada = vista_contacto;
-			_this.onSelect();
+			_this.onSelect(contacto);
 		});
 		
 		if(!this.contacto_seleccionado) {

@@ -11,8 +11,6 @@ var PantallaContactos = {
 	},
 	show:function(){
 		this.ui.show();
-		PantallaContacto.show();
-		PantallaListaContactos.show();
 		this.ui.animate({scrollLeft: 0}, 300);
 	}
 };

@@ -6,18 +6,18 @@ var Traders = {
 	_onNovedades:[],
     
 	onNovedades: function(){
-		var _this = this;
-		
-		if(arguments.length==1){
-			this._onNovedades.push(arguments[0]);
-			
-		}else{
-			this.saveDataUsuario();
-			
-			_.each(this._onNovedades, function(evento){
-				evento();
-			});
-		}
+//		var _this = this;
+//		
+//		if(arguments.length==1){
+//			this._onNovedades.push(arguments[0]);
+//			
+//		}else{
+//			this.saveDataUsuario();
+//			
+//			_.each(this._onNovedades, function(evento){
+//				evento();
+//			});
+//		}
 		
 	},
 	
@@ -63,8 +63,8 @@ var Traders = {
         Contactos.start();     
 		RepositorioDeConexiones.start(this.usuario.id);
         
-        Contactos.change(function(){this.onNovedades()});
-        Usuario.change(function(){this.onNovedades()});		
+        Contactos.change(function(){_this.onNovedades()});
+        Usuario.change(function(){_this.onNovedades()});		
 		
 		////parche para atajar las respuestas
 		vx.when({

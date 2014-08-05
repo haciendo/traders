@@ -3,7 +3,7 @@ var Contactos = {
 	start: function(opt){
 		var _this = this;
 		_.extend(this, opt);
-		var str_datos_guardados = localStorage.getItem(Usuario.id + "_Contactos");
+		var str_datos_guardados = Persistidor.get(Usuario.id + "_Contactos");
 		if(str_datos_guardados){
 			var ids_contactos_guardados = JSON.parse(str_datos_guardados);
 			_.each(ids_contactos_guardados, function(un_id_contacto){
@@ -15,7 +15,7 @@ var Contactos = {
 		}
 		
 		this.change(function(){
-			localStorage.setItem(Usuario.id + "_Contactos", JSON.stringify(_this.resumenParaGuardar()));
+			Persistidor.set(Usuario.id + "_Contactos", _this.resumenParaGuardar());
 		});
 		this.change();
 	},

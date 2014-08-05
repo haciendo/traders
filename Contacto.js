@@ -2,13 +2,13 @@ var Contacto = function(opt){
 	var _this = this;
 	_.extend(this, opt);
 	
-	var datos_guardados = localStorage.getItem(Usuario.id + "_Contacto_" + this.id);	
+	var datos_guardados = Persistidor.get(Usuario.id + "_Contacto_" + this.id);	
 	if(datos_guardados){
 		_.extend(this, JSON.parse(datos_guardados));
 	};
 	
 	this.change(function(){
-		localStorage.setItem(Usuario.id + "_Contacto_" + _this.id, JSON.stringify(_this.resumenParaGuardar()));		
+		Persistidor.set(Usuario.id + "_Contacto_" + _this.id, _this.resumenParaGuardar());		
 	});
 	
 	this.portal = vx.portal();

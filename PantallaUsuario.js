@@ -15,7 +15,7 @@ var PantallaUsuario = {
         this.btnLoad = this.ui.find("#btn_load");
         
         this.btn_add_producto.click(function(){
-            Traders.agregarProducto({
+            Usuario.agregarProducto({
                 nombre:_this.txt_nombre_producto_add.val()
             });
             _this.txt_nombre_producto_add.val("");
@@ -30,10 +30,10 @@ var PantallaUsuario = {
 		this.btn_compartir_id.click(function(){
 			vex.dialog.prompt({
 				message: 'Compartí tu id',
-				value: Traders.usuario.id,
+				value: Usuario.id,
 				callback: function(value) {
 					if(value){
-						clipboardCopy(Traders.usuario.id);
+						clipboardCopy(Usuario.id);
 					}
 				}
 			});
@@ -99,7 +99,7 @@ var PantallaUsuario = {
                 var pantalla_edicion = new PantallaEdicionProducto(producto);
             },
             alEliminar: function(producto){
-                Traders.quitarProducto(producto);
+                Usuario.quitarProducto(producto);
             }
         });
         this.inventario_usuario.dibujarEn(this.panel_inventario);
@@ -112,11 +112,11 @@ var PantallaUsuario = {
     },
     render: function(){
         this.lbl_nombre_usuario.text(Traders.usuario.nombre);
-		if(Traders.usuario.avatar!="") this.img_avatar_usuario.attr("src", Traders.usuario.avatar);
+		if(Usuario.avatar!="") this.img_avatar_usuario.attr("src", Usuario.avatar);
 		
 		// DEBUG
 		if(window.isphone){
-			this.lbl_nombre_usuario.text(Traders.usuario.nombre + ' es un celu carajo');
+			this.lbl_nombre_usuario.text(Usuario.nombre + ' es un celu carajo');
 		}
 		else this.img_avatar_usuario.attr("src", "avatar_default.png");
         this.inventario_usuario.render();

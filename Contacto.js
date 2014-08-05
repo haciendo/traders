@@ -26,7 +26,7 @@ var Contacto = function(opt){
 	}, function(mensaje){
 		var producto = _.findWhere(_this.inventario, {id: mensaje.datoSeguro.producto.id});
 		if(producto === undefined) return;			
-		producto = _.extend(producto, mensaje.datoSeguro.producto);
+		_.extend(producto, mensaje.datoSeguro.cambios);
 
 		_this.change();
 	});

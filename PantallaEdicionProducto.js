@@ -5,8 +5,9 @@ var PantallaEdicionProducto = function(producto){
 	this.ui = $("#plantillas .pantalla_edicion_producto").clone();
 	this.txt_nombre_producto = this.ui.find("#txt_nombre_producto");
 	this.txt_nombre_producto.change(function(){
-		producto.nombre = _this.txt_nombre_producto.val();
-		Traders.modificarProducto(producto);
+		producto.modificar({
+			nombre: _this.txt_nombre_producto.val()
+		});
 	});
 	
     this.imagen_producto = this.ui.find("#imagen_producto");
@@ -27,14 +28,15 @@ var PantallaEdicionProducto = function(producto){
                 canvas.width = 100;
                 ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, 100, 100);
                 var bytes_imagen = canvas.toDataURL('image/jpg');        
-                producto.imagen = bytes_imagen;
-                Traders.modificarProducto(producto);
+                producto.modificar({
+					imagen: bytes_imagen
+				});
             };
         }, false);
         $(fileInputImagenes).click();
     });
     
-	Traders.onNovedades(function(){
+	producto.change(function(){
 		_this.render();
 	});
 	

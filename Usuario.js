@@ -62,20 +62,6 @@ var Usuario = {
 		
 		return producto;
     },
-    modificarProducto: function(p){
-        var producto = _.findWhere(this.inventario, {id: p.id});
-		producto = ClonadorDeObjetos.extend(producto, p);
-		
-        vx.send({
-            tipoDeMensaje:"traders.avisoDeProductoModificado",
-            de: this.id,
-            datoSeguro: {
-                producto: producto
-            }
-        });
-		
-        this.change();  
-    },
     quitarProducto: function(p){
         this.inventario = $.grep(this.inventario, function(prod){
             return prod.id != p.id;

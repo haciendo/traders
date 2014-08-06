@@ -1,6 +1,5 @@
 var VistaDeUnProductoEnLista = function(opt){
-	this.alClickear = this.alternarSeleccionParaTrueque;
-    $.extend(true, this, opt);
+    _.extend(this, opt);
     this.start();
 };
 
@@ -15,6 +14,10 @@ VistaDeUnProductoEnLista.prototype.start = function(){
 	this.avatar_propietario = this.ui.find("#avatar_propietario");
 	this.avatar_propietario.click(function(){
 		//TO DO: abrir pantalla de usuario o contacto segun corresponda
+	});
+	
+	this.producto.change(function(){
+		_this.render();
 	});
 	
     if(this.alEliminar){        

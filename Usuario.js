@@ -7,10 +7,16 @@ var Usuario = {
             avatar:""            
         };
 		_.extend(this, def, opt);
-		var str_datos_guardados = localStorage.getItem(this.id);
+		var str_datos_guardados = Persistidor.get(this.id);
 		if(str_datos_guardados){
 			var datos_usuario = JSON.parse(str_datos_guardados);
-			_.extend(_this, datos_usuario);
+			_this.nombre = datos_usuario.nombre;
+			_this.avatar = datos_usuario.avatar;
+			_.each(datos_usuario.inventario, function(un_id_producto){
+				_this.agregarProducto(new Producto({
+					id: un_id_producto
+				}));				
+			});
 		}
 		
         vx.when({
@@ -27,7 +33,7 @@ var Usuario = {
 					contacto: {
                         id: _this.id,
 						nombre: _this.nombre,
-						inventario: _this.inventario,
+						inventario: _this.resumenInventario(),
 						avatar:_this.avatar
 					}
 				}
@@ -39,28 +45,28 @@ var Usuario = {
 		
         
 		this.change(function(){
-			localStorage.setItem(_this.id, JSON.stringify(_this.resumenParaGuardar()));
+			Persistidor.set(_this.id, JSON.stringify(_this.resumenParaGuardar()));
 		});
 		this.change();
 	},
-    agregarProducto: function(p){
+	crearProducto: function(p){
 		p.id = this.nextProductoId();
-    	var producto = new Producto(p);
+    	var producto = new Producto(p);	
 		
-		this.inventario.push(producto);		
-		
-        vx.send({
-            tipoDeMensaje:"traders.avisoDeNuevoProducto",
-            de: this.id,
-            datoSeguro: {
-                producto: producto
-            }
-        });
-		
-        this.onProductoAgregado(producto);
-        this.change();
-		
+		vx.send({
+			tipoDeMensaje:"traders.avisoDeNuevoProducto",
+			de: this.id,
+			datoSeguro: {
+				producto: producto.resumenParaEnviar()
+			}
+		});
+		this.agregarProducto(producto);
 		return producto;
+    },
+    agregarProducto: function(producto){
+		this.inventario.push(producto);		
+        this.onProductoAgregado(producto);
+        this.change();	
     },
     quitarProducto: function(p){
         this.inventario = $.grep(this.inventario, function(prod){
@@ -128,11 +134,18 @@ var Usuario = {
             this._change.disparar();
         }		
     },
+	resumenInventario: function(){
+		resumen = [];
+		_.each(this.inventario, function(producto){
+			resumen.push(producto.id);
+		});
+		return resumen;
+	},
     resumenParaGuardar: function(){
         return {
             nombre:this.nombre,
-            inventario:this.inventario,
-            avatar:this.avatar
+            avatar:this.avatar,
+			inventario: this.resumenInventario()
         }
     }
 };

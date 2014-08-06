@@ -1,5 +1,6 @@
 var Producto = function(opt){
-	this = _.extend(this, opt);
+	_.extend(this, opt);
+	var _this = this;
 	var datos_guardados = Persistidor.get(Usuario.id + "_Producto_" + this.id);	
 	if(datos_guardados){
 		_.extend(this, JSON.parse(datos_guardados));
@@ -7,6 +8,7 @@ var Producto = function(opt){
 	this.change(function(){
 		Persistidor.set(Usuario.id + "_Producto_" + _this.id, _this.resumenParaGuardar());		
 	});
+	this.change();
 };
 Producto.modificar = function(cambios){
 	_.extend(this, cambios);
@@ -45,6 +47,13 @@ Producto.prototype.eliminar= function(){
 };
 Producto.prototype.resumenParaGuardar= function(){
 	return {
+		nombre:this.nombre,
+		imagen:this.imagen
+	}
+};
+Producto.prototype.resumenParaEnviar= function(){
+	return {
+		id:this.id,
 		nombre:this.nombre,
 		imagen:this.imagen
 	}

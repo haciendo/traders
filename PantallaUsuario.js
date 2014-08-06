@@ -15,7 +15,7 @@ var PantallaUsuario = {
         this.btnLoad = this.ui.find("#btn_load");
         
         this.btn_add_producto.click(function(){
-            Usuario.agregarProducto({
+            Usuario.crearProducto({
                 nombre:_this.txt_nombre_producto_add.val()
             });
             _this.txt_nombre_producto_add.val("");
@@ -94,7 +94,7 @@ var PantallaUsuario = {
         });
         
         this.inventario_usuario = new ListaProductos({
-            selector:{propietario:Traders.usuario}, 
+            selector:{propietario:Usuario}, 
             alSeleccionar: function(producto){
                 var pantalla_edicion = new PantallaEdicionProducto(producto);
             },

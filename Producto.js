@@ -10,7 +10,7 @@ var Producto = function(opt){
 	});
 	this.change();
 };
-Producto.modificar = function(cambios){
+Producto.prototype.modificar = function(cambios){
 	_.extend(this, cambios);
 	
 	vx.send({
@@ -43,6 +43,7 @@ Producto.prototype.alEliminar= function(){
 };
 Producto.prototype.eliminar= function(){
 	//this.portal.desconectar();
+	Persistidor.remove(Usuario.id + "_Producto_" + this.id)
 	this.alEliminar();
 };
 Producto.prototype.resumenParaGuardar= function(){

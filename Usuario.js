@@ -45,7 +45,7 @@ var Usuario = {
 		
         
 		this.change(function(){
-			Persistidor.set(_this.id, JSON.stringify(_this.resumenParaGuardar()));
+			Persistidor.set(_this.id, _this.resumenParaGuardar());
 		});
 		this.change();
 	},
@@ -64,8 +64,12 @@ var Usuario = {
 		return producto;
     },
     agregarProducto: function(producto){
+		var _this = this;
 		this.inventario.push(producto);		
         this.onProductoAgregado(producto);
+		producto.alEliminar(function(){
+			_this.quitarProducto(producto);
+		});
         this.change();	
     },
     quitarProducto: function(p){
@@ -113,7 +117,7 @@ var Usuario = {
         if(_.isFunction(arguments[0])){		
             return this._onProductoAgregado.addHandler(arguments[0]);			
         }else{
-            this._onProductoAgregado.disparar();
+            this._onProductoAgregado.disparar(arguments[0]);
         }		
     },
     onProductoQuitado: function(){
@@ -122,7 +126,7 @@ var Usuario = {
         if(_.isFunction(arguments[0])){		
             return this._onProductoQuitado.addHandler(arguments[0]);			
         }else{
-            this._onProductoQuitado.disparar();
+            this._onProductoQuitado.disparar(arguments[0]);
         }		
     },    
     change: function(){
@@ -131,7 +135,7 @@ var Usuario = {
         if(_.isFunction(arguments[0])){		
             return this._change.addHandler(arguments[0]);			
         }else{
-            this._change.disparar();
+            this._change.disparar(arguments[0]);
         }		
     },
 	resumenInventario: function(){

@@ -16,8 +16,14 @@ VistaDeUnProductoEnLista.prototype.start = function(){
 		//TO DO: abrir pantalla de usuario o contacto segun corresponda
 	});
 	
-	this.producto.change(function(){
+	var change_handler = this.producto.change(function(){
 		_this.render();
+	});
+	
+	var eliminar_handler = this.producto.alEliminar(function(){
+		_this.ui.remove();
+		change_handler.remove();
+		eliminar_handler.remove();
 	});
 	
     if(this.alEliminar){        
@@ -29,6 +35,7 @@ VistaDeUnProductoEnLista.prototype.start = function(){
     this.ui.click(function(){
 		_this.alClickear(_this.producto);
     });
+	this.render();
 };
 
 VistaDeUnProductoEnLista.prototype.render = function(){

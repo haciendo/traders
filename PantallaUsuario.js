@@ -86,40 +86,61 @@ var PantallaUsuario = {
             canvas.getContext('2d').drawImage(_this.video_para_sacar_foto, x_rec, 0, alto_rec_video, alto_rec_video, 0, 0, 100, 100);
             var imagen_serializada = canvas.toDataURL('image/jpeg');
             _this.img_avatar_usuario.attr("src", imagen_serializada);
-			Traders.cambiarAvatar(imagen_serializada);
-            $(_this.video_para_sacar_foto).hide();
+			$(_this.video_para_sacar_foto).hide();
             _this.img_avatar_usuario.show();
             _this.video_para_sacar_foto.pause();
             video_stream.stop();
+			
+			Usuario.cambiarAvatar(imagen_serializada);            
         });
         
-        this.inventario_usuario = new ListaProductos({
-            selector:{propietario:Usuario}, 
-            alSeleccionar: function(producto){
-                var pantalla_edicion = new PantallaEdicionProducto(producto);
-            },
-            alEliminar: function(producto){
-                Usuario.quitarProducto(producto);
-            }
-        });
-        this.inventario_usuario.dibujarEn(this.panel_inventario);
+//        this.inventario_usuario = new ListaProductos({
+//            selector:{propietario:Usuario}, 
+//            alSeleccionar: function(producto){
+//                var pantalla_edicion = new PantallaEdicionProducto(producto);
+//            },
+//            alEliminar: function(producto){
+//                Usuario.quitarProducto(producto);
+//            }
+//        });
+//        this.inventario_usuario.dibujarEn(this.panel_inventario);
         
+		Usuario.onProductoAgregado(function(producto){
+			_this.agregarVistaDeProducto(producto);
+		});
 		Usuario.change(function(){
-            _this.render();
+            _this.renderDatosUsuario();
         });	
 		this.render();
 		this.show();
     },
-    render: function(){
-        this.lbl_nombre_usuario.text(Traders.usuario.nombre);
+	agregarVistaDeProducto:function(producto){
+		var _this = this;
+		var vista = new VistaDeUnProductoEnLista({
+			producto: producto,
+			propietario: Usuario.id,
+			mostrarPropietario: false,
+			alClickear: function(){
+				var pantalla_edicion = new PantallaEdicionProducto(producto);
+			},
+			alEliminar: function(){
+				producto.eliminar();
+			}
+		});
+		vista.dibujarEn(_this.panel_inventario);
+	},
+	render: function(){
+		var _this = this;
+		this.renderDatosUsuario();
+		_.each(Usuario.inventario, function(producto){
+			_this.agregarVistaDeProducto(producto);
+		});
+	},
+    renderDatosUsuario: function(){
+        this.lbl_nombre_usuario.text(Usuario.nombre);
 		if(Usuario.avatar!="") this.img_avatar_usuario.attr("src", Usuario.avatar);
-		
-		// DEBUG
-		if(window.isphone){
-			this.lbl_nombre_usuario.text(Usuario.nombre + ' es un celu carajo');
-		}
 		else this.img_avatar_usuario.attr("src", "avatar_default.png");
-        this.inventario_usuario.render();
+        //this.inventario_usuario.render();
     },
 	show: function(){
 		this.txt_nombre_producto_add.focus();

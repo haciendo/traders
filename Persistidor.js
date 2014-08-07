@@ -4,5 +4,8 @@ var Persistidor = {
 	},
 	get: function(clave){
 		return localStorage.getItem(clave);
+	},
+	remove: function(clave){
+		localStorage.removeItem(clave);
 	}
 };

@@ -1,0 +1,3 @@
+var Inventario = function(opt){
+	
+};

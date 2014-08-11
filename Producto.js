@@ -1,28 +1,78 @@
-var Producto = function(opt){
-	_.extend(this, opt);
+var Producto = function(id, idOwner, idLectura){
 	var _this = this;
-	var datos_guardados = Persistidor.get(Usuario.id + "_Producto_" + this.id);	
-	if(datos_guardados){
-		_.extend(this, JSON.parse(datos_guardados));
-	};
-	this.change(function(){
-		Persistidor.set(Usuario.id + "_Producto_" + _this.id, _this.resumenParaGuardar());		
-	});
-	this.change();
-};
-Producto.prototype.modificar = function(cambios){
-	_.extend(this, cambios);
+	this._cambios = [];
+	this.id = id;
+	this.idOwner = idOwner;
+	this.idLectura = idLectura;
 	
-	vx.send({
-		tipoDeMensaje:"traders.avisoDeProductoModificado",
-		de: this.id,
-		datoSeguro: {
-			cambios: cambios
-		}
+	var str_baja_guardada = Persistidor.get(this.idOwner + "_Producto_" + this.id + "_baja");	
+	if(str_baja_guardada){
+		if(JSON.parse(Encriptador.desEncriptarString(str_baja_guardada, this.idOwner, this.idLectura)).id != _this.id) return; 
+		_this.baja = str_baja_guardada;
+		_this.alEliminar();
+	};
+	
+	var str_cambios_guardados = Persistidor.get(this.idOwner + "_Producto_" + this.id + "_cambios");	
+	if(str_cambios_guardados){
+		_this._cambios = JSON.parse(str_cambios_guardados);
+		_.each(_this._cambios, function(cambio){
+			//aplico los cambios (solo si puedo desencriptar y validar, si no tiro excepcion)
+			_.extend(this, JSON.parse(Encriptador.desEncriptarString(cambio, this.idOwner, this.idLectura)));		
+		});
+		//tiro un change
+		_this.change();
+	};
+	
+	this.portal = vx.portal();
+	this.portal.when({
+		tipoDeMensaje: "Traders.modificacionDeProducto",
+		id: this.id,
+		idOwner: this.idOwner
+	} function(mensaje){		
+		//guardo los cambios
+		_this._cambios.push(mensaje.cambio);	
+		Persistidor.set(this.idOwner + "_Producto_" + this.id + "_cambios", _this._cambios); 
+		//aplico los cambios (solo si puedo desencriptar y validar, si no tiro excepcion)
+		_this._aplicarCambio(mensaje.cambio);
+		//tiro un change
+		_this.change();
 	});
-		
-	this.change();  
-},
+	
+	this.portal.when({
+		tipoDeMensaje: "Traders.bajaDeProducto",
+		id: this.id,
+		idOwner: this.idOwner
+	} function(mensaje){	
+		//si mensaje no es valido, me rajo
+		if(JSON.parse(Encriptador.desEncriptarString(mensaje.baja, this.idOwner, this.idLectura)).id != _this.id) return; 
+		_this.baja = mensaje.baja;
+		Persistidor.set(this.idOwner + "_Producto_" + this.id + "_baja", mensaje.baja);
+		_this.alEliminar();
+	});
+};
+
+Producto.prototype.modificar = function(cambio){
+	//creo un certificado de modificacion, si no puedo crearlo tiro excepcion
+	//envio el certificado por vortex, debería recibirlo yo mismo y todos los demas
+	vx.send({
+		tipoDeMensaje:"Traders.modificacionDeProducto",
+		id: this.id,
+		idOwner: this.idOwner,
+		cambio: Encriptador.encriptarString(Json.stringify(cambio))
+	});
+};
+
+Producto.prototype.eliminar= function(){
+	//creo un certificado de baja, si no puedo crearlo tiro excepcion
+	//envio el certificado por vortex, debería recibirlo yo mismo y todos los demas
+	vx.send({
+		tipoDeMensaje:"Traders.bajaDeProducto",
+		id: this.id,
+		idOwner: this.idOwner,
+		baja: Encriptador.encriptarString(Json.stringify({id: this.id}))
+	});
+};
+
 Producto.prototype.change= function(){
 	var _this = this;
 	if(!this._change) this._change = new Evento();
@@ -41,21 +91,6 @@ Producto.prototype.alEliminar= function(){
 		this._alEliminar.disparar();
 	}		
 };
-Producto.prototype.eliminar= function(){
-	//this.portal.desconectar();
-	Persistidor.remove(Usuario.id + "_Producto_" + this.id)
-	this.alEliminar();
-};
-Producto.prototype.resumenParaGuardar= function(){
-	return {
-		nombre:this.nombre,
-		imagen:this.imagen
-	}
-};
-Producto.prototype.resumenParaEnviar= function(){
-	return {
-		id:this.id,
-		nombre:this.nombre,
-		imagen:this.imagen
-	}
+Producto.prototype._aplicarCambio = function(cambio){
+	_.extend(this, JSON.parse(Encriptador.desEncriptarString(cambio, this.idOwner, this.idLectura)));		
 };

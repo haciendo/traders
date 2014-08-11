@@ -24,7 +24,7 @@ var Contacto = function(opt){
 		tipoDeMensaje:"traders.avisoDeProductoModificado",
 		de: this.id
 	}, function(mensaje){
-		var producto = _.findWhere(_this.inventario, {id: mensaje.datoSeguro.producto.id});
+		var producto = _.findWhere(_this.inventario, {id: mensaje.datoSeguro.idProducto});
 		if(producto === undefined) return;			
 		_.extend(producto, mensaje.datoSeguro.cambios);
 

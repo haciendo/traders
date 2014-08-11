@@ -37,12 +37,7 @@ var Contactos = {
             de: Usuario.id,
             para: id_contacto,
             datoSeguro: {
-                contacto: {
-                    id: Usuario.id,
-                    nombre: Usuario.nombre,
-                    inventario: Usuario.inventario,
-                    avatar: Usuario.avatar
-                }
+				contacto: Usuario.resumenParaEnviar()
             }
 
         },function(mensaje){

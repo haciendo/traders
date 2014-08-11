@@ -146,9 +146,17 @@ var Usuario = {
 		return resumen;
 	},
     resumenParaGuardar: function(){
+        return {			
+            nombre: this.nombre,
+            avatar: this.avatar,
+			inventario: this.resumenInventario()
+        }
+    },
+	resumenParaEnviar: function(){
         return {
-            nombre:this.nombre,
-            avatar:this.avatar,
+			id: this.id,
+            nombre: this.nombre,
+            avatar: this.avatar,
 			inventario: this.resumenInventario()
         }
     }

@@ -18,7 +18,7 @@ var Usuario = {
 				}));				
 			});
 		}
-		
+        
         vx.when({
 			tipoDeMensaje:"traders.solicitudDeAmistad",
 			para: this.id
@@ -43,36 +43,42 @@ var Usuario = {
 			Contactos.agregar(mensaje.datoSeguro.contacto);
 		});
 		
+        this.portal.when({
+            tipoDeMensaje: "Traders.altaDeProducto",
+            idOwner: this.id            
+        } function(alta){	
+            //si mensaje no es valido, me rajo
+            _this.altas.push(alta);
+            Persistidor.set(_this.id + "_altas", _this.altas);
+            
+            var producto = _this._agregarProducto(alta);            
+            _this.onProductoAgregado(producto);
+        });
         
-		this.change(function(){
-			Persistidor.set(_this.id, _this.resumenParaGuardar());
-		});
-		this.change();
+//		this.change(function(){
+//			Persistidor.set(_this.id, _this.resumenParaGuardar());
+//		});
+//		this.change();
 	},
-	crearProducto: function(p){
-		p.id = this.nextProductoId();
-    	var producto = new Producto(p);	
-		
+	crearProducto: function(valorInicial){
 		vx.send({
-			tipoDeMensaje:"traders.avisoDeNuevoProducto",
-			de: this.id,
-			datoSeguro: {
-				producto: producto.resumenParaEnviar()
-			}
+			tipoDeMensaje:"Traders.altaDeProducto",
+			idOwner: this.id,
+            claveLectura: this.claveLectura,
+            idProducto: this.nextProductoId(),
+			valorInicial: Encriptador.encriptarString(Json.stringify(valorInicial, this.id, this.claveLectura))
 		});
-		this.agregarProducto(producto);
-		return producto;
     },
-    agregarProducto: function(producto){
+    _agregarProducto: function(alta){
 		var _this = this;
-		this.inventario.push(producto);		
-        this.onProductoAgregado(producto);
+        var producto = new Producto(alta);
+		this.inventario.push(producto);		        
 		producto.alEliminar(function(){
 			_this.quitarProducto(producto);
 		});
-        this.change();	
+        return producto;
     },
-    quitarProducto: function(p){
+    _quitarProducto: function(p){
         this.inventario = $.grep(this.inventario, function(prod){
             return prod.id != p.id;
         });		

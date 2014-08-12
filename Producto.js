@@ -1,13 +1,15 @@
-var Producto = function(id, idOwner, idLectura){
+var Producto = function(alta){
 	var _this = this;
 	this._cambios = [];
-	this.id = id;
-	this.idOwner = idOwner;
-	this.idLectura = idLectura;
+	this.id = alta.idProducto;
+	this.idOwner = alta.idOwner;
+	this.claveLectura = alta.claveLectura;
 	
+    _.extend(this, JSON.parse(Encriptador.desEncriptarString(alta.valorInicial, this.idOwner, this.claveLectura)));		
+    
 	var str_baja_guardada = Persistidor.get(this.idOwner + "_Producto_" + this.id + "_baja");	
 	if(str_baja_guardada){
-		if(JSON.parse(Encriptador.desEncriptarString(str_baja_guardada, this.idOwner, this.idLectura)).id != _this.id) return; 
+		if(JSON.parse(Encriptador.desEncriptarString(str_baja_guardada, this.idOwner, this.claveLectura)).id != _this.id) return; 
 		_this.baja = str_baja_guardada;
 		_this.alEliminar();
 	};
@@ -17,7 +19,7 @@ var Producto = function(id, idOwner, idLectura){
 		_this._cambios = JSON.parse(str_cambios_guardados);
 		_.each(_this._cambios, function(cambio){
 			//aplico los cambios (solo si puedo desencriptar y validar, si no tiro excepcion)
-			_.extend(this, JSON.parse(Encriptador.desEncriptarString(cambio, this.idOwner, this.idLectura)));		
+			_.extend(this, JSON.parse(Encriptador.desEncriptarString(cambio, this.idOwner, this.claveLectura)));		
 		});
 		//tiro un change
 		_this.change();
@@ -44,7 +46,7 @@ var Producto = function(id, idOwner, idLectura){
 		idOwner: this.idOwner
 	} function(mensaje){	
 		//si mensaje no es valido, me rajo
-		if(JSON.parse(Encriptador.desEncriptarString(mensaje.baja, this.idOwner, this.idLectura)).id != _this.id) return; 
+		if(JSON.parse(Encriptador.desEncriptarString(mensaje.baja, this.idOwner, this.claveLectura)).id != _this.id) return; 
 		_this.baja = mensaje.baja;
 		Persistidor.set(this.idOwner + "_Producto_" + this.id + "_baja", mensaje.baja);
 		_this.alEliminar();
@@ -58,7 +60,7 @@ Producto.prototype.modificar = function(cambio){
 		tipoDeMensaje:"Traders.modificacionDeProducto",
 		id: this.id,
 		idOwner: this.idOwner,
-		cambio: Encriptador.encriptarString(Json.stringify(cambio))
+		cambio: Encriptador.encriptarString(Json.stringify(cambio), this.idOwner, this.claveLectura)
 	});
 };
 
@@ -69,7 +71,7 @@ Producto.prototype.eliminar= function(){
 		tipoDeMensaje:"Traders.bajaDeProducto",
 		id: this.id,
 		idOwner: this.idOwner,
-		baja: Encriptador.encriptarString(Json.stringify({id: this.id}))
+		baja: Encriptador.encriptarString(Json.stringify({id: this.id}), this.idOwner, this.claveLectura)
 	});
 };
 
@@ -92,5 +94,5 @@ Producto.prototype.alEliminar= function(){
 	}		
 };
 Producto.prototype._aplicarCambio = function(cambio){
-	_.extend(this, JSON.parse(Encriptador.desEncriptarString(cambio, this.idOwner, this.idLectura)));		
+	_.extend(this, JSON.parse(Encriptador.desEncriptarString(cambio, this.idOwner, this.claveLectura)));		
 };

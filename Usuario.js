@@ -3,16 +3,19 @@ var Usuario = {
 		var _this = this;
         var def = {
             nombre:"novato",
-            inventario:[],
+            altas:[],
             avatar:""            
         };
 		_.extend(this, def, opt);
+        
+        this.claveLectura = Encriptador.claveAnonima;
+        
 		var str_datos_guardados = Persistidor.get(this.id);
 		if(str_datos_guardados){
 			var datos_usuario = JSON.parse(str_datos_guardados);
 			_this.nombre = datos_usuario.nombre;
 			_this.avatar = datos_usuario.avatar;
-			_.each(datos_usuario.inventario, function(un_id_producto){
+			_.each(datos_usuario.altas, function(un_id_producto){
 				_this.agregarProducto(new Producto({
 					id: un_id_producto
 				}));				
@@ -30,12 +33,7 @@ var Usuario = {
 				de: _this.id,
 				datoSeguro: {
                     solicitudAceptada: true,
-					contacto: {
-                        id: _this.id,
-						nombre: _this.nombre,
-						inventario: _this.resumenInventario(),
-						avatar:_this.avatar
-					}
+					contacto: _this.resumenParaEnviar()
 				}
 			});
 			
@@ -43,30 +41,34 @@ var Usuario = {
 			Contactos.agregar(mensaje.datoSeguro.contacto);
 		});
 		
-        this.portal.when({
+        vx.when({
             tipoDeMensaje: "Traders.altaDeProducto",
             idOwner: this.id            
-        } function(alta){	
+        }, function(mensaje){	
             //si mensaje no es valido, me rajo
-            _this.altas.push(alta);
-            Persistidor.set(_this.id + "_altas", _this.altas);
-            
-            var producto = _this._agregarProducto(alta);            
+            _this.altas.push(mensaje.alta);            
+            var producto = _this._agregarProducto(mensaje.alta, _this.id, _this.claveLectura);       
+            _this.change();
             _this.onProductoAgregado(producto);
         });
         
-//		this.change(function(){
-//			Persistidor.set(_this.id, _this.resumenParaGuardar());
-//		});
-//		this.change();
+		this.change(function(){
+			Persistidor.set(_this.id, _this.resumenParaGuardar());
+		});
+		this.change();
 	},
-	crearProducto: function(valorInicial){
+	crearProducto: function(valorInicial){   
+        var alta = {
+            documento: "Traders.altaDeProducto",
+            idOwner: this.id,
+            idProducto: this.nextProductoId(),
+            valorInicial: valorInicial
+        };
+        
 		vx.send({
 			tipoDeMensaje:"Traders.altaDeProducto",
 			idOwner: this.id,
-            claveLectura: this.claveLectura,
-            idProducto: this.nextProductoId(),
-			valorInicial: Encriptador.encriptarString(Json.stringify(valorInicial, this.id, this.claveLectura))
+            alta: Encriptador.encriptarString(JSON.stringify(alta, this.claveLectura, this.id))            
 		});
     },
     _agregarProducto: function(alta){
@@ -144,26 +146,16 @@ var Usuario = {
             this._change.disparar(arguments[0]);
         }		
     },
-	resumenInventario: function(){
-		resumen = [];
-		_.each(this.inventario, function(producto){
-			resumen.push(producto.id);
-		});
-		return resumen;
-	},
     resumenParaGuardar: function(){
         return {			
             nombre: this.nombre,
             avatar: this.avatar,
-			inventario: this.resumenInventario()
+			inventario: this.altas
         }
     },
 	resumenParaEnviar: function(){
-        return {
-			id: this.id,
-            nombre: this.nombre,
-            avatar: this.avatar,
-			inventario: this.resumenInventario()
-        }
+        var resumen = this.resumenParaGuardar();
+        resumen.id = this.id;
+        return resumen;
     }
 };

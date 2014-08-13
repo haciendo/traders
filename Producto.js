@@ -1,6 +1,9 @@
-var Producto = function(alta){
+var Producto = function(alta, idOwner, idLectura){
 	var _this = this;
 	this._cambios = [];
+    
+    this.alta = Encriptador.desEncriptarString(alta, this.claveLectura, this.idOwner));
+    
 	this.id = alta.idProducto;
 	this.idOwner = alta.idOwner;
 	this.claveLectura = alta.claveLectura;
@@ -25,12 +28,11 @@ var Producto = function(alta){
 		_this.change();
 	};
 	
-	this.portal = vx.portal();
-	this.portal.when({
+	vx.when({
 		tipoDeMensaje: "Traders.modificacionDeProducto",
 		id: this.id,
 		idOwner: this.idOwner
-	} function(mensaje){		
+	}, function(mensaje){		
 		//guardo los cambios
 		_this._cambios.push(mensaje.cambio);	
 		Persistidor.set(this.idOwner + "_Producto_" + this.id + "_cambios", _this._cambios); 
@@ -40,11 +42,11 @@ var Producto = function(alta){
 		_this.change();
 	});
 	
-	this.portal.when({
+	vx.when({
 		tipoDeMensaje: "Traders.bajaDeProducto",
 		id: this.id,
 		idOwner: this.idOwner
-	} function(mensaje){	
+	}, function(mensaje){	
 		//si mensaje no es valido, me rajo
 		if(JSON.parse(Encriptador.desEncriptarString(mensaje.baja, this.idOwner, this.claveLectura)).id != _this.id) return; 
 		_this.baja = mensaje.baja;

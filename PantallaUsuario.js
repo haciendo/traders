@@ -132,7 +132,7 @@ var PantallaUsuario = {
 	render: function(){
 		var _this = this;
 		this.renderDatosUsuario();
-		_.each(Usuario.inventario, function(producto){
+		_.each(Usuario.inventario(), function(producto){
 			_this.agregarVistaDeProducto(producto);
 		});
 	},

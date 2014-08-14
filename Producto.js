@@ -2,13 +2,12 @@ var Producto = function(alta, idOwner, claveLectura){
 	var _this = this;
 	this._cambios = [];
    
-   	this.id = alta.idProducto;
 	this.idOwner = idOwner;
 	this.claveLectura = claveLectura;
 	 
     this.alta = JSON.parse(Encriptador.desEncriptarString(alta, this.idOwner, this.claveLectura));
 
-    _.extend(this, alta.valorInicial, this.idOwner, this.claveLectura);		
+    _.extend(this, this.alta.valorInicial);		
     
 	var str_baja_guardada = Persistidor.get(this.idOwner + "_Producto_" + this.id + "_baja");	
 	if(str_baja_guardada){

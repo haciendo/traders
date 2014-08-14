@@ -16,11 +16,13 @@ var Usuario = {
 			var datos_usuario = JSON.parse(str_datos_guardados);
 			_this.nombre = datos_usuario.nombre;
 			_this.avatar = datos_usuario.avatar;
-			_.each(datos_usuario.altas, function(un_id_producto){
-				_this.agregarProducto(new Producto({
-					id: un_id_producto
-				}));				
+            _this.altas = datos_usuario.altas;
+            
+			_.each(_this.altas, function(un_alta){
+                var producto = _this._agregarProducto(un_alta);       
+                _this.onProductoAgregado(producto);
 			});
+            _this.change();
 		}
         
         vx.when({
@@ -47,7 +49,7 @@ var Usuario = {
             idOwner: this.id            
         }, function(mensaje){	
             _this.altas.push(mensaje.alta);            
-            var producto = _this._agregarProducto(mensaje.alta, _this.id, _this.claveLectura);       
+            var producto = _this._agregarProducto(mensaje.alta);       
             _this.change();
             _this.onProductoAgregado(producto);
         });
@@ -57,11 +59,15 @@ var Usuario = {
 		});
 		this.change();
 	},
+    inventario: function(filtro){
+        if(!filtro) return this._inventario;
+        return _.findWhere(this._inventario, filtro);
+    },
 	crearProducto: function(valorInicial){   
+        valorInicial.id = this.nextProductoId();
         var alta = {
             documento: "Traders.altaDeProducto",
             idOwner: this.id,
-            idProducto: this.nextProductoId(),
             valorInicial: valorInicial
         };
         

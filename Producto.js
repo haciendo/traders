@@ -1,14 +1,14 @@
-var Producto = function(alta, idOwner, idLectura){
+var Producto = function(alta, idOwner, claveLectura){
 	var _this = this;
 	this._cambios = [];
-    
-    this.alta = Encriptador.desEncriptarString(alta, this.claveLectura, this.idOwner));
-    
-	this.id = alta.idProducto;
-	this.idOwner = alta.idOwner;
-	this.claveLectura = alta.claveLectura;
-	
-    _.extend(this, JSON.parse(Encriptador.desEncriptarString(alta.valorInicial, this.idOwner, this.claveLectura)));		
+   
+   	this.id = alta.idProducto;
+	this.idOwner = idOwner;
+	this.claveLectura = claveLectura;
+	 
+    this.alta = JSON.parse(Encriptador.desEncriptarString(alta, this.idOwner, this.claveLectura));
+
+    _.extend(this, alta.valorInicial, this.idOwner, this.claveLectura);		
     
 	var str_baja_guardada = Persistidor.get(this.idOwner + "_Producto_" + this.id + "_baja");	
 	if(str_baja_guardada){

@@ -8,6 +8,7 @@ var Usuario = {
         };
 		_.extend(this, def, opt);
         
+		this._inventario = [];
         this.claveLectura = Encriptador.claveAnonima;
         
 		var str_datos_guardados = Persistidor.get(this.id);
@@ -45,7 +46,6 @@ var Usuario = {
             tipoDeMensaje: "Traders.altaDeProducto",
             idOwner: this.id            
         }, function(mensaje){	
-            //si mensaje no es valido, me rajo
             _this.altas.push(mensaje.alta);            
             var producto = _this._agregarProducto(mensaje.alta, _this.id, _this.claveLectura);       
             _this.change();
@@ -68,20 +68,20 @@ var Usuario = {
 		vx.send({
 			tipoDeMensaje:"Traders.altaDeProducto",
 			idOwner: this.id,
-            alta: Encriptador.encriptarString(JSON.stringify(alta, this.claveLectura, this.id))            
+            alta: Encriptador.encriptarString(JSON.stringify(alta), this.claveLectura, this.id)            
 		});
     },
     _agregarProducto: function(alta){
 		var _this = this;
-        var producto = new Producto(alta);
-		this.inventario.push(producto);		        
+        var producto = new Producto(alta, this.id, this.claveLectura);
+		this._inventario.push(producto);		        
 		producto.alEliminar(function(){
 			_this.quitarProducto(producto);
 		});
         return producto;
     },
     _quitarProducto: function(p){
-        this.inventario = $.grep(this.inventario, function(prod){
+        this._inventario = $.grep(this._inventario, function(prod){
             return prod.id != p.id;
         });		
 		
@@ -112,7 +112,7 @@ var Usuario = {
 		var _this = this;
 		var id = randomString(10);
 		
-		_.each(this.inventario, function(producto){
+		_.each(this._inventario, function(producto){
 			if(producto.id == id){
 				id = _this.nextProductoId();
 			}
@@ -150,7 +150,7 @@ var Usuario = {
         return {			
             nombre: this.nombre,
             avatar: this.avatar,
-			inventario: this.altas
+			altas: this.altas
         }
     },
 	resumenParaEnviar: function(){

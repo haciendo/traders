@@ -1,6 +1,6 @@
 var Producto = function(alta, idOwner, claveLectura){
 	var _this = this;
-	this._cambios = [];
+	this._modificaciones = [];
    
 	this.idOwner = idOwner;
 	this.claveLectura = claveLectura;
@@ -9,19 +9,13 @@ var Producto = function(alta, idOwner, claveLectura){
 
     _.extend(this, this.alta.valorInicial);		
     
-	var str_baja_guardada = Persistidor.get(this.idOwner + "_Producto_" + this.id + "_baja");	
-	if(str_baja_guardada){
-		if(JSON.parse(Encriptador.desEncriptarString(str_baja_guardada, this.idOwner, this.claveLectura)).id != _this.id) return; 
-		_this.baja = str_baja_guardada;
-		_this.alEliminar();
-	};
-	
-	var str_cambios_guardados = Persistidor.get(this.idOwner + "_Producto_" + this.id + "_cambios");	
-	if(str_cambios_guardados){
-		_this._cambios = JSON.parse(str_cambios_guardados);
-		_.each(_this._cambios, function(cambio){
-			//aplico los cambios (solo si puedo desencriptar y validar, si no tiro excepcion)
-			_.extend(this, JSON.parse(Encriptador.desEncriptarString(cambio, this.idOwner, this.claveLectura)));		
+	var str_datos_guardados = Persistidor.get(this.idOwner + "_Producto_" + this.id);	
+	if(str_datos_guardados){
+        var datos_guardados = JSON.parse(str_datos_guardados);
+        _this._modificaciones = datos_guardados.modificaciones;
+        _this._baja = datos_guardados.baja;
+        _.each(_this._modificaciones, function(doc_modificacion){
+            _this._aplicarCambio(doc_modificacion);
 		});
 		//tiro un change
 		_this.change();
@@ -29,15 +23,11 @@ var Producto = function(alta, idOwner, claveLectura){
 	
 	vx.when({
 		tipoDeMensaje: "Traders.modificacionDeProducto",
-		id: this.id,
+		idProducto: this.id,
 		idOwner: this.idOwner
 	}, function(mensaje){		
-		//guardo los cambios
-		_this._cambios.push(mensaje.cambio);	
-		Persistidor.set(this.idOwner + "_Producto_" + this.id + "_cambios", _this._cambios); 
-		//aplico los cambios (solo si puedo desencriptar y validar, si no tiro excepcion)
-		_this._aplicarCambio(mensaje.cambio);
-		//tiro un change
+		_this._modificaciones.push(mensaje.docModificacion);	
+		_this._aplicarCambio(mensaje.docModificacion);
 		_this.change();
 	});
 	
@@ -52,17 +42,32 @@ var Producto = function(alta, idOwner, claveLectura){
 		Persistidor.set(this.idOwner + "_Producto_" + this.id + "_baja", mensaje.baja);
 		_this.alEliminar();
 	});
+    
+    this.change(function(){
+        var resumen = {            
+            modificaciones: _this._modificaciones,
+            baja: _this._baja
+        }
+        Persistidor.set(_this.idOwner + "_Producto_" + _this.id, resumen); 
+    });
 };
 
 Producto.prototype.modificar = function(cambio){
 	//creo un certificado de modificacion, si no puedo crearlo tiro excepcion
 	//envio el certificado por vortex, debería recibirlo yo mismo y todos los demas
-	vx.send({
-		tipoDeMensaje:"Traders.modificacionDeProducto",
-		id: this.id,
+    var docModificacion = {
+        tipoDeDocumento: "Traders.altaDeProducto",
+        idProducto: this.id,
+        idOwner: this.idOwner,
+        cambio: cambio
+    };
+    
+    vx.send({
+        tipoDeMensaje:"Traders.modificacionDeProducto",
+		idProducto: this.id,
 		idOwner: this.idOwner,
-		cambio: Encriptador.encriptarString(Json.stringify(cambio), this.idOwner, this.claveLectura)
-	});
+        docModificacion: Encriptador.encriptarString(JSON.stringify(docModificacion), this.claveLectura, this.idOwner)            
+    });
 };
 
 Producto.prototype.eliminar= function(){
@@ -94,6 +99,7 @@ Producto.prototype.alEliminar= function(){
 		this._alEliminar.disparar();
 	}		
 };
-Producto.prototype._aplicarCambio = function(cambio){
-	_.extend(this, JSON.parse(Encriptador.desEncriptarString(cambio, this.idOwner, this.claveLectura)));		
+Producto.prototype._aplicarCambio = function(doc_modificacion){
+    var cambio = JSON.parse(Encriptador.desEncriptarString(doc_modificacion, this.idOwner, this.claveLectura)).cambio;
+	_.extend(this, cambio);		
 };

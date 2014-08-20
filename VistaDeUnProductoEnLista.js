@@ -27,7 +27,8 @@ VistaDeUnProductoEnLista.prototype.start = function(){
 	});
 	
     if(this.alEliminar){        
-        this.btnEliminar.click(function(){
+        this.btnEliminar.click(function(evento){
+            evento.stopPropagation();
             _this.alEliminar(_this.producto);
         });
         this.btnEliminar.show();

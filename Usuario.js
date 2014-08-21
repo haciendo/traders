@@ -61,7 +61,7 @@ var Usuario = {
 	},
     inventario: function(filtro){
         if(!filtro) return this._inventario;
-        return _.findWhere(this._inventario, filtro);
+        return _.where(this._inventario, filtro);
     },
 	crearProducto: function(valorInicial){   
         valorInicial.id = this.nextProductoId();

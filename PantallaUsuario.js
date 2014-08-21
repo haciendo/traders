@@ -106,7 +106,7 @@ var PantallaUsuario = {
 //        this.inventario_usuario.dibujarEn(this.panel_inventario);
         
 		Usuario.onProductoAgregado(function(producto){
-			_this.agregarVistaDeProducto(producto);
+			if(!producto.baja) _this.agregarVistaDeProducto(producto);
 		});
 		Usuario.change(function(){
             _this.renderDatosUsuario();
@@ -132,7 +132,7 @@ var PantallaUsuario = {
 	render: function(){
 		var _this = this;
 		this.renderDatosUsuario();
-		_.each(Usuario.inventario(), function(producto){
+		_.each(Usuario.inventario({baja:false}), function(producto){
 			_this.agregarVistaDeProducto(producto);
 		});
 	},

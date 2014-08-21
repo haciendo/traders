@@ -6,7 +6,8 @@ var Producto = function(alta, idOwner, claveLectura){
 	this.claveLectura = claveLectura;
 	 
     this.alta = JSON.parse(Encriptador.desEncriptarString(alta, this.idOwner, this.claveLectura));
-
+	this.baja = false;
+	
     _.extend(this, this.alta.valorInicial);		
     
 	var str_datos_guardados = Persistidor.get(this.idOwner + "_Producto_" + this.id);	
@@ -14,10 +15,12 @@ var Producto = function(alta, idOwner, claveLectura){
         var datos_guardados = JSON.parse(str_datos_guardados);
         _this._modificaciones = datos_guardados.modificaciones;
         _this._baja = datos_guardados.baja;
+		_this.baja = (datos_guardados.baja !== undefined);
         _.each(_this._modificaciones, function(doc_modificacion){
             _this._aplicarCambio(doc_modificacion);
 		});
 		//tiro un change
+		if(_this.baja) _this.alEliminar();
 		_this.change();
 	};
 	
@@ -33,14 +36,15 @@ var Producto = function(alta, idOwner, claveLectura){
 	
 	vx.when({
 		tipoDeMensaje: "Traders.bajaDeProducto",
-		id: this.id,
+		idProducto: this.id,
 		idOwner: this.idOwner
 	}, function(mensaje){	
 		//si mensaje no es valido, me rajo
-		if(JSON.parse(Encriptador.desEncriptarString(mensaje.baja, this.idOwner, this.claveLectura)).id != _this.id) return; 
-		_this.baja = mensaje.baja;
-		Persistidor.set(this.idOwner + "_Producto_" + this.id + "_baja", mensaje.baja);
+		if(JSON.parse(Encriptador.desEncriptarString(mensaje.docBaja, _this.idOwner, _this.claveLectura)).idProducto != _this.id) return; 
+		_this._baja = mensaje.docBaja;
+		_this.baja = (_this._baja !== undefined);
 		_this.alEliminar();
+		_this.change();
 	});
     
     this.change(function(){
@@ -73,12 +77,18 @@ Producto.prototype.modificar = function(cambio){
 Producto.prototype.eliminar= function(){
 	//creo un certificado de baja, si no puedo crearlo tiro excepcion
 	//envio el certificado por vortex, debería recibirlo yo mismo y todos los demas
-	vx.send({
-		tipoDeMensaje:"Traders.bajaDeProducto",
-		id: this.id,
+	var docBaja = {
+        tipoDeDocumento: "Traders.bajaDeProducto",
+        idProducto: this.id,
+        idOwner: this.idOwner
+    };
+    
+    vx.send({
+        tipoDeMensaje:"Traders.bajaDeProducto",
+		idProducto: this.id,
 		idOwner: this.idOwner,
-		baja: Encriptador.encriptarString(Json.stringify({id: this.id}), this.idOwner, this.claveLectura)
-	});
+        docBaja: Encriptador.encriptarString(JSON.stringify(docBaja), this.claveLectura, this.idOwner)            
+    });
 };
 
 Producto.prototype.change= function(){

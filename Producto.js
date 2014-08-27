@@ -19,7 +19,7 @@ var Producto = function(alta, idOwner, claveLectura){
         _.each(_this._modificaciones, function(doc_modificacion){
             _this._aplicarCambio(doc_modificacion);
 		});
-		//tiro un change
+		
 		if(_this.baja) _this.alEliminar();
 		_this.change();
 	};

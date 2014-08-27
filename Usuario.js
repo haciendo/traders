@@ -3,7 +3,7 @@ var Usuario = {
 		var _this = this;
         var def = {
             nombre:"novato",
-            altas:[],
+            altas_de_producto:[],
             avatar:""            
         };
 		_.extend(this, def, opt);
@@ -16,9 +16,9 @@ var Usuario = {
 			var datos_usuario = JSON.parse(str_datos_guardados);
 			_this.nombre = datos_usuario.nombre;
 			_this.avatar = datos_usuario.avatar;
-            _this.altas = datos_usuario.altas;
+            _this.altas_de_producto = datos_usuario.altas_de_producto;
             
-			_.each(_this.altas, function(un_alta){
+			_.each(_this.altas_de_producto, function(un_alta){
                 var producto = _this._agregarProducto(un_alta);       
                 _this.onProductoAgregado(producto);
 			});
@@ -48,7 +48,7 @@ var Usuario = {
             tipoDeMensaje: "Traders.altaDeProducto",
             idOwner: this.id            
         }, function(mensaje){	
-            _this.altas.push(mensaje.alta);            
+            _this.altas_de_producto.push(mensaje.alta);            
             var producto = _this._agregarProducto(mensaje.alta);       
             _this.change();
             _this.onProductoAgregado(producto);
@@ -156,7 +156,7 @@ var Usuario = {
         return {			
             nombre: this.nombre,
             avatar: this.avatar,
-			altas: this.altas
+			altas_de_producto: this.altas_de_producto
         }
     },
 	resumenParaEnviar: function(){

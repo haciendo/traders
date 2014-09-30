@@ -20,44 +20,8 @@ var onDeviceReady = function() {
 	// url:'http://localhost:3000',
 	
     PantallaInicio.start();
-    BarraSuperior.start();
-    
-    Traders.onUsuarioLogueado(function(){
-		
-		
-		PantallaUsuario.start();		
-		PantallaContactos.start();		
-		PantallaTrueques.start();		
-		PantallaListaConexiones.start();
-		PantallaProductos.start();
-		// PersistidorManual.start(this.usuario.id);
-		// PersistidorLocalStorage.start(this.usuario.id);
-		
-		/*
-		ACLARACIóN: si no usas "var" se declara global,
-					en este caso es lo mismo,
-					no nesecitamos hacer referencia directa a los persistidores
-		*/
-		
-		
-		
-		
-		/*
-		//DEBUG: para corroborar que anda el phonegap
-		PersistidorLocalStorage_Propio = new PersistidorLocalStorage({
-			usuario_id: this.usuario.id
-		});
-		*/
-		
-		if(window.isphone){
-			PersistidorPhoneGap_Propio = new PersistidorPhoneGap({
-				usuario_id: this.usuario.id
-			});
-		}
-		
-    });
-
     PantallaInicio.render();
+	
 	vex.defaultOptions.className = 'vex-theme-top';
 	/**
 	 * Enables the background mode. The app will not pause while in background.

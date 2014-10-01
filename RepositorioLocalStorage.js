@@ -1,19 +1,29 @@
 var RepositorioLocalStorage = {
-	start: function(opt){
-		var _this = this;  
-		var optDefault = {
-			usuario_id: null
-		};
-		_.extend(this, optDefault, opt);			
+	start: function(){
+		if(!Usuario.id){
+			throw "El usuario todavía no se logueo y ya se está inicializando el repo, mal..."; 
+		}
+		var keys = Object.keys(localStorage);
+		this.objetosGuardados = [];
+		keys.forEach(function(k){
+			if(k.split('_')[0]==Usuario.id) this.objetosGuardados.push(JSON.parse(Encriptador.desEncriptarString(localStorage.getItem(k), Usuario.id, Usuario.id)));
+		});
 	},
 	save: function(objeto){
-		objeto.id = objeto.id||this.nextId();
-		if(!objeto.tipo) throw "el objeto debe tener un tipo para ser guardado"
-		localStorage.setItem(Usuario.id+"_"+objeto.tipo+"_"+objeto.id, Encriptador.EncriptarString(JSON.stringify(objeto))));
-	},
-	get: function(filtro){
-		if(filtro.id) return JSON.parse(localStorage.getItem(Usuario.id+"_"+filtro.tipo+"_"+filtro.id));
+		if(objeto.id){
+			var obj_guardado = _.find(this.objetosGuardados, function(o){
+				return o.id = objeto.id;
+			});
+			_.extend(obj_guardado, objeto);
+		}
+		else{
+			objeto.id = this.nextId();
+		}
+		localStorage.setItem(Usuario.id+"_"+objeto.id, Encriptador.encriptarString(JSON.stringify(objeto), Usuario.id, Usuario.id));
 		
+	},
+	load: function(filtro){
+		return _.where(this.objetosGuardados, filtro);
 	},
 	nextId: function() {
 		var text = "";

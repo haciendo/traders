@@ -1,0 +1,92 @@
+#pantalla_usuario
+	.datos_usuario{
+		position: absolute;
+		left: 0px;
+		right: 0px;
+		top:0px;
+		height:115px;
+		background-color: rgb(248, 248, 248);
+}
+
+#pantalla_usuario 
+	.panel_inventario_container {
+		position: absolute;
+		left: 0px;
+		right: 0px;
+		top:115px;
+		bottom: 0px;
+}
+
+#pantalla_usuario
+	#panel_inventario {
+}
+
+#pantalla_usuario
+	#txt_nombre_producto_add{
+		position: absolute;
+		right: 46px;
+		bottom: 1px;
+		width: 105px;
+}
+
+#pantalla_usuario
+	#btn_add_producto{
+		position: absolute;
+		right: 8px;
+		bottom: 11px;
+		border-radius: 50%;
+		height: 30px;
+		width: 30px;
+		padding-left: 10px;
+}
+
+#pantalla_usuario
+	#panel_alta_producto
+		#btn_add_producto{
+			margin-top: -12px;
+}
+
+#pantalla_usuario .lbl_nombre_usuario {
+	position: absolute;
+	top: 23px;
+	left: 120px;
+	font-size: 45px;
+    font-weight: bold;
+    vertical-align: bottom;
+}
+
+#pantalla_usuario #btn_compartir_id {
+    position: absolute;
+	top: 73px;
+	left: 120px;
+}
+
+#pantalla_usuario .datos_persona{
+    background-color: rgb(248, 248, 248);
+	height: 120px;
+}
+
+#pantalla_usuario #avatar_usuario{
+    cursor:pointer;
+	margin-left: -2px;
+	margin-top: -3px;
+}
+
+#pantalla_usuario #video_para_sacar_foto {
+    height: 100px;
+    width: 133px;
+    margin-left: -16px;
+    cursor: pointer;
+}
+
+#pantalla_usuario #div_recorte_avatar{
+    height: 100px;
+    width: 100px;
+    border-radius: 50%;
+    border: black solid;
+    display: inline-block;
+    overflow: hidden;
+    margin:5px;
+    position: relative;
+}
+

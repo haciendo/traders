@@ -11,7 +11,7 @@ var PantallaInicio = {
             var nombre_usuario = _this.txtNombreUsuario.val();
             var password = _this.txtPassword.val();
            
-			var Usuario.id = Encriptador.addKey(_nombre + password);
+			Usuario.id = Encriptador.addKey(nombre_usuario + password);
 			
 			////parche para atajar las respuestas
 			vx.when({
@@ -20,13 +20,13 @@ var PantallaInicio = {
 				//nada-nop
 			});
 			
-			if(window.isphone){
+			//if(window.isphone){
+				RepositorioLocalStorage.start();
 				traders_server = new TradersServer({
-					persistidor: new PersistidorPhoneGap({
-						usuario_id: Usuario.id
-					}
+					repositorio: RepositorioLocalStorage,
+					usuario: Usuario
 				});
-			}
+			//}
 			
 			BarraSuperior.start();
 			BarraSuperior.render();

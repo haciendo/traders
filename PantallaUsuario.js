@@ -1,0 +1,134 @@
+var PantallaUsuario = {
+    start: function(){
+        var _this = this;
+        this.ui =  $("#pantalla_usuario");
+        
+        this.panel_inventario = this.ui.find("#panel_inventario");
+		
+        this.lbl_nombre_usuario = this.ui.find("#lbl_nombre_usuario");			
+		this.img_avatar_usuario = this.ui.find("#avatar_usuario");
+		vx.send({
+			tipoDeMensaje:"traders.getDatosPersonales",
+			de: Usuario.id,
+			para: Usuario.id
+		},function(mensaje){
+			_this.lbl_nombre_usuario.text(mensaje.datoSeguro.nombre);
+			_this.img_avatar_usuario.attr("src", mensaje.datoSeguro.avatar);
+		});
+		
+		vx.when({
+			tipoDeMensaje:"traders.avisoDeCambioEnDatosPersonales",
+			de: Usuario.id
+		}, function(mensaje){
+			_this.lbl_nombre_usuario.text(mensaje.datoSeguro.nombre);
+			_this.img_avatar_usuario.attr("src", mensaje.datoSeguro.avatar);
+		});
+		
+        this.txt_nombre_producto_add = this.ui.find("#txt_nombre_producto_add");
+        this.btn_add_producto = this.ui.find("#btn_add_producto");
+        this.btn_add_producto.click(function(){
+			vx.send({
+				tipoDeMensaje: "traders.crearProducto",
+				de: Usuario.id,
+				para: Usuario.id,
+				datoSeguro:{
+					nombre:_this.txt_nombre_producto_add.val()
+				}
+			}, function(msg){
+				
+			});
+            _this.txt_nombre_producto_add.val("");
+        }); 
+		
+		this.txt_nombre_producto_add.keypress(function(e) {
+			if(e.which == 13) {
+				_this.btn_add_producto.click();
+			}
+		});    
+        
+		this.btn_compartir_id = this.ui.find("#btn_compartir_id");
+		this.btn_compartir_id.click(function(){
+			vex.dialog.prompt({
+				message: 'Compartí tu id',
+				value: Usuario.id,
+				callback: function(value) {
+					if(value){
+						clipboardCopy(Usuario.id);
+					}
+				}
+			});
+		});
+		
+        this.video_para_sacar_foto= this.ui.find("#video_para_sacar_foto")[0];
+		var video_stream;
+        this.img_avatar_usuario.click(function(){		            
+            var width = 100;
+            var height = 100;
+            var streaming = false;
+            
+            var errBack = function(error) {
+                    console.log("Video capture error: ", error.code); 
+                };
+            
+            navigator.getMedia = ( navigator.getUserMedia || 
+                                    navigator.webkitGetUserMedia ||
+                                    navigator.mozGetUserMedia ||
+                                    navigator.msGetUserMedia);
+
+            navigator.getMedia(
+                { 
+                    video: true, 
+                    audio: false 
+                },
+                function(stream) {
+                    video_stream = stream;
+                    if (navigator.mozGetUserMedia) { 
+                        _this.video_para_sacar_foto.mozSrcObject = stream;
+                    } else {
+                        var vendorURL = window.URL || window.webkitURL;
+                        _this.video_para_sacar_foto.src = vendorURL ? vendorURL.createObjectURL(stream) : stream;
+                    }
+                    _this.video_para_sacar_foto.play();
+                    $(_this.video_para_sacar_foto).show();
+                    _this.img_avatar_usuario.hide();
+                },
+                function(err) {
+                    console.log("An error occured! " + err);
+                }
+            );
+        });
+        
+        $(this.video_para_sacar_foto).click(function(){
+            var canvas = $('<canvas>')[0];
+            var ctx = canvas.getContext('2d');
+            canvas.width = 100;
+            canvas.height = 100;
+            var alto_rec_video = _this.video_para_sacar_foto.videoHeight;
+            var x_rec = (_this.video_para_sacar_foto.videoWidth - alto_rec_video)/2;
+            canvas.getContext('2d').drawImage(_this.video_para_sacar_foto, x_rec, 0, alto_rec_video, alto_rec_video, 0, 0, 100, 100);
+            var imagen_serializada = canvas.toDataURL('image/jpeg');
+            _this.img_avatar_usuario.attr("src", imagen_serializada);
+			Traders.cambiarAvatar(imagen_serializada);
+            $(_this.video_para_sacar_foto).hide();
+            _this.img_avatar_usuario.show();
+            _this.video_para_sacar_foto.pause();
+            video_stream.stop();
+        });
+        
+//        this.inventario_usuario = new ListaProductos({
+//            selector:{propietario:Usuario.id}, 
+//            alSeleccionar: function(producto){
+//                var pantalla_edicion = new PantallaEdicionProducto(producto);
+//            },
+//            alEliminar: function(producto){
+//                throw "Envio de mensaje de eliminar producto no implementado";
+//            }
+//        });
+//        this.inventario_usuario.dibujarEn(this.panel_inventario);	
+//		
+    },
+    render: function(){  
+		this.txt_nombre_producto_add.focus();
+        this.ui.show();      
+    }
+};

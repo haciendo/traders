@@ -1,0 +1,74 @@
+#plantillas{
+    display:none;
+}
+
+html, body{
+    height:100%;
+    margin: 0px;
+	padding: 0px;
+}
+
+
+ul {
+	list-style-type: none;
+	margin:0;
+	padding:0;
+}
+
+#main {
+    height: 100%;
+}
+
+.pantalla{
+    display: none;
+    position: absolute;
+    top: 40px;
+    bottom: 0px;
+	left:0px;
+	right:0px;
+}
+
+.titulo_panel {
+	height: 45px;
+}
+
+
+.descripcion_titulo{
+	font-size: 35px;
+	padding: 13px 10px 0px 10px;
+}
+
+.avatar_usuario {
+    height: 100px;
+    width: 100px;
+	border-radius: 50%;
+	border: solid black;
+}
+
+.seccion_container{
+	border: solid 1px;
+	/*position: absolute;
+	bottom: 0px;*/
+}
+
+.item_en_lista{
+	font-size: 25px;
+	vertical-align: bottom;
+	height: 21px;
+	border: 1px solid black;
+	transition: all .5s ease;
+	cursor: pointer;
+	position: relative;
+	padding: 10px;
+}
+
+.item_en_lista:hover{
+    background-color: rgb(231, 231, 231);
+}
+
+.item_en_lista #btn_eliminar{
+	position: absolute;
+	right: 10px;
+	top: 8px;
+    color:blue;
+}

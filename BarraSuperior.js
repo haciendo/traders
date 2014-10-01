@@ -19,7 +19,7 @@ var BarraSuperior = {
 		});
 		
 		vx.send({
-			tipoDeMensaje:"traders.getAvatar",
+			tipoDeMensaje:"traders.getDatosPersonales",
 			de: Usuario.id,
 			para: Usuario.id
 		},function(mensaje){
@@ -27,7 +27,7 @@ var BarraSuperior = {
 		});
 		
 		vx.when({
-			tipoDeMensaje:"traders.avisoDeCambioDeAvatar",
+			tipoDeMensaje:"traders.avisoDeCambioEnDatosPersonales",
 			de: Usuario.id
 		}, function(mensaje){
 			_this.avatar_usuario.attr("src", mensaje.datoSeguro.avatar);

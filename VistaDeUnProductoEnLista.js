@@ -40,9 +40,9 @@ VistaDeUnProductoEnLista.prototype.start = function(){
 	}
 	
 	var pedido_modificacion = vx.when({
+		tipoDeMensaje:"vortex.persistencia.avisoDeObjetoActualizado",
 		de: this.propietario,
-		tipoDeMensaje:"traders.avisoDeModificacionDeProducto",
-		idProducto: this.producto.id		
+		idObjeto: this.producto.id		
 	}, function(aviso){
 		var cambios = aviso.datoSeguro.cambios;
 		if(cambios.nombre) _this.lblNombre.text(cambios.nombre);
@@ -51,9 +51,9 @@ VistaDeUnProductoEnLista.prototype.start = function(){
 	});
 	
 	var pedido_eliminacion = vx.when({
+		tipoDeMensaje:"vortex.persistencia.avisoDeObjetoEliminado",
 		de: this.propietario,
-		tipoDeMensaje:"traders.avisoDeEliminacionDeProducto",
-		idProducto: this.producto.id		
+		idObjeto: this.producto.id		
 	}, function(aviso){
 		pedido_modificacion.quitar();
 		pedido_eliminacion.quitar();

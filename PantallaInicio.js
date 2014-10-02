@@ -22,7 +22,10 @@ var PantallaInicio = {
 			
 			//if(window.isphone){
 				RepositorioLocalStorage.start();
-				traders_server = new TradersServer({
+				RepositorioVortex.start({
+					repositorio: RepositorioLocalStorage
+				});
+				TradersServer.start({
 					repositorio: RepositorioLocalStorage,
 					usuario: Usuario
 				});

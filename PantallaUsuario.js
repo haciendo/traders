@@ -7,33 +7,38 @@ var PantallaUsuario = {
 		
         this.lbl_nombre_usuario = this.ui.find("#lbl_nombre_usuario");			
 		this.img_avatar_usuario = this.ui.find("#avatar_usuario");
+		
 		vx.send({
-			tipoDeMensaje:"traders.getDatosPersonales",
+			tipoDeMensaje:"vortex.persistencia.select",
 			de: Usuario.id,
-			para: Usuario.id
+			para: Usuario.id,
+			datoSeguro: {
+				filtro: {
+					id: "DATOS_PERSONALES"
+				}
+			}
 		},function(mensaje){
 			_this.lbl_nombre_usuario.text(mensaje.datoSeguro.nombre);
 			_this.img_avatar_usuario.attr("src", mensaje.datoSeguro.avatar);
 		});
 		
 		vx.when({
-			tipoDeMensaje:"traders.avisoDeCambioEnDatosPersonales",
-			de: Usuario.id
+			tipoDeMensaje:"traders.avisoDeObjetoActualizado",
+			de: Usuario.id,
+			idObjeto: "DATOS_PERSONALES"
 		}, function(mensaje){
-			_this.lbl_nombre_usuario.text(mensaje.datoSeguro.nombre);
-			_this.img_avatar_usuario.attr("src", mensaje.datoSeguro.avatar);
+			if(mensaje.datoSeguro.cambios.avatar) _this.img_avatar_usuario.attr("src", mensaje.datoSeguro.cambios.avatar);
+			if(mensaje.datoSeguro.cambios.nombre) _this.lbl_nombre_usuario.text("src", mensaje.datoSeguro.cambios.nombre);
 		});
 		
         this.txt_nombre_producto_add = this.ui.find("#txt_nombre_producto_add");
         this.btn_add_producto = this.ui.find("#btn_add_producto");
         this.btn_add_producto.click(function(){
 			vx.send({
-				tipoDeMensaje: "traders.crearProducto",
+				tipoDeMensaje: "vortex.persistencia.insert",
 				de: Usuario.id,
 				para: Usuario.id,
-				datoSeguro:{
-					nombre:_this.txt_nombre_producto_add.val()
-				}
+				datoSeguro:{ objeto:{ nombre:_this.txt_nombre_producto_add.val()}}
 			}, function(msg){
 				
 			});
@@ -122,12 +127,10 @@ var PantallaUsuario = {
             },
             alEliminar: function(producto){
                 vx.send({
-					tipoDeMensaje: "traders.eliminarProducto",
+					tipoDeMensaje: "vortex.persistencia.delete",
 					de: Usuario.id,
 					para: Usuario.id,
-					datoSeguro:{
-						idProducto: producto.id
-					}
+					datoSeguro:{ filtro:{ idProducto: producto.id}}
 				}, function(msg){
 					
 				});

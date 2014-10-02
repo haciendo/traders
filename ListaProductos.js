@@ -9,20 +9,25 @@ var ListaProductos = function(opt){
 	this.listado_de_productos = this.ui.find("#listado_de_productos");
 	
 	vx.send({
+		tipoDeMensaje: "vortex.persistencia.select",
 		de: Usuario.id,
 		para: this.selector.propietario,
-		tipoDeMensaje: "traders.getProductos"
+		datoSeguro: {
+				filtro: {
+					tipo: "Producto"
+				}
+			}
 	}, function(respuesta){
-		_.forEach(respuesta.datoSeguro.productos, function(producto){
+		_.forEach(respuesta.datoSeguro.objeto, function(producto){
 			_this.agregarVistaProducto(producto, _this.selector.propietario);
 		});
 	});
 		
 	vx.when({
-		de: this.selector.propietario,
-		tipoDeMensaje:"traders.avisoDeNuevoProducto"
+		tipoDeMensaje:"vortex.persistencia.avisoDeObjetoNuevo",
+		de: this.selector.propietario
 	}, function(aviso){
-		_this.agregarVistaProducto(aviso.datoSeguro.producto, _this.selector.propietario);
+		_this.agregarVistaProducto(aviso.datoSeguro.objeto, _this.selector.propietario);
 	});
 };
 

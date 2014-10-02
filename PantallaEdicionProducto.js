@@ -4,15 +4,17 @@ var PantallaEdicionProducto = function(producto){
 	this.txt_nombre_producto = this.ui.find("#txt_nombre_producto");
 	this.txt_nombre_producto.change(function(){
 		vx.send({
-			tipoDeMensaje: "traders.modificarProducto",
+			tipoDeMensaje: "vortex.persistencia.update",
 			de: Usuario.id,
 			para: Usuario.id,
 			datoSeguro: {
-				idProducto: producto.id,
+				filtro:{idProducto: producto.id},
 				cambios: {					
 					nombre: _this.txt_nombre_producto.val()
 				}
 			}
+		}, function(resp){
+			
 		});
 	});
 	
@@ -35,16 +37,18 @@ var PantallaEdicionProducto = function(producto){
                 ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, 100, 100);
                 var bytes_imagen = canvas.toDataURL('image/jpg');        
                 producto.imagen = bytes_imagen;
-                vx.send({
-					tipoDeMensaje: "traders.modificarProducto",
+				vx.send({
+					tipoDeMensaje: "vortex.persistencia.update",
 					de: Usuario.id,
 					para: Usuario.id,
 					datoSeguro: {
-						cambios: {
-							id: producto.id,
+						filtro:{idProducto: producto.id},
+						cambios: {					
 							imagen: bytes_imagen
 						}
 					}
+				}, function(resp){
+
 				});
             };
         }, false);
@@ -52,9 +56,9 @@ var PantallaEdicionProducto = function(producto){
     });
     
 	var pedido_modificacion = vx.when({
+		tipoDeMensaje:"vortex.persistencia.avisoDeObjetoActualizado",
 		de: Usuario.id,
-		tipoDeMensaje:"traders.avisoDeModificacionDeProducto",
-		idProducto: producto.id		
+		idObjeto: producto.id				
 	}, function(aviso){
 		var cambios = aviso.datoSeguro.cambios;
 		if(cambios.nombre) _this.txt_nombre_producto.val(cambios.nombre);
@@ -62,10 +66,12 @@ var PantallaEdicionProducto = function(producto){
 	});
 	
 	var pedido_eliminacion = vx.when({
+		tipoDeMensaje:"vortex.persistencia.avisoDeObjetoEliminado",
 		de: Usuario.id,
-		tipoDeMensaje:"traders.avisoDeEliminacionDeProducto",
-		idProducto: producto.id		
+		idObjeto: producto.id		
 	}, function(aviso){
+		pedido_modificacion.quitar();
+		pedido_eliminacion.quitar();
 		vex.close(_this.idVex);
 	});
 	

@@ -23,11 +23,24 @@ var RepositorioLocalStorage = {
 		localStorage.setItem(Usuario.id+"_"+objeto.id, Encriptador.encriptarString(JSON.stringify(objeto), Usuario.id, Usuario.id));
 		
 	},
-	load: function(filtro){
+	select: function(filtro){
 		return _.where(this.objetosGuardados, filtro);
 	},
-	remove: function(id_obj){
-		localStorage.removeItem(Usuario.id+"_"+id_obj);
+	update: function(filtro, cambios){
+		var _this = this;
+		var objetos_filtrados = this.select(filtro);
+		_.forEach(objetos_filtrados, function(obj){
+			_.extend(obj, cambios);					
+			_this.save(obj);	
+		});
+		return objetos_filtrados;
+	},
+	remove: function(filtro){
+		var objetos_filtrados = this.select(filtro);
+		_.forEach(objetos_filtrados, function(obj){
+			localStorage.removeItem(Usuario.id+"_"+obj.id);			
+		});
+		return objetos_filtrados;
 	},
 	nextId: function() {
 		var id = "";

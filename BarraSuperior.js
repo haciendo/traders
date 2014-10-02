@@ -19,18 +19,24 @@ var BarraSuperior = {
 		});
 		
 		vx.send({
-			tipoDeMensaje:"traders.getDatosPersonales",
+			tipoDeMensaje:"vortex.persistencia.select",
 			de: Usuario.id,
-			para: Usuario.id
+			para: Usuario.id,
+			datoSeguro: {
+				filtro: {
+					id: "DATOS_PERSONALES"
+				}
+			}
 		},function(mensaje){
-			_this.avatar_usuario.attr("src", mensaje.datoSeguro.avatar);
+			_this.avatar_usuario.attr("src", mensaje.datoSeguro.objetos[0]);
 		});
 		
 		vx.when({
-			tipoDeMensaje:"traders.avisoDeCambioEnDatosPersonales",
-			de: Usuario.id
+			tipoDeMensaje:"traders.avisoDeObjetoActualizado",
+			de: Usuario.id,
+			idObjeto: "DATOS_PERSONALES"
 		}, function(mensaje){
-			_this.avatar_usuario.attr("src", mensaje.datoSeguro.avatar);
+			if(mensaje.datoSeguro.cambios.avatar) _this.avatar_usuario.attr("src", mensaje.datoSeguro.cambios.avatar);
 		});
 				
 		this.solapa_yo.click(function(e) {

@@ -5,8 +5,9 @@ var RepositorioLocalStorage = {
 		}
 		var keys = Object.keys(localStorage);
 		this.objetosGuardados = [];
-		keys.forEach(function(k){
-			if(k.split('_')[0]==Usuario.id) this.objetosGuardados.push(JSON.parse(Encriptador.desEncriptarString(localStorage.getItem(k), Usuario.id, Usuario.id)));
+		var _this = this;
+		_.forEach(keys, function(k){
+			if(k.split('_')[0]==Usuario.id) _this.objetosGuardados.push(JSON.parse(Encriptador.desEncriptarString(localStorage.getItem(k), Usuario.id, Usuario.id)));
 		});
 	},
 	save: function(objeto){
@@ -25,13 +26,17 @@ var RepositorioLocalStorage = {
 	load: function(filtro){
 		return _.where(this.objetosGuardados, filtro);
 	},
+	remove: function(id_obj){
+		localStorage.removeItem(Usuario.id+"_"+id_obj);
+	},
 	nextId: function() {
-		var text = "";
+		var id = "";
 		var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
 		for( var i=0; i < 6; i++ )
-			text += possible.charAt(Math.floor(Math.random() * possible.length));
+			id += possible.charAt(Math.floor(Math.random() * possible.length));
 
-		return text;
+		if(_.findWhere(this.objetosGuardados, {id:id})) return this.nextId();
+		return id;
 	}
 };

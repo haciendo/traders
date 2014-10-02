@@ -23,7 +23,7 @@ var TradersServer = function(opt){
             de: Usuario.id,
 			para: msg.de,
             datoSeguro: {
-                producto: producto
+                idProducto: producto.id
             }
         });
 		vx.send({
@@ -36,11 +36,82 @@ var TradersServer = function(opt){
 	});
 	
 	vx.when({
+		de: Usuario.id,
+		para: Usuario.id,
+		tipoDeMensaje: "traders.modificarProducto"
+	}, function(msg){
+		var producto = _this.repositorio.load({
+			id: msg.datoSeguro.idProducto
+		})[0];		
+		_.extend(producto, msg.datoSeguro.cambios);	
+		_this.repositorio.save(producto);	
+		
+        vx.send({
+			responseTo: msg.idRequest,
+            de: Usuario.id,
+			para: msg.de,
+            datoSeguro: {
+                resultado: "success"
+            }
+        });
+		vx.send({
+            tipoDeMensaje:"traders.avisoDeModificacionDeProducto",
+            de: Usuario.id,
+			idProducto: producto.id,
+            datoSeguro: {
+                cambios: msg.datoSeguro.cambios
+            }
+        });
+	});
+	
+	vx.when({
+		de: Usuario.id,
+		para: Usuario.id,
+		tipoDeMensaje: "traders.eliminarProducto"
+	}, function(msg){
+		_this.repositorio.remove(msg.datoSeguro.idProducto);
+        vx.send({
+			responseTo: msg.idRequest,
+            de: Usuario.id,
+			para: msg.de,
+            datoSeguro: {
+                resultado: "success"
+            }
+        });
+		vx.send({
+            tipoDeMensaje:"traders.avisoDeEliminacionDeProducto",
+            de: Usuario.id,
+			idProducto: msg.datoSeguro.idProducto,
+            datoSeguro: {
+                idProducto: msg.datoSeguro.idProducto	//pa poner algo nomá
+            }
+        });
+	});
+	
+	vx.when({
+		para: Usuario.id,
+		tipoDeMensaje: "traders.getProductos"
+	}, function(msg){	
+		var productos = _this.repositorio.load({
+			tipo:"producto"
+		});
+		
+        vx.send({
+			responseTo: msg.idRequest,
+			para: msg.de,
+			de: Usuario.id,
+			datoSeguro: {
+				productos: productos
+			} 
+		});
+	});
+	
+	vx.when({
 		para: Usuario.id,
 		tipoDeMensaje: "traders.getDatosPersonales"
 	}, function(msg){	
 		var res_bus = _this.repositorio.load({
-			tipo:"DatosPersonales"
+			tipo:"datosPersonales"
 		});
 		var datos_personales;
 		var resultado;

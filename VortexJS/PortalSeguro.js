@@ -29,14 +29,14 @@ PortalSeguro.prototype.send = function(){
 	if(opt.callback){
 		opt.mensaje.idRequest = this.id.toString() + "_" + randomString(32);
 		var portal_respuesta = new PortalSeguro();
-		var id_pedido = this.when({
+		var pedido = this.when({
 			filtro: {
 				responseTo: opt.mensaje.idRequest,
 				para: opt.mensaje.de
 			},
 			callback: function(objRespuesta){
 				opt.callback(objRespuesta);
-				_this.portal.quitarPedido(id_pedido);
+				pedido.quitar();
 			},
 			atenderMensajesPropios: true
 		});
@@ -46,6 +46,7 @@ PortalSeguro.prototype.send = function(){
 };
 
 PortalSeguro.prototype.when = function(){	
+	var _this = this;
 	var opt = getArguments(arguments, {
 		filtro:{},
 		callback: function(){},
@@ -66,5 +67,10 @@ PortalSeguro.prototype.when = function(){
 		}
 	};
 	
-	return this.portal.pedirMensajes(opt);
+	var id_pedido = this.portal.pedirMensajes(opt);
+	return {
+		quitar: function(){
+			_this.portal.quitarPedido(id_pedido);
+		}
+	}
 };

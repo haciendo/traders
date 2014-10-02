@@ -115,17 +115,26 @@ var PantallaUsuario = {
             video_stream.stop();
         });
         
-//        this.inventario_usuario = new ListaProductos({
-//            selector:{propietario:Usuario.id}, 
-//            alSeleccionar: function(producto){
-//                var pantalla_edicion = new PantallaEdicionProducto(producto);
-//            },
-//            alEliminar: function(producto){
-//                throw "Envio de mensaje de eliminar producto no implementado";
-//            }
-//        });
-//        this.inventario_usuario.dibujarEn(this.panel_inventario);	
-//		
+        this.inventario_usuario = new ListaProductos({
+            selector:{propietario:Usuario.id}, 
+            alSeleccionar: function(producto){
+                var pantalla_edicion = new PantallaEdicionProducto(producto);
+            },
+            alEliminar: function(producto){
+                vx.send({
+					tipoDeMensaje: "traders.eliminarProducto",
+					de: Usuario.id,
+					para: Usuario.id,
+					datoSeguro:{
+						idProducto: producto.id
+					}
+				}, function(msg){
+					
+				});
+            }
+        });
+        this.inventario_usuario.dibujarEn(this.panel_inventario);	
+		
     },
     render: function(){  
 		this.txt_nombre_producto_add.focus();

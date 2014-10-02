@@ -1,12 +1,19 @@
 var PantallaEdicionProducto = function(producto){
 	var _this = this;
-	this.producto = producto;
-	
 	this.ui = $("#plantillas .pantalla_edicion_producto").clone();
 	this.txt_nombre_producto = this.ui.find("#txt_nombre_producto");
 	this.txt_nombre_producto.change(function(){
-		producto.nombre = _this.txt_nombre_producto.val();
-		Traders.modificarProducto(producto);
+		vx.send({
+			tipoDeMensaje: "traders.modificarProducto",
+			de: Usuario.id,
+			para: Usuario.id,
+			datoSeguro: {
+				idProducto: producto.id,
+				cambios: {					
+					nombre: _this.txt_nombre_producto.val()
+				}
+			}
+		});
 	});
 	
     this.imagen_producto = this.ui.find("#imagen_producto");
@@ -28,26 +35,52 @@ var PantallaEdicionProducto = function(producto){
                 ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, 100, 100);
                 var bytes_imagen = canvas.toDataURL('image/jpg');        
                 producto.imagen = bytes_imagen;
-                Traders.modificarProducto(producto);
+                vx.send({
+					tipoDeMensaje: "traders.modificarProducto",
+					de: Usuario.id,
+					para: Usuario.id,
+					datoSeguro: {
+						cambios: {
+							id: producto.id,
+							imagen: bytes_imagen
+						}
+					}
+				});
             };
         }, false);
         $(fileInputImagenes).click();
     });
     
-	Traders.onNovedades(function(){
-		_this.render();
+	var pedido_modificacion = vx.when({
+		de: Usuario.id,
+		tipoDeMensaje:"traders.avisoDeModificacionDeProducto",
+		idProducto: producto.id		
+	}, function(aviso){
+		var cambios = aviso.datoSeguro.cambios;
+		if(cambios.nombre) _this.txt_nombre_producto.val(cambios.nombre);
+		if(cambios.imagen) _this.imagen_producto.attr("src", cambios.imagen);
 	});
+	
+	var pedido_eliminacion = vx.when({
+		de: Usuario.id,
+		tipoDeMensaje:"traders.avisoDeEliminacionDeProducto",
+		idProducto: producto.id		
+	}, function(aviso){
+		vex.close(_this.idVex);
+	});
+	
+	this.txt_nombre_producto.val(producto.nombre);
+    if(producto.imagen) this.imagen_producto.attr("src", producto.imagen);
+    else this.imagen_producto.attr("src", "Gift-icon-grande.png");
 	
 	vex.open({
 		afterOpen: function($vexContent) {
+			_this.idVex = $vexContent.data().vex.id;
 			return $vexContent.append(_this.ui);
+		},
+		afterClose: function(){
+			pedido_modificacion.quitar();
+			pedido_eliminacion.quitar();
 		}
 	});
-	this.render();
-};
-
-PantallaEdicionProducto.prototype.render = function(){
-	this.txt_nombre_producto.val(this.producto.nombre);
-    if(this.producto.imagen) this.imagen_producto.attr("src", this.producto.imagen);
-    else this.imagen_producto.attr("src", "Gift-icon-grande.png");
 };

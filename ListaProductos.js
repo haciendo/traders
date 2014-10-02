@@ -18,7 +18,7 @@ var ListaProductos = function(opt){
 				}
 			}
 	}, function(respuesta){
-		_.forEach(respuesta.datoSeguro.objeto, function(producto){
+		_.forEach(respuesta.datoSeguro.objetos, function(producto){
 			_this.agregarVistaProducto(producto, _this.selector.propietario);
 		});
 	});

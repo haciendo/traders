@@ -38,7 +38,10 @@ var PantallaUsuario = {
 				tipoDeMensaje: "vortex.persistencia.insert",
 				de: Usuario.id,
 				para: Usuario.id,
-				datoSeguro:{ objeto:{ nombre:_this.txt_nombre_producto_add.val()}}
+				datoSeguro:{ objeto:{ 
+                    tipo: "Producto",
+                    nombre: _this.txt_nombre_producto_add.val()
+                }}
 			}, function(msg){
 				
 			});
@@ -130,7 +133,7 @@ var PantallaUsuario = {
 					tipoDeMensaje: "vortex.persistencia.delete",
 					de: Usuario.id,
 					para: Usuario.id,
-					datoSeguro:{ filtro:{ idProducto: producto.id}}
+					datoSeguro:{ filtro:{ id: producto.id}}
 				}, function(msg){
 					
 				});

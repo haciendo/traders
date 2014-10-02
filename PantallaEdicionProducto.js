@@ -8,7 +8,7 @@ var PantallaEdicionProducto = function(producto){
 			de: Usuario.id,
 			para: Usuario.id,
 			datoSeguro: {
-				filtro:{idProducto: producto.id},
+				filtro:{id: producto.id},
 				cambios: {					
 					nombre: _this.txt_nombre_producto.val()
 				}
@@ -42,7 +42,7 @@ var PantallaEdicionProducto = function(producto){
 					de: Usuario.id,
 					para: Usuario.id,
 					datoSeguro: {
-						filtro:{idProducto: producto.id},
+						filtro:{id: producto.id},
 						cambios: {					
 							imagen: bytes_imagen
 						}

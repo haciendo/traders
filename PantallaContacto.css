@@ -1,0 +1,51 @@
+#pantalla_contacto{
+	position: absolute;
+	bottom: 0px;
+	left: 200px;
+	top:0px;
+	right: 0px;
+}
+
+@media screen and (max-width: 550px) {	
+    #pantalla_contacto{
+		left: 100%;
+		width: 100%;
+		right: initial;
+	}
+}
+
+
+#pantalla_contacto
+	.datos_usuario{
+		background-color: rgb(248, 248, 248);
+}
+
+#pantalla_contacto
+	#panel_inventario_contacto {
+		position: absolute;
+		top: 114px;
+		left:0px;
+		right: 0px;
+		bottom: 5px;
+}
+
+#avatar_contacto{
+	margin-top: 5px;
+	margin-left: 5px;
+}
+
+#pantalla_contacto #btn_trocar
+{
+	position: absolute;	
+	top: 70px;
+	left: 120px;
+}
+
+#pantalla_contacto #lbl_nombre_contacto
+{
+	position: absolute;
+	top: 30px;
+	left: 120px;
+	font-size: 35px;
+	font-weight: bold;
+}

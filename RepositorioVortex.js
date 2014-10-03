@@ -16,7 +16,7 @@ var RepositorioVortex = {
 			tipoDeMensaje: "vortex.persistencia.insert"
 		}, function(msg){
 			var obj = _.clone(msg.datoSeguro.objeto);
-			_this.repositorio.save(obj);
+			_this.repositorio.insert(obj);
 
 			vx.send({
 				responseTo: msg.idRequest,
@@ -37,6 +37,17 @@ var RepositorioVortex = {
 			});
 		});
 
+        this.repositorio.onObjetoInsertado(function(){
+            vx.send({
+				tipoDeMensaje: "vortex.persistencia.avisoDeObjetoNuevo",
+				de: Usuario.id,
+				tipoDeObjeto: obj.tipo,
+				datoSeguro: {
+					objeto: obj
+				}
+			});
+        });
+        
 		vx.when({
 			de: Usuario.id,
 			para: Usuario.id,
@@ -65,6 +76,18 @@ var RepositorioVortex = {
 			});
 		});
 
+        this.repositorio.onObjetoActualizado(function(){
+            vx.send({
+                tipoDeMensaje:"vortex.persistencia.avisoDeObjetoActualizado",
+                de: Usuario.id,
+                idObjeto: obj.id,
+                tipoDeObjeto: obj.tipo,
+                datoSeguro: {
+                    cambios: msg.datoSeguro.cambios
+                }
+            });
+        });
+        
 		vx.when({
 			de: Usuario.id,
 			para: Usuario.id,
@@ -92,6 +115,18 @@ var RepositorioVortex = {
 			});			
 		});
 
+        this.repositorio.onObjetoEliminado(function(){
+            vx.send({
+                tipoDeMensaje:"vortex.persistencia.avisoDeObjetoEliminado",
+                de: Usuario.id,
+                idObjeto: obj.id,
+                tipoDeObjeto: obj.tipo,
+                datoSeguro: {
+                    idObjeto: obj.id	//pa poner algo nomá
+                }
+            });		
+        });
+        
 		vx.when({
 			para: Usuario.id,
 			tipoDeMensaje: "vortex.persistencia.select"
@@ -107,6 +142,7 @@ var RepositorioVortex = {
 				} 
 			});
 		});
-
+        
+        
 	}
 };

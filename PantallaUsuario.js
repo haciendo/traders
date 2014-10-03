@@ -42,8 +42,6 @@ var PantallaUsuario = {
                     tipo: "Producto",
                     nombre: _this.txt_nombre_producto_add.val()
                 }}
-			}, function(msg){
-				
 			});
             _this.txt_nombre_producto_add.val("");
         }); 

@@ -5,8 +5,7 @@ var PantallaListaContactos = {
 		
         this.ui =  $("#pantalla_lista_contactos");     
         
-        this.contacto_seleccionado = {};
-        
+        this.contacto_seleccionado = {};        
 		
         this.lista_contactos = this.ui.find("#lista_contactos");
 		
@@ -17,26 +16,45 @@ var PantallaListaContactos = {
 				placeholder: 'Id del usuario',
 				callback: function(value) {
 					if(value){
-						Traders.agregarContacto(value);
+                        vx.send({
+                            tipoDeMensaje: "vortex.persistencia.insert",
+                            de: Usuario.id,
+                            para: Usuario.id,
+                            datoSeguro:{ objeto:{ 
+                                tipo: "Contacto",
+                                idContacto: value
+                            }}
+                        });
 					}
 				}
 			});			
-			_this.render();
 		});
-		
-		
-		Traders.onNovedades(function(){
-			if(_this.ui.is(':visible')){
-				_this.render();
-			}
+        
+        vx.send({
+            tipoDeMensaje: "vortex.persistencia.select",
+            de: Usuario.id,
+            para: Usuario.id,
+            datoSeguro: {
+                filtro: {
+                    tipo: "Contacto"
+                }
+            }
+        }, function(respuesta){
+            _.forEach(respuesta.datoSeguro.objetos, function(datosContacto){
+                _this.agregarVistaContacto(datosContacto);
+            });
         });
-		
-		
-		this.hide();
-		
+            
+        vx.when({
+            tipoDeMensaje:"vortex.persistencia.avisoDeObjetoNuevo",
+            de: Usuario.id
+        }, function(aviso){
+            _this.agregarVistaContacto(aviso.datoSeguro.objeto);
+        });
+        
     },
 	
-	add: function(contacto){
+	agregarVistaContacto: function(datosContacto){
 		var _this = this;
 		
 		var $contacto_en_lista = $("#plantillas .contacto_en_lista").clone();
@@ -73,8 +91,7 @@ var PantallaListaContactos = {
 			}
 		};
 		
-		this.lista_contactos.append($contacto_en_lista);
-		
+		this.lista_contactos.append($contacto_en_lista);		
 	},
 	
 	_onSelect:[],

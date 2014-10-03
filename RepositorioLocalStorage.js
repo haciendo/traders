@@ -32,7 +32,11 @@ var RepositorioLocalStorage = {
 		_.forEach(objetos_filtrados, function(objeto){
 			_.extend(objeto, cambios);		            
 			localStorage.setItem(Usuario.id+"_"+objeto.id, Encriptador.encriptarString(JSON.stringify(objeto), Usuario.id, Usuario.id));		
-            _this.onObjetoActualizado(objeto);
+            _this.onObjetoActualizado({
+                idObjeto: objeto.id,
+                tipoObjeto: objeto.tipo,
+                cambios: cambios
+            });
 		});
 		return objetos_filtrados;
 	},

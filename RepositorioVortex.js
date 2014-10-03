@@ -27,17 +27,9 @@ var RepositorioVortex = {
 					idObjeto: obj.id
 				}
 			});
-			vx.send({
-				tipoDeMensaje: "vortex.persistencia.avisoDeObjetoNuevo",
-				de: Usuario.id,
-				tipoDeObjeto: obj.tipo,
-				datoSeguro: {
-					objeto: obj
-				}
-			});
 		});
 
-        this.repositorio.onObjetoInsertado(function(){
+        this.repositorio.onObjetoInsertado(function(obj){
             vx.send({
 				tipoDeMensaje: "vortex.persistencia.avisoDeObjetoNuevo",
 				de: Usuario.id,
@@ -53,19 +45,7 @@ var RepositorioVortex = {
 			para: Usuario.id,
 			tipoDeMensaje: "vortex.persistencia.update"
 		}, function(msg){
-			var objetos_actualizados = _this.repositorio.update(msg.datoSeguro.filtro, msg.datoSeguro.cambios);	
-			_.forEach(objetos_actualizados, function(obj){
-				vx.send({
-					tipoDeMensaje:"vortex.persistencia.avisoDeObjetoActualizado",
-					de: Usuario.id,
-					idObjeto: obj.id,
-					tipoDeObjeto: obj.tipo,
-					datoSeguro: {
-						cambios: msg.datoSeguro.cambios
-					}
-				});
-			});
-
+			_this.repositorio.update(msg.datoSeguro.filtro, msg.datoSeguro.cambios);	
 			vx.send({
 				responseTo: msg.idRequest,
 				de: Usuario.id,
@@ -76,14 +56,14 @@ var RepositorioVortex = {
 			});
 		});
 
-        this.repositorio.onObjetoActualizado(function(){
+        this.repositorio.onObjetoActualizado(function(data){
             vx.send({
                 tipoDeMensaje:"vortex.persistencia.avisoDeObjetoActualizado",
                 de: Usuario.id,
-                idObjeto: obj.id,
-                tipoDeObjeto: obj.tipo,
+                idObjeto: data.idObjeto,
+                tipoDeObjeto: data.tipoObjeto,
                 datoSeguro: {
-                    cambios: msg.datoSeguro.cambios
+                    cambios: data.cambios
                 }
             });
         });
@@ -93,18 +73,7 @@ var RepositorioVortex = {
 			para: Usuario.id,
 			tipoDeMensaje: "vortex.persistencia.delete"
 		}, function(msg){
-			var obj_borrados =_this.repositorio.remove(msg.datoSeguro.filtro);
-			_.forEach(obj_borrados, function(obj){
-				vx.send({
-					tipoDeMensaje:"vortex.persistencia.avisoDeObjetoEliminado",
-					de: Usuario.id,
-					idObjeto: obj.id,
-					tipoDeObjeto: obj.tipo,
-					datoSeguro: {
-						idObjeto: obj.id	//pa poner algo nomá
-					}
-				});				
-			});
+			_this.repositorio.remove(msg.datoSeguro.filtro);
 			vx.send({
 				responseTo: msg.idRequest,
 				de: Usuario.id,
@@ -115,7 +84,7 @@ var RepositorioVortex = {
 			});			
 		});
 
-        this.repositorio.onObjetoEliminado(function(){
+        this.repositorio.onObjetoEliminado(function(obj){
             vx.send({
                 tipoDeMensaje:"vortex.persistencia.avisoDeObjetoEliminado",
                 de: Usuario.id,

@@ -8,28 +8,15 @@ var PantallaUsuario = {
 		this.img_avatar_usuario = this.ui.find("#avatar_usuario");
 		
 		
-		this.productos = new ColeccionRemotaVortex("Producto", Usuario.id)
-		vx.send({
-			tipoDeMensaje:"vortex.persistencia.select",
-			de: Usuario.id,
-			para: Usuario.id,
-			datoSeguro: {
-				filtro: {
-					id: "DATOS_PERSONALES"
-				}
-			}
-		},function(mensaje){
-			_this.lbl_nombre_usuario.text(mensaje.datoSeguro.nombre);
-			_this.img_avatar_usuario.attr("src", mensaje.datoSeguro.avatar);
-		});
+		this.productos = new ColeccionRemotaVortex("Producto", Usuario.id);
+		this.datos_usuario = new ObjetoRemotoVortex({	id: "DATOS_PERSONALES", 
+													 	nombre:"Anónimo", 
+													 	avatar:"avatar_default.png"}, 
+													Usuario.id, true);
 		
-		vx.when({
-			tipoDeMensaje:"traders.avisoDeObjetoActualizado",
-			de: Usuario.id,
-			idObjeto: "DATOS_PERSONALES"
-		}, function(mensaje){
-			if(mensaje.datoSeguro.cambios.avatar) _this.img_avatar_usuario.attr("src", mensaje.datoSeguro.cambios.avatar);
-			if(mensaje.datoSeguro.cambios.nombre) _this.lbl_nombre_usuario.text("src", mensaje.datoSeguro.cambios.nombre);
+		this.datos_usuario.alCambiar(function(cambios){
+			if(cambios.nombre) _this.lbl_nombre_usuario.text(cambios.nombre);
+			if(cambios.avatar) _this.img_avatar_usuario.attr("src", cambios.avatar);
 		});
 		
         this.txt_nombre_producto_add = this.ui.find("#txt_nombre_producto_add");
@@ -109,7 +96,7 @@ var PantallaUsuario = {
             canvas.getContext('2d').drawImage(_this.video_para_sacar_foto, x_rec, 0, alto_rec_video, alto_rec_video, 0, 0, 100, 100);
             var imagen_serializada = canvas.toDataURL('image/jpeg');
             _this.img_avatar_usuario.attr("src", imagen_serializada);
-			Traders.cambiarAvatar(imagen_serializada);
+			_this.datos_usuario.avatar = imagen_serializada;
             $(_this.video_para_sacar_foto).hide();
             _this.img_avatar_usuario.show();
             _this.video_para_sacar_foto.pause();

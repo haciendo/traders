@@ -1,15 +1,16 @@
-var ObjetoRemotoVortex = function(objeto, id_owner){
+var ObjetoRemotoVortex = function(objeto, id_owner, insertar_si_no_existe){
 	_.extend(this, objeto);
 	this.idOwner = id_owner;
 	
 	var _this= this;
 	Evento.agregarEventoA(this, "alEliminar");
 	Evento.agregarEventoA(this, "alCambiar");
+	Evento.agregarEventoA(this, "alNoExistir");
 	
 	var update_observer = function(changes){
 		var cambios = {};
 		changes.forEach(function(change) {
-			cambios[change.name] = _this[changes.name];
+			cambios[change.name] = _this[change.name];
 		});
 		
 		vx.send({
@@ -48,6 +49,36 @@ var ObjetoRemotoVortex = function(objeto, id_owner){
 		pedido_modificacion.quitar();
 		pedido_eliminacion.quitar();
 		_this.alEliminar();
+	});
+	
+	this.alNoExistir(function(){
+		if(insertar_si_no_existe){
+			vx.send({
+				tipoDeMensaje: "vortex.persistencia.insert",
+				de: Usuario.id,
+				para: _this.idOwner,
+				datoSeguro:{ objeto: objeto}
+			}, function(resp){
+				if(resp.datoSeguro.resultado == "success"){
+					_this.alCambiar(objeto);
+				}
+			});
+		}
+	});
+	
+	if(insertar_si_no_existe) this.load();
+};
+
+ObjetoRemotoVortex.prototype.load = function(){
+	var _this = this;
+	vx.send({
+		tipoDeMensaje: "vortex.persistencia.select",
+		de: Usuario.id,
+		para: this.idOwner,
+		datoSeguro: {filtro: {id: this.id}}
+	}, function(respuesta){
+		if(respuesta.datoSeguro.objetos.length>0) _.extend(_this, aviso.datoSeguro.objetos[0]);
+		else _this.alNoExistir();
 	});
 };
 

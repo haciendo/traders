@@ -25,7 +25,8 @@ var ListaProductos = function(opt){
 		
 	vx.when({
 		tipoDeMensaje:"vortex.persistencia.avisoDeObjetoNuevo",
-		de: this.selector.propietario
+		de: this.selector.propietario,
+		tipoDeObjeto: "Producto"
 	}, function(aviso){
 		_this.agregarVistaProducto(aviso.datoSeguro.objeto, _this.selector.propietario);
 	});

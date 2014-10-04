@@ -35,7 +35,7 @@ var PantallaInicio = {
 			BarraSuperior.render();
 			PantallaUsuario.start();				
 			PantallaUsuario.render();	
-			PantallaContactos.start();	
+			//PantallaContactos.start();	
 			
             _this.ui.hide();
         });

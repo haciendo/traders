@@ -8,27 +8,13 @@ var ListaProductos = function(opt){
 	this.ui = $("#plantillas").find(".lista_productos").clone();  
 	this.listado_de_productos = this.ui.find("#listado_de_productos");
 	
-	vx.send({
-		tipoDeMensaje: "vortex.persistencia.select",
-		de: Usuario.id,
-		para: this.selector.propietario,
-		datoSeguro: {
-				filtro: {
-					tipo: "Producto"
-				}
-			}
-	}, function(respuesta){
-		_.forEach(respuesta.datoSeguro.objetos, function(producto){
-			_this.agregarVistaProducto(producto, _this.selector.propietario);
+	this.productos.alCargar(function(){
+		_this.productos.forEach(function(producto){
+			_this.agregarVistaProducto(producto, _this.productos.idOwner);
 		});
 	});
-		
-	vx.when({
-		tipoDeMensaje:"vortex.persistencia.avisoDeObjetoNuevo",
-		de: this.selector.propietario,
-		tipoDeObjeto: "Producto"
-	}, function(aviso){
-		_this.agregarVistaProducto(aviso.datoSeguro.objeto, _this.selector.propietario);
+	this.productos.alAgregar(function(producto){
+		_this.agregarVistaProducto(producto, _this.productos.idOwner);
 	});
 };
 

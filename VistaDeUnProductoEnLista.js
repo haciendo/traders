@@ -39,24 +39,14 @@ VistaDeUnProductoEnLista.prototype.start = function(){
 		this.avatar_propietario.opentip( this.propietario.nombre);
 	}
 	
-	var pedido_modificacion = vx.when({
-		tipoDeMensaje:"vortex.persistencia.avisoDeObjetoActualizado",
-		de: this.propietario,
-		idObjeto: this.producto.id		
-	}, function(aviso){
-		var cambios = aviso.datoSeguro.cambios;
+	var handler_cambio = this.producto.alCambiar(function(cambios){
 		if(cambios.nombre) _this.lblNombre.text(cambios.nombre);
 		if(cambios.imagen) _this.thumbnail.attr("src", cambios.imagen);
-		_.extend(_this.producto, cambios); //capaz que es al pedo, lo hice por las dudas, que bien que vendrian unos tests
 	});
 	
-	var pedido_eliminacion = vx.when({
-		tipoDeMensaje:"vortex.persistencia.avisoDeObjetoEliminado",
-		de: this.propietario,
-		idObjeto: this.producto.id		
-	}, function(aviso){
-		pedido_modificacion.quitar();
-		pedido_eliminacion.quitar();
+	var handler_eliminacion = this.producto.alEliminar(function(){
+		handler_cambio.remove();
+		handler_eliminacion.remove();
 		_this.ui.remove();
 	});
 };

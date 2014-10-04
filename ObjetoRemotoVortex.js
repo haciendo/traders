@@ -1,9 +1,10 @@
 var ObjetoRemotoVortex = function(objeto, id_owner){
 	_.extend(this, objeto);
-	
 	this.idOwner = id_owner;
 	
 	var _this= this;
+	Evento.agregarEventoA(this, "alEliminar");
+	Evento.agregarEventoA(this, "alCambiar");
 	
 	var update_observer = function(changes){
 		var cambios = {};
@@ -50,7 +51,7 @@ var ObjetoRemotoVortex = function(objeto, id_owner){
 	});
 };
 
-ObjetoRemotoVortex.prototype.eliminar = funtion(){
+ObjetoRemotoVortex.prototype.eliminar = function(){
 	vx.send({
 		tipoDeMensaje: "vortex.persistencia.delete",
 		de: Usuario.id,
@@ -60,3 +61,4 @@ ObjetoRemotoVortex.prototype.eliminar = funtion(){
 		//se elimino correctamente
 	});
 };
+

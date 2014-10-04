@@ -31,7 +31,10 @@ NodoPortalBidi.prototype.enviarMensaje = function(un_mensaje){
     this._pata.recibirMensaje(un_mensaje);
  	this._listaPedidos.forEach(function(p){
         if(!p.atenderMensajesPropios) return;
-		if(p.filtro.evaluarMensaje(un_mensaje)) p.callback(ClonadorDeObjetos.clonarObjeto(un_mensaje));
+		if(p.filtro.evaluarMensaje(un_mensaje)) 
+			setTimeout(function(){
+				p.callback(ClonadorDeObjetos.clonarObjeto(un_mensaje));
+			}, 0);
     });
 };
 

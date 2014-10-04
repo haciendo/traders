@@ -4,10 +4,11 @@ var PantallaUsuario = {
         this.ui =  $("#pantalla_usuario");
         
         this.panel_inventario = this.ui.find("#panel_inventario");
-		
         this.lbl_nombre_usuario = this.ui.find("#lbl_nombre_usuario");			
 		this.img_avatar_usuario = this.ui.find("#avatar_usuario");
 		
+		
+		this.productos = new ColeccionRemotaVortex("Producto", Usuario.id)
 		vx.send({
 			tipoDeMensaje:"vortex.persistencia.select",
 			de: Usuario.id,
@@ -34,14 +35,8 @@ var PantallaUsuario = {
         this.txt_nombre_producto_add = this.ui.find("#txt_nombre_producto_add");
         this.btn_add_producto = this.ui.find("#btn_add_producto");
         this.btn_add_producto.click(function(){
-			vx.send({
-				tipoDeMensaje: "vortex.persistencia.insert",
-				de: Usuario.id,
-				para: Usuario.id,
-				datoSeguro:{ objeto:{ 
-                    tipo: "Producto",
-                    nombre: _this.txt_nombre_producto_add.val()
-                }}
+			_this.productos.add({
+				nombre: _this.txt_nombre_producto_add.val()
 			});
             _this.txt_nombre_producto_add.val("");
         }); 
@@ -122,19 +117,12 @@ var PantallaUsuario = {
         });
         
         this.inventario_usuario = new ListaProductos({
-            selector:{propietario:Usuario.id}, 
+            productos: this.productos, 
             alSeleccionar: function(producto){
                 var pantalla_edicion = new PantallaEdicionProducto(producto);
             },
             alEliminar: function(producto){
-                vx.send({
-					tipoDeMensaje: "vortex.persistencia.delete",
-					de: Usuario.id,
-					para: Usuario.id,
-					datoSeguro:{ filtro:{ id: producto.id}}
-				}, function(msg){
-					
-				});
+				producto.eliminar();
             }
         });
         this.inventario_usuario.dibujarEn(this.panel_inventario);	

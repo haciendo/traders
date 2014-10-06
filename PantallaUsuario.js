@@ -4,7 +4,7 @@ var PantallaUsuario = {
         this.ui =  $("#pantalla_usuario");
         
         this.panel_inventario = this.ui.find("#panel_inventario");
-        this.lbl_nombre_usuario = this.ui.find("#lbl_nombre_usuario");			
+        this.lbl_nombre_usuario = this.ui.find("#lbl_nombre_usuario");        
 		this.img_avatar_usuario = this.ui.find("#avatar_usuario");
 		
 		
@@ -19,6 +19,18 @@ var PantallaUsuario = {
 			if(cambios.avatar) _this.img_avatar_usuario.attr("src", cambios.avatar);
 		});
 		
+        this.lbl_nombre_usuario.click(function(){
+            vex.dialog.prompt({
+				message: 'Ingresá tu nuevo alias',
+				value: _this.datos_usuario.nombre,
+				callback: function(value) {
+					if(value){
+						_this.datos_usuario.nombre = value;
+					}
+				}
+			});
+        });
+        
         this.txt_nombre_producto_add = this.ui.find("#txt_nombre_producto_add");
         this.btn_add_producto = this.ui.find("#btn_add_producto");
         this.btn_add_producto.click(function(){
@@ -104,14 +116,16 @@ var PantallaUsuario = {
         });
         
         this.inventario_usuario = new ListaProductos({
-            productos: this.productos, 
-            alSeleccionar: function(producto){
-                var pantalla_edicion = new PantallaEdicionProducto(producto);
-            },
-            alEliminar: function(producto){
-				producto.eliminar();
-            }
+            productos: this.productos,
+            mostrarBotonQuitar: true
+        });        
+        this.inventario_usuario.alSeleccionarProducto(function(producto){
+            var pantalla_edicion = new PantallaEdicionProducto(producto);
+        });        
+        this.inventario_usuario.alQuitarProducto(function(producto){
+            producto.eliminar();
         });
+        
         this.inventario_usuario.dibujarEn(this.panel_inventario);	
 		
     },

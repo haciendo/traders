@@ -77,7 +77,7 @@ ObjetoRemotoVortex.prototype.load = function(){
 		para: this.idOwner,
 		datoSeguro: {filtro: {id: this.id}}
 	}, function(respuesta){
-		if(respuesta.datoSeguro.objetos.length>0) _.extend(_this, aviso.datoSeguro.objetos[0]);
+		if(respuesta.datoSeguro.objetos.length>0) _.extend(_this, respuesta.datoSeguro.objetos[0]);
 		else _this.alNoExistir();
 	});
 };

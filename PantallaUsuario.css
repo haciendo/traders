@@ -53,6 +53,7 @@
 	font-size: 45px;
     font-weight: bold;
     vertical-align: bottom;
+    cursor: pointer;	
 }
 
 #pantalla_usuario #btn_compartir_id {

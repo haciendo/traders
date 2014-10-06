@@ -1,5 +1,4 @@
 var VistaDeUnProductoEnLista = function(opt){
-	this.alClickear = this.alternarSeleccionParaTrueque;
     $.extend(true, this, opt);
     this.start();
 };
@@ -7,32 +6,33 @@ var VistaDeUnProductoEnLista = function(opt){
 VistaDeUnProductoEnLista.prototype.start = function(){
     var _this = this;
     this.ui = $("#plantillas").find(".producto_en_lista").clone();  
-    this.lblNombre = this.ui.find("#nombre");
-    this.thumbnail = this.ui.find("#thumbnail_producto");
-    this.btnEliminar = this.ui.find("#btn_eliminar");
-    this.btnEliminar.hide();
+    
+    Evento.agregarEventoA(this, "alClickear");
+    Evento.agregarEventoA(this, "alQuitar");
 	
-	this.avatar_propietario = this.ui.find("#avatar_propietario");
-	this.avatar_propietario.click(function(){
-		//TO DO: abrir pantalla de usuario o contacto segun corresponda
-	});
-	
-    if(this.alEliminar){        
-        this.btnEliminar.click(function(){
-            _this.alEliminar(_this.producto);
+    if(this.mostrarBotonQuitar){    
+        this.btnQuitar = this.ui.find("#btn_eliminar");
+        this.btnQuitar.click(function(){
+            _this.alQuitar(_this.producto);
         });
-        this.btnEliminar.show();
+        this.btnQuitar.show();
     }
     this.ui.click(function(){
 		_this.alClickear(_this.producto);
     });
 	
+    this.lblNombre = this.ui.find("#nombre");
 	this.lblNombre.text(this.producto.nombre);
-	
+    
+    this.thumbnail = this.ui.find("#thumbnail_producto");	
     if(this.producto.imagen) this.thumbnail.attr("src", this.producto.imagen);
     else this.thumbnail.attr("src", "Gift-icon.png");
 	
 	if(this.mostrarPropietario){ 
+        this.avatar_propietario = this.ui.find("#avatar_propietario");
+        this.avatar_propietario.click(function(){
+            //TO DO: abrir pantalla de usuario o contacto segun corresponda
+        });
 		if(this.propietario.avatar) this.avatar_propietario.attr("src", this.propietario.avatar);
     	else this.avatar_propietario.attr("src", "avatar_default.png");
 		this.avatar_propietario.show();

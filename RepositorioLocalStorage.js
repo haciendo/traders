@@ -7,7 +7,8 @@ var RepositorioLocalStorage = {
 		this.objetosGuardados = [];
 		var _this = this;
 		_.forEach(keys, function(k){
-			if(k.split('_')[0]==Usuario.id) _this.objetosGuardados.push(JSON.parse(Encriptador.desEncriptarString(localStorage.getItem(k), Usuario.id, Usuario.id)));
+			if(k.split('_')[0]==Usuario.id) 
+                _this.objetosGuardados.push(JSON.parse(Encriptador.desEncriptarString(localStorage.getItem(k), Usuario.id, Usuario.id)));
 		});
         this.callbacks_insercion = [];
         this.callbacks_actualizacion = [];
@@ -15,10 +16,13 @@ var RepositorioLocalStorage = {
 	},
 	insert: function(objeto){
 		if(objeto.id){
-            this.update({id:objeto.id}, objeto);
-            return;
-		}
-        objeto.id = this.nextId();
+            if(this.select({id:objeto.id}).length>0) {
+                this.update({id:objeto.id}, objeto);
+                return;
+            }
+		}else{
+            objeto.id = this.nextId();
+        }
         this.objetosGuardados.push(objeto);
 		localStorage.setItem(Usuario.id+"_"+objeto.id, Encriptador.encriptarString(JSON.stringify(objeto), Usuario.id, Usuario.id));
 		this.onObjetoInsertado(objeto);

@@ -1,5 +1,6 @@
 var PantallaUsuario = {
-    start: function(){
+    start: function(opt){
+        _.extend(this, opt);
         var _this = this;
         this.ui =  $("#pantalla_usuario");
         
@@ -9,12 +10,11 @@ var PantallaUsuario = {
 		
 		
 		this.productos = new ColeccionRemotaVortex("Producto", Usuario.id);
-		this.datos_usuario = new ObjetoRemotoVortex({	id: "DATOS_PERSONALES", 
-													 	nombre:"Anónimo", 
-													 	avatar:"avatar_default.png"}, 
-													Usuario.id, true);
-		
-		this.datos_usuario.alCambiar(function(cambios){
+        
+        this.lbl_nombre_usuario.text(this.datosUsuario.nombre);
+		this.img_avatar_usuario.attr("src", this.datosUsuario.avatar);
+        
+		this.datosUsuario.alCambiar(function(cambios){
 			if(cambios.nombre) _this.lbl_nombre_usuario.text(cambios.nombre);
 			if(cambios.avatar) _this.img_avatar_usuario.attr("src", cambios.avatar);
 		});
@@ -22,10 +22,10 @@ var PantallaUsuario = {
         this.lbl_nombre_usuario.click(function(){
             vex.dialog.prompt({
 				message: 'Ingresá tu nuevo alias',
-				value: _this.datos_usuario.nombre,
+				value: _this.datosUsuario.nombre,
 				callback: function(value) {
 					if(value){
-						_this.datos_usuario.nombre = value;
+						_this.datosUsuario.nombre = value;
 					}
 				}
 			});
@@ -108,7 +108,7 @@ var PantallaUsuario = {
             canvas.getContext('2d').drawImage(_this.video_para_sacar_foto, x_rec, 0, alto_rec_video, alto_rec_video, 0, 0, 100, 100);
             var imagen_serializada = canvas.toDataURL('image/jpeg');
             _this.img_avatar_usuario.attr("src", imagen_serializada);
-			_this.datos_usuario.avatar = imagen_serializada;
+			_this.datosUsuario.avatar = imagen_serializada;
             $(_this.video_para_sacar_foto).hide();
             _this.img_avatar_usuario.show();
             _this.video_para_sacar_foto.pause();

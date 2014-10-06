@@ -1,5 +1,6 @@
 var BarraSuperior = {
-    start : function(){   
+    start : function(opt){
+        _.extend(this, opt);
         var _this = this;
 		
         this.ui = $("#barra_superior");
@@ -18,25 +19,8 @@ var BarraSuperior = {
 			$(this).addClass('solapa_selected',1000);
 		});
 		
-		vx.send({
-			tipoDeMensaje:"vortex.persistencia.select",
-			de: Usuario.id,
-			para: Usuario.id,
-			datoSeguro: {
-				filtro: {
-					id: "DATOS_PERSONALES"
-				}
-			}
-		},function(mensaje){
-			_this.avatar_usuario.attr("src", mensaje.datoSeguro.objetos[0]);
-		});
-		
-		vx.when({
-			tipoDeMensaje:"traders.avisoDeObjetoActualizado",
-			de: Usuario.id,
-			idObjeto: "DATOS_PERSONALES"
-		}, function(mensaje){
-			if(mensaje.datoSeguro.cambios.avatar) _this.avatar_usuario.attr("src", mensaje.datoSeguro.cambios.avatar);
+        this.datosUsuario.alCambiar(function(cambios){
+			if(cambios.avatar) _this.avatar_usuario.attr("src", cambios.avatar);
 		});
 				
 		this.solapa_yo.click(function(e) {

@@ -31,9 +31,20 @@ var PantallaInicio = {
 				});
 			//}
 			
-			BarraSuperior.start();
+            var datos_usuario = new ObjetoRemotoVortex({	
+                id: "DATOS_PERSONALES", 
+                nombre:"Anónimo", 
+                avatar:"avatar_default.png"}, 
+            Usuario.id, true);
+            
+            
+			BarraSuperior.start({
+                datosUsuario: datos_usuario
+            });
 			BarraSuperior.render();
-			PantallaUsuario.start();				
+			PantallaUsuario.start({
+                datosUsuario: datos_usuario
+            });				
 			PantallaUsuario.render();	
 			//PantallaContactos.start();	
 			

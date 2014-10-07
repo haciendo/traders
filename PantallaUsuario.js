@@ -9,7 +9,7 @@ var PantallaUsuario = {
 		this.img_avatar_usuario = this.ui.find("#avatar_usuario");
 		
 		
-		this.productos = new ColeccionRemotaVortex("Producto", Usuario.id);
+		this.productos = new ColeccionRemotaVortex({tipo:"Producto"}, Usuario.id);
         
         this.lbl_nombre_usuario.text(this.datosUsuario.nombre);
 		this.img_avatar_usuario.attr("src", this.datosUsuario.avatar);
@@ -34,7 +34,7 @@ var PantallaUsuario = {
         this.txt_nombre_producto_add = this.ui.find("#txt_nombre_producto_add");
         this.btn_add_producto = this.ui.find("#btn_add_producto");
         this.btn_add_producto.click(function(){
-			_this.productos.add({
+			_this.productos.crear({
 				nombre: _this.txt_nombre_producto_add.val()
 			});
             _this.txt_nombre_producto_add.val("");

@@ -9,11 +9,6 @@ var ListaProductos = function(opt){
     Evento.agregarEventoA(this, "alSeleccionarProducto");
     Evento.agregarEventoA(this, "alQuitarProducto");
     
-	this.productos.alCargar(function(){
-		_this.productos.forEach(function(producto){
-			_this.agregarVistaProducto(producto);
-		});
-	});
 	this.productos.alAgregar(function(producto){
 		_this.agregarVistaProducto(producto);
 	});

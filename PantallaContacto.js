@@ -25,9 +25,9 @@ var PantallaContacto = {
 			BarraSuperior.solapa_trueques.click();
 		});	
 		
-		this.inventario_contacto = new ListaProductos({
-            selector:{}
-        });
+//		this.inventario_contacto = new ListaProductos({
+//            selector:{}
+//        });
 		this.inventario_contacto.dibujarEn(this.panel_inventario_contacto);
     },
 	mostrarContacto: function(contacto){

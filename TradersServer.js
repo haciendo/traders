@@ -3,62 +3,88 @@ TradersServer = {
 		var _this = this;
 		_.extend(this, opt);
 
-		if(!this.repositorio){
-			throw "El server traders debe conocer a un repositorio";
-		}
 		if(!Usuario.id){
 			throw "El usuario debe estar loguado antes de inicializar el server de traders";
 		}
 		// pedidos    
-//		vx.when({
-//			de: Usuario.id,
-//			para: Usuario.id,
-//			tipoDeMensaje: "traders.enviarSolicitudDeAmistad"
-//		}, function(msg){
-//	        vx.send({
-//				responseTo: msg.idRequest,
-//	            de: Usuario.id,
-//				para: msg.de,
-//	            datoSeguro: {
-//	                resultado:"success"
-//	            }
-//	        });
-//			vx.send({
-//	            tipoDeMensaje:"traders.solicitudDeAmistad",
-//	            de: Usuario.id,
-//                para: msg.datoSeguro.idContacto,
-//	            datoSeguro: {
-//	                idSolicitante: Usuario.id
-//	            }
-//	        });    
-//            _this.repositorio.insert({
-//                tipo: "SolicitudDeAmistadEnviada",
-//                idContacto: msg.datoSeguro.idContacto
-//            });
-//		});
+		
+		var misSolicitudesDeAmistad = new ColeccionRemotaVortex({tipo: "SolicitudDeAmistad"}, Usuario.id);
+		misSolicitudesDeAmistad.alAgregar(function(solicitud){
+			if(solicitud.estado == "Enviando") {
+				vx.send({
+					tipoDeMensaje: "traders.solicitudDeAmistad",
+					de: Usuario.id,
+					para: solicitud.idContacto,
+					datoSeguro: {
+						idSolicitante: Usuario.id
+					}
+				}, function(respuesta){
+					if(respuesta.datoSeguro == "success"){
+						solicitud.estado = "Enviada";
+					}
+				}); 
+			}
+			
+			if(solicitud.estado == "Aprobando") {
+				vx.send({
+					tipoDeMensaje: "traders.aprobarSolicitudDeAmistad",
+					de: Usuario.id,
+					para: solicitud.idContacto
+				}, function(respuesta){
+					if(respuesta.datoSeguro == "success"){
+						solicitud.estado = "Aprobada";
+					}
+				}); 
+			}
+		});
+		
+		misSolicitudesDeAmistad.alCambiar(function(solicitud, cambios){
+			if(cambios.estado == "Aprobando"){
+				vx.send({
+					tipoDeMensaje: "traders.aprobacionDeSolicitudDeAmistad",
+					de: Usuario.id,
+					para: solicitud.idContacto
+				}, function(respuesta){
+					if(respuesta.datoSeguro == "success"){
+						solicitud.estado = "Aprobada";
+					}
+				}); 
+			}
+		});
 //        
-//        vx.when({
-//			para: Usuario.id,
-//			tipoDeMensaje: "traders.solicitudDeAmistad"
-//		}, function(msg){ 
-//            _this.repositorio.insert({
-//                tipo: "SolicitudDeAmistadRecibida",
-//                idContacto: msg.datoSeguro.idContacto
-//            });
-//		});
+        vx.when({
+			para: Usuario.id,
+			tipoDeMensaje: "traders.solicitudDeAmistad"
+		}, function(msg){ 
+			var solicitud = misSolicitudesDeAmistad.crear({
+                tipo: "SolicitudDeAmistad",
+				estado: "Recibida",
+                idContacto: msg.datoSeguro.idContacto
+            });
+			vx.send({
+				responseTo: msg.idRequest,
+				de: Usuario.id,
+				para: msg.de,
+				datoSeguro: {
+					resultado: "success"
+				}
+			});
+		});
 //        
-//        vx.when({
-//            de: Usuario.id,
-//			para: Usuario.id,
-//			tipoDeMensaje: "traders.aceptarSolicitudDeAmistad"
-//		}, function(msg){ 
-//            var solicitud = _this.repositorio.remove({
-//                id: msg.datoSeguro.idSolicitud
-//            })[0];
-//            _this.repositorio.insert({
-//                tipo: "Contacto",
-//                idContacto: solicitud.idContacto
-//            });            
-//		});
+        vx.when({
+			para: Usuario.id,
+			tipoDeMensaje: "traders.aprobacionDeSolicitudDeAmistad"
+		}, function(msg){ 
+			var solicitud = _.findWhere(misSolicitudesDeAmistad, {idContacto: msg.de});
+            solicitud_enviada.estado = "Aprobada"; 
+			vx.send({
+				responseTo: msg.idRequest,
+				de: Usuario.id,
+				para: msg.de,
+				datoSeguro: {
+					resultado: "success"
+				}
+			});
+		});
 	}
 };

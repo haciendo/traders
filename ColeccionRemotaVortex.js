@@ -9,17 +9,7 @@ var ColeccionRemotaVortex = function(filtro, id_owner){
 	Evento.agregarEventoA(this, "alCambiar");
 	Evento.agregarEventoA(this, "alQuitar");
 	
-	vx.send({
-		tipoDeMensaje: "vortex.persistencia.select",
-		de: Usuario.id,
-		para: this.idOwner,
-		datoSeguro: {filtro: filtro}
-	}, function(respuesta){
-		_.forEach(respuesta.datoSeguro.objetos, function(objeto){
-			_this._agregar(objeto);
-		});
-		_this.alCargar(_this.objetos);
-	});
+	this.load();
 	
 	vx.when({
 		tipoDeMensaje:"vortex.persistencia.avisoDeObjetoNuevo",
@@ -27,6 +17,28 @@ var ColeccionRemotaVortex = function(filtro, id_owner){
 		tipoDeObjeto: filtro.tipo
 	}, function(aviso){
 		_this._agregar(aviso.datoSeguro.objeto);
+	});
+	
+	vx.when({
+		tipoDeMensaje:"vortex.avisoDeConexion",
+		de: this.idOwner
+	}, function(aviso){
+		_this.load();
+	});
+};
+
+ColeccionRemotaVortex.prototype.load = function(){
+	var _this = this;
+	vx.send({
+		tipoDeMensaje: "vortex.persistencia.select",
+		de: Usuario.id,
+		para: this.idOwner,
+		datoSeguro: {filtro: this.filtro}
+	}, function(respuesta){
+		_.forEach(respuesta.datoSeguro.objetos, function(objeto){
+			_this._agregar(objeto);
+		});
+		_this.alCargar(_this.objetos);
 	});
 };
 

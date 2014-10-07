@@ -26,17 +26,27 @@ VistaDeUnContactoEnLista.prototype.start = function(){
 		_this.solicitud.eliminar();
 	});		
 		
+	this.datosContacto = new ObjetoRemotoVortex({id: "DATOS_PERSONALES"}, this.solicitud.idContacto);
+	this.datosContacto.load();
+	this.datosContacto.alCargar(function(obj){
+		avatar.attr("src", obj.avatar);
+	});
+	
+	this.datosContacto.alCambiar(function(cambios){
+		if(cambios.avatar) avatar.attr("src", cambios.avatar);
+	});
+	
 	this.ui.click(function(){
 		_this.alSeleccionar(_this);
 		_this.ui.addClass("contacto_seleccionado");
 		_this.seleccionado = true;
-		_this.alSeleccionar();
+		_this.alSeleccionar(_this.datosContacto);
 	});
 	
     if(this.mostrarBotonQuitar){    
         this.btnQuitar = this.ui.find("#btn_eliminar");
         this.btnQuitar.click(function(){
-            _this.alQuitar(_this.producto);
+            _this.alQuitar(_this.solicitud);
         });
         this.btnQuitar.show();
     }

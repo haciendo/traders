@@ -112,6 +112,9 @@ var RepositorioVortex = {
 			});
 		});
         
-        
+        vx.send({
+			de:Usuario.id,
+			tipoDeMensaje: "vortex.avisoDeConexion"
+		});
 	}
 };

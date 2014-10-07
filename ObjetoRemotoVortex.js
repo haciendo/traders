@@ -3,6 +3,7 @@ var ObjetoRemotoVortex = function(objeto, id_owner, insertar_si_no_existe){
 	this.idOwner = id_owner;
 	
 	var _this= this;
+	Evento.agregarEventoA(this, "alCargar");
 	Evento.agregarEventoA(this, "alEliminar");
 	Evento.agregarEventoA(this, "alCambiar");
 	Evento.agregarEventoA(this, "alNoExistir");
@@ -66,6 +67,13 @@ var ObjetoRemotoVortex = function(objeto, id_owner, insertar_si_no_existe){
 		}
 	});
 	
+	vx.when({
+		tipoDeMensaje:"vortex.avisoDeConexion",
+		de: this.idOwner
+	}, function(aviso){
+		_this.load();
+	});
+	
 	if(insertar_si_no_existe) this.load();
 };
 
@@ -77,7 +85,10 @@ ObjetoRemotoVortex.prototype.load = function(){
 		para: this.idOwner,
 		datoSeguro: {filtro: {id: this.id}}
 	}, function(respuesta){
-		if(respuesta.datoSeguro.objetos.length>0) _.extend(_this, respuesta.datoSeguro.objetos[0]);
+		if(respuesta.datoSeguro.objetos.length>0) {
+			_.extend(_this, respuesta.datoSeguro.objetos[0]);
+			_this.alCargar(_this);
+		}
 		else _this.alNoExistir();
 	});
 };

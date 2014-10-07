@@ -28,12 +28,16 @@ var PantallaListaContactos = {
 		});
         
 		this.solicitudesDeAmistad.alAgregar(function(solicitud){
-			_this.agregarVistaContacto(solicitud)
+			_this.agregarVistaContacto(solicitud);
 		});
     },
 	
 	agregarVistaContacto: function(solicitud){
+		var _this = this;
 		var vista = new VistaDeUnContactoEnLista({solicitud: solicitud});
+		vista.alSeleccionar(function(datos_contacto){
+			_this.alSeleccionar(datos_contacto);
+		});
 		vista.dibujarEn(this.lista_contactos);
 	}
 };

@@ -45,8 +45,8 @@ var PantallaInicio = {
 			PantallaUsuario.start({
                 datosUsuario: datos_usuario
             });				
-			PantallaUsuario.render();	
-			//PantallaContactos.start();	
+			PantallaUsuario.show();	
+			PantallaContactos.start();	
 			
             _this.ui.hide();
         });

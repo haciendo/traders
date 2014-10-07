@@ -24,11 +24,13 @@ var BarraSuperior = {
 		});
 				
 		this.solapa_yo.click(function(e) {
-			PantallaUsuario.render();
+			PantallaUsuario.show();
+			PantallaContactos.hide();
 		});		
 		
 		this.solapa_contactos.click(function(e) {
-			PantallaContactos.render();
+			PantallaContactos.show();
+			PantallaUsuario.hide();
 		});	
 		
 		this.solapa_trueques.click(function(e) {

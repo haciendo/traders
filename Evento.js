@@ -9,7 +9,7 @@ Evento.prototype.addHandler = function(callback){
 	var handler = new HandlerEvento(this.ultimo_id_handler, callback, this);
 	this._handlers.push(handler);
 	this.ultimo_id_handler++;
-	if(this._unico && this._ya_disparo) setTimeout(function(){ handler.callback(_this._argumentos_disparo);},0);
+	if(this._unico && this._ya_disparo) setTimeout(function(){ handler.callback.apply(_this, _this._argumentos_disparo);},0);
 	return handler;
 };
 
@@ -17,14 +17,15 @@ Evento.prototype.removeHandler = function(id_handler){
 	this._handlers = _.reject(this._handlers, function(handler){return handler.id == id_handler;});
 };
 
-Evento.prototype.disparar = function(info){
+Evento.prototype.disparar = function(){
+	var args = arguments;
 	_.each(this._handlers, function(handler){
 		setTimeout(function(){
-			handler.callback(info);
+			handler.callback.apply(this, args);
 		},0);
 	});
 	this._ya_disparo = true;
-	this._argumentos_disparo = info;
+	this._argumentos_disparo = arguments;
 };
 
 Evento.agregarEventoA = function(objeto_target, nombre_evento, evento_unico){
@@ -34,7 +35,7 @@ Evento.agregarEventoA = function(objeto_target, nombre_evento, evento_unico){
 		if(_.isFunction(arguments[0])){		
 			return objeto_target["_"+nombre_evento].addHandler(arguments[0]);			
 		}else{
-			objeto_target["_"+nombre_evento].disparar(arguments[0]);
+			objeto_target["_"+nombre_evento].disparar.apply(objeto_target["_"+nombre_evento], arguments);
 		}	
 	}	
 };

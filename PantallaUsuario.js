@@ -129,8 +129,11 @@ var PantallaUsuario = {
         this.inventario_usuario.dibujarEn(this.panel_inventario);	
 		
     },
-    render: function(){  
+    show: function(){  
 		this.txt_nombre_producto_add.focus();
         this.ui.show();      
+    },
+	hide: function(){  
+        this.ui.hide();      
     }
 };

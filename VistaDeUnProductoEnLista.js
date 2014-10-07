@@ -1,5 +1,5 @@
 var VistaDeUnProductoEnLista = function(opt){
-    $.extend(true, this, opt);
+    _.extend(this, opt);
     this.start();
 };
 

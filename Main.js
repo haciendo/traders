@@ -19,6 +19,9 @@ var onDeviceReady = function() {
     
 	// url:'http://router-vortex.herokuapp.com',
 	// url:'http://localhost:3000',
+	vx.conectarPorWebSockets({
+		url:"https://router-vortex.herokuapp.com"
+	}); 
 	
     PantallaInicio.start();
     PantallaInicio.render();

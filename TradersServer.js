@@ -19,7 +19,7 @@ TradersServer = {
 						idSolicitante: Usuario.id
 					}
 				}, function(respuesta){
-					if(respuesta.datoSeguro == "success"){
+					if(respuesta.datoSeguro.resultado == "success"){
 						solicitud.estado = "Enviada";
 					}
 				}); 
@@ -31,7 +31,7 @@ TradersServer = {
 					de: Usuario.id,
 					para: solicitud.idContacto
 				}, function(respuesta){
-					if(respuesta.datoSeguro == "success"){
+					if(respuesta.datoSeguro.resultado == "success"){
 						solicitud.estado = "Aprobada";
 					}
 				}); 
@@ -39,13 +39,14 @@ TradersServer = {
 		});
 		
 		misSolicitudesDeAmistad.alCambiar(function(solicitud, cambios){
+			if(!cambios.estado) return;
 			if(cambios.estado == "Aprobando"){
 				vx.send({
 					tipoDeMensaje: "traders.aprobacionDeSolicitudDeAmistad",
 					de: Usuario.id,
 					para: solicitud.idContacto
 				}, function(respuesta){
-					if(respuesta.datoSeguro == "success"){
+					if(respuesta.datoSeguro.resultado == "success"){
 						solicitud.estado = "Aprobada";
 					}
 				}); 
@@ -59,7 +60,7 @@ TradersServer = {
 			var solicitud = misSolicitudesDeAmistad.crear({
                 tipo: "SolicitudDeAmistad",
 				estado: "Recibida",
-                idContacto: msg.datoSeguro.idContacto
+                idContacto: msg.datoSeguro.idSolicitante
             });
 			vx.send({
 				responseTo: msg.idRequest,
@@ -75,8 +76,8 @@ TradersServer = {
 			para: Usuario.id,
 			tipoDeMensaje: "traders.aprobacionDeSolicitudDeAmistad"
 		}, function(msg){ 
-			var solicitud = _.findWhere(misSolicitudesDeAmistad, {idContacto: msg.de});
-            solicitud_enviada.estado = "Aprobada"; 
+			var solicitud = _.findWhere(misSolicitudesDeAmistad.objetos, {idContacto: msg.de});
+            solicitud.estado = "Aprobada"; 
 			vx.send({
 				responseTo: msg.idRequest,
 				de: Usuario.id,

@@ -35,7 +35,7 @@ ColeccionRemotaVortex.prototype.crear = function(valor_inicial){
 		tipoDeMensaje: "vortex.persistencia.insert",
 		de: Usuario.id,
 		para: this.idOwner,
-		datoSeguro:{ objeto: _.extend(this.filtro, valor_inicial)}
+		datoSeguro:{ objeto: _.extend({}, this.filtro, valor_inicial)}
 	});
 };
 

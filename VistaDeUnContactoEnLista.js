@@ -26,8 +26,6 @@ VistaDeUnContactoEnLista.prototype.start = function(){
 		_this.solicitud.eliminar();
 	});		
 		
-	this.datosContacto = new ObjetoRemotoVortex({id: "DATOS_PERSONALES"}, this.solicitud.idContacto);
-	this.datosContacto.load();
 	this.datosContacto.alCargar(function(obj){
 		avatar.attr("src", obj.avatar);
 	});
@@ -37,7 +35,6 @@ VistaDeUnContactoEnLista.prototype.start = function(){
 	});
 	
 	this.ui.click(function(){
-		_this.alSeleccionar(_this);
 		_this.ui.addClass("contacto_seleccionado");
 		_this.seleccionado = true;
 		_this.alSeleccionar(_this.datosContacto);
@@ -59,8 +56,8 @@ VistaDeUnContactoEnLista.prototype.start = function(){
 	});
 	
 	var handler_eliminacion = this.solicitud.alEliminar(function(){
-		handler_cambio.remove();
-		handler_eliminacion.remove();
+		handler_cambio.quitar();
+		handler_eliminacion.quitar();
 		_this.ui.remove();
 	});
 };

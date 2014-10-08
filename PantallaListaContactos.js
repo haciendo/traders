@@ -34,8 +34,10 @@ var PantallaListaContactos = {
 	
 	agregarVistaContacto: function(solicitud){
 		var _this = this;
-		var vista = new VistaDeUnContactoEnLista({solicitud: solicitud});
-		vista.alSeleccionar(function(datos_contacto){
+        var datos_contacto = new ObjetoRemotoVortex({id: "DATOS_PERSONALES"}, solicitud.idContacto);
+        datos_contacto.load();
+		var vista = new VistaDeUnContactoEnLista({solicitud: solicitud, datosContacto:datos_contacto});
+		vista.alSeleccionar(function(){
 			_this.alSeleccionar(datos_contacto);
 		});
 		vista.dibujarEn(this.lista_contactos);

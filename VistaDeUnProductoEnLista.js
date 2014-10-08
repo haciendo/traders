@@ -45,8 +45,8 @@ VistaDeUnProductoEnLista.prototype.start = function(){
 	});
 	
 	var handler_eliminacion = this.producto.alEliminar(function(){
-		handler_cambio.remove();
-		handler_eliminacion.remove();
+		handler_cambio.quitar();
+		handler_eliminacion.quitar();
 		_this.ui.remove();
 	});
 };

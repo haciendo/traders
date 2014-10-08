@@ -33,6 +33,7 @@ var PantallaInicio = {
 			
             var datos_usuario = new ObjetoRemotoVortex({	
                 id: "DATOS_PERSONALES", 
+                idUsuario:Usuario.id,
                 nombre:"Anónimo", 
                 avatar:"avatar_default.png"}, 
             Usuario.id, true);

@@ -4,7 +4,7 @@ var HandlerEvento = function(id, callback, evento){
 	this.evento = evento;
 };
 
-HandlerEvento.prototype.remove = function(){
+HandlerEvento.prototype.quitar = function(){
 	this.evento.removeHandler(this.id);
 	this.callback = undefined;
 };

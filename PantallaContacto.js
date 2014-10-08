@@ -24,26 +24,17 @@ var PantallaContacto = {
 			
 			BarraSuperior.solapa_trueques.click();
 		});	
-		
-//		this.inventario_contacto = new ListaProductos({
-//            selector:{}
-//        });
-		this.inventario_contacto.dibujarEn(this.panel_inventario_contacto);
+		this.productosContacto = new ColeccionRemotaVortex({tipo: "TUVIEJA"}, 1111);         
+		this.inventarioContacto = new ListaProductos({
+            productos: this.productosContacto
+        });        
+        this.inventarioContacto.dibujarEn(this.panel_inventario_contacto);
     },
-	mostrarContacto: function(contacto){
+	mostrarContacto: function(datos_contacto){
         var _this = this;        
-		if(contacto === undefined) {
-			this.panel_contacto.hide();
-			return;
-		}
-		
-        this.lbl_nombre_contacto.text(contacto.nombre);
-		
-		if(contacto.avatar!="") this.img_avatar_contacto.attr("src", _contacto.avatar);
-		else this.img_avatar_contacto.attr("src", "avatar_default.png");
-		
-		this.inventario_contacto.setSelector({propietario:_contacto});
-		this.inventario_contacto.render();
+        this.productosContacto.load({tipo: "Producto"}, datos_contacto.idUsuario);        
+        this.lbl_nombre_contacto.text(datos_contacto.nombre);
+		this.img_avatar_contacto.attr("src", datos_contacto.avatar);
     },
     render: function(){
         this.panel_contacto.show();  

@@ -7,6 +7,7 @@ var ObjetoRemotoVortex = function(objeto, id_owner, insertar_si_no_existe){
 	Evento.agregarEventoA(this, "alEliminar");
 	Evento.agregarEventoA(this, "alCambiar");
 	Evento.agregarEventoA(this, "alNoExistir");
+	Evento.agregarEventoA(this, "alDesconectar");
 	
 	var update_observer = function(changes){
 		var cambios = {};
@@ -47,12 +48,18 @@ var ObjetoRemotoVortex = function(objeto, id_owner, insertar_si_no_existe){
 		de: id_owner,
 		idObjeto: this.id		
 	}, function(aviso){
-		pedido_modificacion.quitar();
-		pedido_eliminacion.quitar();
 		_this.alEliminar();
+        _this.desconectar();
 	});
 	
-	this.alNoExistir(function(){
+    var pedido_aviso_conexion = vx.when({
+		tipoDeMensaje:"vortex.avisoDeConexion",
+		de: this.idOwner
+	}, function(aviso){
+		_this.load();
+	});
+    
+	var pedido_no_existencia = this.alNoExistir(function(){
 		if(insertar_si_no_existe){
 			vx.send({
 				tipoDeMensaje: "vortex.persistencia.insert",
@@ -67,13 +74,15 @@ var ObjetoRemotoVortex = function(objeto, id_owner, insertar_si_no_existe){
 		}
 	});
 	
-	vx.when({
-		tipoDeMensaje:"vortex.avisoDeConexion",
-		de: this.idOwner
-	}, function(aviso){
-		_this.load();
+    var pedido_desconexion = this.alDesconectar(function(){
+		pedido_modificacion.quitar();
+		pedido_eliminacion.quitar();
+        pedido_aviso_conexion.quitar();
+        pedido_no_existencia.quitar();
+        pedido_desconexion.quitar();
+        Object.unobserve(_this, update_observer);
 	});
-	
+    
 	if(insertar_si_no_existe) this.load();
 };
 
@@ -91,6 +100,10 @@ ObjetoRemotoVortex.prototype.load = function(){
 		}
 		else _this.alNoExistir();
 	});
+};
+
+ObjetoRemotoVortex.prototype.desconectar = function(){
+    this.alDesconectar();
 };
 
 ObjetoRemotoVortex.prototype.eliminar = function(){

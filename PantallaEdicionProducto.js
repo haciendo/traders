@@ -41,8 +41,8 @@ var PantallaEdicionProducto = function(producto){
 	});
 	
 	var handler_eliminacion = this.producto.alEliminar(function(){
-		handler_cambio.remove();
-		handler_eliminacion.remove();
+		handler_cambio.quitar();
+		handler_eliminacion.quitar();
 		vex.close(_this.idVex);
 	});
 	
@@ -52,8 +52,8 @@ var PantallaEdicionProducto = function(producto){
 			return $vexContent.append(_this.ui);
 		},
 		afterClose: function(){
-			handler_cambio.remove();
-			handler_eliminacion.remove();
+			handler_cambio.quitar();
+			handler_eliminacion.quitar();
 		}
 	});
 };

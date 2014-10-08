@@ -1,34 +1,24 @@
 var ColeccionRemotaVortex = function(filtro, id_owner){
 	var _this = this;
-	this.objetos = [];
-	this.filtro = filtro;
-	this.idOwner = id_owner;
 	
+    this.objetos = [];
+    
 	Evento.agregarEventoA(this, "alCargar", true);
 	Evento.agregarEventoA(this, "alAgregar");
 	Evento.agregarEventoA(this, "alCambiar");
 	Evento.agregarEventoA(this, "alQuitar");
 	
-	this.load();
-	
-	vx.when({
-		tipoDeMensaje:"vortex.persistencia.avisoDeObjetoNuevo",
-		de: this.idOwner,
-		tipoDeObjeto: filtro.tipo
-	}, function(aviso){
-		_this._agregar(aviso.datoSeguro.objeto);
-	});
-	
-	vx.when({
-		tipoDeMensaje:"vortex.avisoDeConexion",
-		de: this.idOwner
-	}, function(aviso){
-		_this.load();
-	});
+	this.load(filtro, id_owner);
 };
 
-ColeccionRemotaVortex.prototype.load = function(){
+ColeccionRemotaVortex.prototype.load = function(filtro, id_owner){
+    this.filtro = filtro;
+	this.idOwner = id_owner;
 	var _this = this;
+    
+    this.forEach(function(vxo){
+        _this._quitar(vxo);
+    });
 	vx.send({
 		tipoDeMensaje: "vortex.persistencia.select",
 		de: Usuario.id,
@@ -39,6 +29,23 @@ ColeccionRemotaVortex.prototype.load = function(){
 			_this._agregar(objeto);
 		});
 		_this.alCargar(_this.objetos);
+	});
+    
+    if(this.new_obj_hnd) this.new_obj_hnd.quitar();
+    this.new_obj_hnd = vx.when({
+		tipoDeMensaje:"vortex.persistencia.avisoDeObjetoNuevo",
+		de: this.idOwner,
+		tipoDeObjeto: filtro.tipo
+	}, function(aviso){
+		_this._agregar(aviso.datoSeguro.objeto);
+	});
+                            
+	if(this.conexion_hnd) this.conexion_hnd.quitar();
+	this.conexion_hnd = vx.when({
+		tipoDeMensaje:"vortex.avisoDeConexion",
+		de: this.idOwner
+	}, function(aviso){
+		_this.load();
 	});
 };
 
@@ -71,14 +78,14 @@ ColeccionRemotaVortex.prototype._agregar = function(obj){
 			return;
 		}
 		_this._quitar(vxo);
-		eliminar_hnd.remove();
-		modificar_hnd.remove();
 	});
-	var eliminar_hnd = vxo.alEliminar(function(){
-		_this._quitar(vxo);
-		eliminar_hnd.remove();
-		modificar_hnd.remove();
-	});
+    var quitar_hnd = vxo.alDesconectar(function(){
+        modificar_hnd.quitar();
+        quitar_hnd.quitar();
+        _this.objetos = _.without(_this.objetos, vxo);
+        _this.alQuitar(vxo);
+    });
+    
 	this.objetos.push(vxo);
 	this.alAgregar(vxo);
 };
@@ -86,6 +93,5 @@ ColeccionRemotaVortex.prototype._agregar = function(obj){
 ColeccionRemotaVortex.prototype._quitar = function(obj){
 	var vxo = _.findWhere(this.objetos, {id: obj.id});
 	if(!vxo) return;
-	this.objetos = _.without(this.objetos, vxo);
-	this.alQuitar(vxo);
+    vxo.desconectar();
 };

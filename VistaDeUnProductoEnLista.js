@@ -12,7 +12,8 @@ VistaDeUnProductoEnLista.prototype.start = function(){
 	
     if(this.mostrarBotonQuitar){    
         this.btnQuitar = this.ui.find("#btn_eliminar");
-        this.btnQuitar.click(function(){
+        this.btnQuitar.click(function(event){
+			event.stopPropagation();
             _this.alQuitar(_this.producto);
         });
         this.btnQuitar.show();
@@ -44,9 +45,9 @@ VistaDeUnProductoEnLista.prototype.start = function(){
 		if(cambios.imagen) _this.thumbnail.attr("src", cambios.imagen);
 	});
 	
-	var handler_eliminacion = this.producto.alEliminar(function(){
+	var handler_desconexion = this.producto.alDesconectar(function(){
 		handler_cambio.quitar();
-		handler_eliminacion.quitar();
+		handler_desconexion.quitar();
 		_this.ui.remove();
 	});
 };

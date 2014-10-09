@@ -68,6 +68,7 @@ ul {
 
 .item_en_lista #btn_eliminar{
 	position: absolute;
+	display:none;
 	right: 10px;
 	top: 8px;
     color:blue;

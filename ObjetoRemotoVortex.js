@@ -1,5 +1,6 @@
-var ObjetoRemotoVortex = function(objeto, id_owner, insertar_si_no_existe){
-	_.extend(this, objeto);
+var ObjetoRemotoVortex = function(id, id_owner, opt){
+	if(opt) if(opt.valorInicial) _.extend(this, opt.valorInicial);
+	this.id = id;
 	this.idOwner = id_owner;
 	
 	var _this= this;
@@ -60,15 +61,15 @@ var ObjetoRemotoVortex = function(objeto, id_owner, insertar_si_no_existe){
 	});
     
 	var pedido_no_existencia = this.alNoExistir(function(){
-		if(insertar_si_no_existe){
+		if(opt.insertarSiNoExiste){
 			vx.send({
 				tipoDeMensaje: "vortex.persistencia.insert",
 				de: Usuario.id,
 				para: _this.idOwner,
-				datoSeguro:{ objeto: objeto}
+				datoSeguro:{ objeto: opt.valorInicial}
 			}, function(resp){
 				if(resp.datoSeguro.resultado == "success"){
-					_this.alCambiar(objeto);
+					_this.alCambiar(opt.valorInicial);
 				}
 			});
 		}
@@ -83,7 +84,7 @@ var ObjetoRemotoVortex = function(objeto, id_owner, insertar_si_no_existe){
         Object.unobserve(_this, update_observer);
 	});
     
-	if(insertar_si_no_existe) this.load();
+	if(opt.cargarAlInicio) this.load();
 };
 
 ObjetoRemotoVortex.prototype.load = function(){

@@ -39,6 +39,7 @@
 	position: absolute;	
 	top: 70px;
 	left: 120px;
+	display: none;
 }
 
 #pantalla_contacto #lbl_nombre_contacto
@@ -48,4 +49,12 @@
 	left: 120px;
 	font-size: 35px;
 	font-weight: bold;
+}
+
+#pantalla_contacto #btn_aprobar
+{
+	position: absolute;	
+	top: 70px;
+	left: 120px;	
+	display: none;
 }

@@ -5,9 +5,7 @@ var PantallaListaContactos = {
 		Evento.agregarEventoA(this, "alSeleccionar");
 		
         this.ui =  $("#pantalla_lista_contactos");     
-        this.solicitudesDeAmistad = new ColeccionRemotaVortex({tipo: "SolicitudDeAmistad"}, Usuario.id);
-		
-        this.contacto_seleccionado = {};        
+        this.solicitudesDeAmistad = vx.get({tipo: "SolicitudDeAmistad", idOwner: Usuario.id});
 		
         this.lista_contactos = this.ui.find("#lista_contactos");
 		
@@ -28,17 +26,16 @@ var PantallaListaContactos = {
 		});
         
 		this.solicitudesDeAmistad.alAgregar(function(solicitud){
-			_this.agregarVistaContacto(solicitud);
+			_this.agregarVistaContacto(solicitud.idContacto);
 		});
     },
 	
-	agregarVistaContacto: function(solicitud){
+	agregarVistaContacto: function(idContacto){
 		var _this = this;
-        var datos_contacto = new ObjetoRemotoVortex({id: "DATOS_PERSONALES"}, solicitud.idContacto);
-        datos_contacto.load();
-		var vista = new VistaDeUnContactoEnLista({solicitud: solicitud, datosContacto:datos_contacto});
+        
+		var vista = new VistaDeUnContactoEnLista(idContacto);
 		vista.alSeleccionar(function(){
-			_this.alSeleccionar(datos_contacto);
+			_this.alSeleccionar(idContacto);
 		});
 		vista.dibujarEn(this.lista_contactos);
 	}

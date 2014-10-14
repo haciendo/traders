@@ -31,13 +31,10 @@ var PantallaInicio = {
 				});
 			//}
 			
-            var datos_usuario = new ObjetoRemotoVortex({	
-                id: "DATOS_PERSONALES", 
-                idUsuario:Usuario.id,
-                nombre:"Anónimo", 
-                avatar:"avatar_default.png"}, 
-            Usuario.id, true);
-            
+            var datos_usuario = vx.get(
+				{id: "DATOS_PERSONALES", idOwner: Usuario.id}, 
+				{ valorInicial: { id: "DATOS_PERSONALES", idUsuario:Usuario.id, nombre: nombre_usuario, avatar:"avatar_default.png"}, cargarAlInicio: true, insertarSiNoExiste: true}
+			);            
             
 			BarraSuperior.start({
                 datosUsuario: datos_usuario

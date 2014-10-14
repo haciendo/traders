@@ -97,8 +97,13 @@ var Vortex = Vx = vX = vx = {
 		});
 		return new PortalSeguro(opt);
 	},
-	object: function(opt){
-		return new VxString(opt);
+	get: function(filtro, opt){
+		if(filtro.id) {
+			return new ObjetoRemotoVortex(filtro.id, filtro.idOwner, opt);
+		}
+		if(filtro.tipo) {
+			return new ColeccionRemotaVortex(filtro, filtro.idOwner, opt);
+		}
 	}
 };
 

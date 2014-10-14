@@ -1,6 +1,6 @@
-var ColeccionRemotaVortex = function(filtro, id_owner){
+var ColeccionRemotaVortex = function(filtro, id_owner, opt){
 	var _this = this;
-	
+	this.opt  = _.extend({}, opt);
     this.objetos = [];
     
 	Evento.agregarEventoA(this, "alCargar", true);
@@ -11,7 +11,7 @@ var ColeccionRemotaVortex = function(filtro, id_owner){
 	this.load(filtro, id_owner);
 };
 
-ColeccionRemotaVortex.prototype.load = function(filtro, id_owner){
+ColeccionRemotaVortex.prototype.load = function(filtro, id_owner, opt){
     this.filtro = filtro;
 	this.idOwner = id_owner;
 	var _this = this;
@@ -45,7 +45,7 @@ ColeccionRemotaVortex.prototype.load = function(filtro, id_owner){
 		tipoDeMensaje:"vortex.avisoDeConexion",
 		de: this.idOwner
 	}, function(aviso){
-		_this.load();
+		_this.load(_this.filtro, _this.idOwner);
 	});
 };
 
@@ -71,7 +71,7 @@ ColeccionRemotaVortex.prototype._elObjetoPasaElFiltro = function(obj){
 ColeccionRemotaVortex.prototype._agregar = function(obj){
 	var _this = this;
 	if(_.findWhere(_this.objetos, {id: obj.id})) return;
-	var vxo = new ObjetoRemotoVortex(obj, this.idOwner);
+	var vxo = vx.get({id: obj.id, idOwner: this.idOwner}, {valorInicial: obj});
 	var modificar_hnd = vxo.alCambiar(function(cambios){
 		if(_this._elObjetoPasaElFiltro(vxo)) {
 			_this.alCambiar(vxo, cambios);	

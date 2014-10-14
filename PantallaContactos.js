@@ -4,8 +4,8 @@ var PantallaContactos = {
 		this.ui = $("#pantalla_contactos");	
 		PantallaListaContactos.start();
 		PantallaContacto.start();
-		PantallaListaContactos.alSeleccionar(function(datos_contacto){
-            PantallaContacto.mostrarContacto(datos_contacto);
+		PantallaListaContactos.alSeleccionar(function(idContacto){
+            PantallaContacto.mostrarContacto(idContacto);
 			_this.ui.animate({scrollLeft: _this.ui.width()}, 300);
 		});
 	},

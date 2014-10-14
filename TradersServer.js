@@ -8,7 +8,7 @@ TradersServer = {
 		}
 		// pedidos    
 		
-		var misSolicitudesDeAmistad = new ColeccionRemotaVortex({tipo: "SolicitudDeAmistad"}, Usuario.id);
+		var misSolicitudesDeAmistad = vx.get({tipo: "SolicitudDeAmistad", idOwner: Usuario.id});
 		misSolicitudesDeAmistad.alAgregar(function(solicitud){
 			if(solicitud.estado == "Enviando") {
 				vx.send({

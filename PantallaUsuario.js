@@ -9,7 +9,7 @@ var PantallaUsuario = {
 		this.img_avatar_usuario = this.ui.find("#avatar_usuario");
 		
 		
-		this.productos = new ColeccionRemotaVortex({tipo:"Producto"}, Usuario.id);
+		this.productos = vx.get({tipo:"Producto", idOwner: Usuario.id});
         
         this.lbl_nombre_usuario.text(this.datosUsuario.nombre);
 		this.img_avatar_usuario.attr("src", this.datosUsuario.avatar);

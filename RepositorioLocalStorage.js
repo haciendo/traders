@@ -10,9 +10,10 @@ var RepositorioLocalStorage = {
 			if(k.split('_')[0]==Usuario.id) 
                 _this.objetosGuardados.push(JSON.parse(Encriptador.desEncriptarString(localStorage.getItem(k), Usuario.id, Usuario.id)));
 		});
-        this.callbacks_insercion = [];
-        this.callbacks_actualizacion = [];
-        this.callbacks_eliminacion = [];
+        
+        Evento.agregarEventoA(this, "onObjetoInsertado");
+        Evento.agregarEventoA(this, "onObjetoActualizado");
+        Evento.agregarEventoA(this, "onObjetoEliminado");
 	},
 	insert: function(objeto){
 		if(objeto.id){
@@ -34,13 +35,10 @@ var RepositorioLocalStorage = {
 		var _this = this;
 		var objetos_filtrados = this.select(filtro);
 		_.forEach(objetos_filtrados, function(objeto){
+			var obj_old = _.extend({}, objeto);		            
 			_.extend(objeto, cambios);		            
 			localStorage.setItem(Usuario.id+"_"+objeto.id, Encriptador.encriptarString(JSON.stringify(objeto), Usuario.id, Usuario.id));		
-            _this.onObjetoActualizado({
-                idObjeto: objeto.id,
-                tipoObjeto: objeto.tipo,
-                cambios: cambios
-            });
+            _this.onObjetoActualizado(obj_old, objeto, cambios);
 		});
 		return objetos_filtrados;
 	},
@@ -54,30 +52,6 @@ var RepositorioLocalStorage = {
 		});
 		return objetos_filtrados;
 	},
-    onObjetoInsertado: function(arg){
-        if(arg){
-            if(_.isFunction(arg)) this.callbacks_insercion.push(arg);
-            else _.forEach(this.callbacks_insercion, function(cbk){ cbk(arg);})
-        }else{
-            _.forEach(this.callbacks_insercion, function(cbk){ cbk();})
-        }        
-    },
-    onObjetoActualizado: function(arg){
-        if(arg){
-            if(_.isFunction(arg)) this.callbacks_actualizacion.push(arg);
-            else _.forEach(this.callbacks_actualizacion, function(cbk){ cbk(arg);})
-        }else{
-            _.forEach(this.callbacks_actualizacion, function(cbk){ cbk();})
-        }        
-    },
-    onObjetoEliminado: function(arg){
-        if(arg){
-            if(_.isFunction(arg)) this.callbacks_eliminacion.push(arg);
-            else _.forEach(this.callbacks_eliminacion, function(cbk){ cbk(arg);})
-        }else{
-            _.forEach(this.callbacks_eliminacion, function(cbk){ cbk();})
-        }        
-    },
 	nextId: function() {
 		var id = "";
 		var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

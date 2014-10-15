@@ -42,7 +42,7 @@ ColeccionRemotaVortex.prototype.load = function(filtro, id_owner, opt){
                             
 	if(this.conexion_hnd) this.conexion_hnd.quitar();
 	this.conexion_hnd = vx.when({
-		tipoDeMensaje:"vortex.avisoDeConexion",
+		tipoDeMensaje:"vortex.avisoDeRepositorioOnline",
 		de: this.idOwner
 	}, function(aviso){
 		_this.load(_this.filtro, _this.idOwner);

@@ -54,7 +54,7 @@ var ObjetoRemotoVortex = function(id, id_owner, opt){
 	});
 	
     var pedido_aviso_conexion = vx.when({
-		tipoDeMensaje:"vortex.avisoDeConexion",
+		tipoDeMensaje:"vortex.avisoDeRepositorioOnline",
 		de: this.idOwner
 	}, function(aviso){
 		_this.load();

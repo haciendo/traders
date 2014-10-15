@@ -56,14 +56,14 @@ var RepositorioVortex = {
 			});
 		});
 
-        this.repositorio.onObjetoActualizado(function(data){
+        this.repositorio.onObjetoActualizado(function(obj, cambios){
             vx.send({
                 tipoDeMensaje:"vortex.persistencia.avisoDeObjetoActualizado",
                 de: Usuario.id,
-                idObjeto: data.idObjeto,
-                tipoDeObjeto: data.tipoObjeto,
+                idObjeto: obj.id,
+                tipoDeObjeto: obj.tipo,
                 datoSeguro: {
-                    cambios: data.cambios
+                    cambios: cambios
                 }
             });
         });
@@ -114,7 +114,7 @@ var RepositorioVortex = {
         
         vx.send({
 			de:Usuario.id,
-			tipoDeMensaje: "vortex.avisoDeConexion"
+			tipoDeMensaje: "vortex.avisoDeRepositorioOnline"
 		});
 	}
 };

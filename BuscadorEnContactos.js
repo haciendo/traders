@@ -1,11 +1,11 @@
-var Comunidad = co = {
+var BuscadorEnContactos = BC = {
     start: function(id_usuario){
         this.idUsuario = id_usuario;
-        this.contactos = this.find({
+        this.contactos = this.buscar({
             tipo: "SolicitudDeAmistad", 
             estado: "Aprobada"});
     },
-    find: function(filtro){        
-        return new PedidoDeObjetosComunitarios(filtro);
+    buscar: function(filtro){      	
+        return new BusquedaEnContactos(filtro);
     }
 };

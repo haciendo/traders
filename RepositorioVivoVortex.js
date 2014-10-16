@@ -179,6 +179,16 @@ var RepositorioVivoVortex = {
 			});
 		});
         
+		vx.when({
+			para: Usuario.id,
+			tipoDeMensaje: "vortex.persistencia.quitarPedido"
+		}, function(msg){	
+            var pedido = _this.repositorio.remove({
+                id: msg.datoSeguro.idPedido
+            });
+			_this.pedidos = _.without(_this.pedidos, _.findWhere(_this.pedidos, {id: msg.datoSeguro.idPedido}));
+		});
+		
         vx.send({
 			de:Usuario.id,
 			tipoDeMensaje: "vortex.avisoDeRepositorioOnline"

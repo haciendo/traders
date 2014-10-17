@@ -13,22 +13,22 @@ var VistaDeUnContactoEnLista = function(idContacto){
 		_this.alSeleccionar(idContacto);
 	});
 	
-	var datos_contacto = vx.get({id: "DATOS_PERSONALES", idOwner: idContacto}, {cargarAlInicio: true});
-	datos_contacto.alCargar(function(){
+	var busq_datos_contacto = BC.buscar({id: "DATOS_PERSONALES", idOwner: idContacto});
+	busq_datos_contacto.alCargar(function(){
+        var datos_contacto = busq_datos_contacto.resultados[0];
 		lbl_nombre.text(datos_contacto.nombre);
 		avatar.attr("src", datos_contacto.avatar);
+        
+        datos_contacto.alCambiar(function(cambios){
+            if(cambios.nombre) lbl_nombre.text(cambios.nombre);
+            if(cambios.avatar) avatar.attr("src", cambios.avatar);
+        });
 	});	
-	var hnd_cambio_dp = datos_contacto.alCambiar(function(cambios){
-		if(cambios.nombre) lbl_nombre.text(cambios.nombre);
-		if(cambios.avatar) avatar.attr("src", cambios.avatar);
-	});
 	
-	var solicitud = vx.get({tipo: "SolicitudDeAmistad", idOwner: Usuario.id, idContacto: idContacto});
-	solicitud.alCargar(function(){
-		solicitud = solicitud.objetos[0];
-		var handler_eliminacion_sol = solicitud.alEliminar(function(){
-			hnd_cambio_dp.quitar();
-			handler_eliminacion_sol.quitar();
+	var busq_solicitud = BC.buscar({tipo: "SolicitudDeAmistad", idOwner: BC.idUsuario, idContacto: idContacto});
+	busq_solicitud.alCargar(function(){
+		solicitud = busq_solicitud.resultados[0];
+		solicitud.alQuitarDeLaBusqueda(function(){
 			_this.ui.remove();
 		});
 		btn_eliminar.click(function(e){

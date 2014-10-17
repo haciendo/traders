@@ -21,32 +21,36 @@ var PantallaInicio = {
 			});
 			
 			//if(window.isphone){
-				RepositorioLocalStorage.start();
-				RepositorioVortex.start({
-					repositorio: RepositorioLocalStorage
-				});
-				TradersServer.start({
-					repositorio: RepositorioLocalStorage,
-					usuario: Usuario
-				});
-			//}
-			
-            var datos_usuario = vx.get(
-				{id: "DATOS_PERSONALES", idOwner: Usuario.id}, 
-				{ valorInicial: { id: "DATOS_PERSONALES", idUsuario:Usuario.id, nombre: nombre_usuario, avatar:"avatar_default.png"}, cargarAlInicio: true, insertarSiNoExiste: true}
-			);            
-            
-			BarraSuperior.start({
-                datosUsuario: datos_usuario
+            RepositorioLocalStorage.start();
+            RepositorioVivoVortex.start({
+                repositorio: RepositorioLocalStorage
             });
-			BarraSuperior.render();
-			PantallaUsuario.start({
-                datosUsuario: datos_usuario
-            });				
-			PantallaUsuario.show();	
-			PantallaContactos.start();	
-			
-            _this.ui.hide();
+            TradersServer.start({
+                repositorio: RepositorioLocalStorage,
+                usuario: Usuario
+            });
+			//}
+			BC.start(Usuario.id);
+            
+            var busqueda_datos_usuario = BC.buscar({id: "DATOS_PERSONALES", idOwner: Usuario.id});
+            busqueda_datos_usuario.alCargar(function(){
+                if(busqueda_datos_usuario.resultados.length == 0) {
+                    busqueda_datos_usuario.insertar({nombre: nombre_usuario, avatar:"avatar_default.png"});
+                }
+            });          
+            
+            busqueda_datos_usuario.alAgregar(function(datos_usuario){
+                BarraSuperior.start({
+                    datosUsuario: datos_usuario
+                });
+                BarraSuperior.render();
+                PantallaUsuario.start({
+                    datosUsuario: datos_usuario
+                });				
+                PantallaUsuario.show();	
+                PantallaContactos.start();	
+                _this.ui.hide();
+            });            
         });
 		
 		this.txtNombreUsuario.keypress(function(e) {
@@ -78,6 +82,10 @@ var PantallaInicio = {
 		});
 		
 		
+    },
+    iniciarPantallas: function(datos_usuario){
+        this.ui.show();
+        this.txtNombreUsuario.focus();
     },
     render: function(){
         this.ui.show();

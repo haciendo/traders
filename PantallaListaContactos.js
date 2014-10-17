@@ -5,7 +5,7 @@ var PantallaListaContactos = {
 		Evento.agregarEventoA(this, "alSeleccionar");
 		
         this.ui =  $("#pantalla_lista_contactos");     
-        this.solicitudesDeAmistad = vx.get({tipo: "SolicitudDeAmistad", idOwner: Usuario.id});
+        this.solicitudesDeAmistad = BC.buscar({tipo: "SolicitudDeAmistad", idOwner: Usuario.id});
 		
         this.lista_contactos = this.ui.find("#lista_contactos");
 		
@@ -16,7 +16,7 @@ var PantallaListaContactos = {
 				placeholder: 'Id del usuario',
 				callback: function(value) {
 					if(value){
-						_this.solicitudesDeAmistad.crear({
+						_this.solicitudesDeAmistad.insertar({
 							idContacto: value,
 							estado: "Enviando"
 						});

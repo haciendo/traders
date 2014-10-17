@@ -7,7 +7,7 @@ var ListaProductos = function(opt){
 	this.listado_de_productos = this.ui.find("#listado_de_productos");
 	
     Evento.agregarEventoA(this, "alSeleccionarProducto");
-    Evento.agregarEventoA(this, "alQuitarProducto");
+    Evento.agregarEventoA(this, "alClickearBotonEliminar");
     
 	this.productos.alAgregar(function(producto){
 		_this.agregarVistaProducto(producto);
@@ -24,8 +24,8 @@ ListaProductos.prototype.agregarVistaProducto = function(un_producto){
     vista.alClickear(function(){
         _this.alSeleccionarProducto(un_producto);
     });
-    vista.alQuitar(function(){
-        _this.alQuitarProducto(un_producto);
+    vista.alClickearBotonEliminar(function(){
+        _this.alClickearBotonEliminar(un_producto);
     });
     vista.dibujarEn(_this.listado_de_productos);
 };

@@ -6,10 +6,9 @@ var PantallaUsuario = {
         
         this.panel_inventario = this.ui.find("#panel_inventario");
         this.lbl_nombre_usuario = this.ui.find("#lbl_nombre_usuario");        
-		this.img_avatar_usuario = this.ui.find("#avatar_usuario");
+		this.img_avatar_usuario = this.ui.find("#avatar_usuario");		
 		
-		
-		this.productos = vx.get({tipo:"Producto", idOwner: Usuario.id});
+		this.productos = BC.buscar({tipo:"Producto", idOwner: BC.idUsuario});
         
         this.lbl_nombre_usuario.text(this.datosUsuario.nombre);
 		this.img_avatar_usuario.attr("src", this.datosUsuario.avatar);
@@ -34,7 +33,7 @@ var PantallaUsuario = {
         this.txt_nombre_producto_add = this.ui.find("#txt_nombre_producto_add");
         this.btn_add_producto = this.ui.find("#btn_add_producto");
         this.btn_add_producto.click(function(){
-			_this.productos.crear({
+			_this.productos.insertar({
 				nombre: _this.txt_nombre_producto_add.val()
 			});
             _this.txt_nombre_producto_add.val("");
@@ -122,7 +121,7 @@ var PantallaUsuario = {
         this.inventario_usuario.alSeleccionarProducto(function(producto){
             var pantalla_edicion = new PantallaEdicionProducto(producto);
         });        
-        this.inventario_usuario.alQuitarProducto(function(producto){
+        this.inventario_usuario.alClickearBotonEliminar(function(producto){
             producto.eliminar();
         });
         

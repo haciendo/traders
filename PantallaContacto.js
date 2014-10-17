@@ -30,7 +30,7 @@ var PantallaContacto = {
 			_this.solicitud.estado = "Aprobando";
 		});
 		
-		this.productosContacto = vx.get({tipo: "TUVIEJA", idOwner: 1111});         
+		this.productosContacto = BC.buscar({tipo: "TUVIEJA", idOwner: 1111});         
 		this.inventarioContacto = new ListaProductos({
             productos: this.productosContacto
         });        
@@ -40,27 +40,29 @@ var PantallaContacto = {
         var _this = this; 
 		this.btn_aprobar.show();
 		this.btn_trocar.hide();
-		//if(this.solicitud) this.solicitud.desconectar();
-		this.solicitud = vx.get({tipo: "SolicitudDeAmistad", idOwner: Usuario.id, idContacto: idContacto});
-		this.solicitud.alCargar(function(obj){
-			_this.solicictud = _this.solicitud.objetos[0];
+		if(this.busq_solicitud) this.busq_solicitud.apagar();
+		this.busq_solicitud = BC.buscar({tipo: "SolicitudDeAmistad", idOwner: BC.idUsuario, idContacto: idContacto});
+		this.busq_solicitud.alCargar(function(obj){
+			_this.solicitud = _this.busq_solicitud.resultados[0];
 			if(_this.solicitud.estado == "Recibida") _this.btn_aprobar.show();
 			if(_this.solicitud.estado == "Aprobada") _this.btn_trocar.show();
-		});
-		this.solicitud.alCambiar(function(cambios){
-			if(cambios.estado == "Recibida") {
-				_this.btn_aprobar.show();
-				_this.btn_trocar.hide();
-			}
-			if(cambios.estado == "Aprobada")  {
-				_this.btn_aprobar.hide();
-				_this.btn_trocar.show();
-			}
-		});
+            
+            _this.solicitud.alCambiar(function(cambios){
+                if(cambios.estado == "Recibida") {
+                    _this.btn_aprobar.show();
+                    _this.btn_trocar.hide();
+                }
+                if(cambios.estado == "Aprobada")  {
+                    _this.btn_aprobar.hide();
+                    _this.btn_trocar.show();
+                }
+            });
+		});		
 		
-		if(this.datosContacto) this.datosContacto.desconectar();
-		this.datosContacto = vx.get({id: "DATOS_PERSONALES", idOwner: idContacto}, {cargarAlInicio: true});
-		this.datosContacto.alCargar(function(){
+		if(this.busq_datosContacto) this.datosContacto.apagar();
+		this.busq_datosContacto = BC.buscar({id: "DATOS_PERSONALES", idOwner: idContacto});
+		this.busq_datosContacto.alCargar(function(){
+            _this.datosContacto = _this.busq_datosContacto.resultados[0];
 			_this.lbl_nombre_contacto.text(_this.datosContacto.nombre);
 			_this.img_avatar_contacto.attr("src", _this.datosContacto.avatar);			
 		});                

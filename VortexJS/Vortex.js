@@ -96,15 +96,16 @@ var Vortex = Vx = vX = vx = {
 			desencriptarCon: Encriptador.claveAnonima
 		});
 		return new PortalSeguro(opt);
-	},
-	get: function(filtro, opt){
-		if(filtro.id) {
-			return new ObjetoRemotoVortex(filtro.id, filtro.idOwner, opt);
-		}
-		if(filtro.tipo) {
-			return new ColeccionRemotaVortex(filtro, filtro.idOwner, opt);
-		}
 	}
+//    ,
+//	get: function(filtro, opt){
+//		if(filtro.id) {
+//			return new ObjetoRemotoVortex(filtro.id, filtro.idOwner, opt);
+//		}
+//		if(filtro.tipo) {
+//			return new ColeccionRemotaVortex(filtro, filtro.idOwner, opt);
+//		}
+//	}
 };
 
 if(typeof(require) != "undefined"){

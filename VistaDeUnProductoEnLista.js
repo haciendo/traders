@@ -8,13 +8,13 @@ VistaDeUnProductoEnLista.prototype.start = function(){
     this.ui = $("#plantillas").find(".producto_en_lista").clone();  
     
     Evento.agregarEventoA(this, "alClickear");
-    Evento.agregarEventoA(this, "alQuitar");
+    Evento.agregarEventoA(this, "alClickearBotonEliminar");
 	
     if(this.mostrarBotonQuitar){    
         this.btnQuitar = this.ui.find("#btn_eliminar");
         this.btnQuitar.click(function(event){
 			event.stopPropagation();
-            _this.alQuitar(_this.producto);
+            _this.alClickearBotonEliminar(_this.producto);
         });
         this.btnQuitar.show();
     }
@@ -40,14 +40,12 @@ VistaDeUnProductoEnLista.prototype.start = function(){
 		this.avatar_propietario.opentip( this.propietario.nombre);
 	}
 	
-	var handler_cambio = this.producto.alCambiar(function(cambios){
+	this.producto.alCambiar(function(cambios){
 		if(cambios.nombre) _this.lblNombre.text(cambios.nombre);
 		if(cambios.imagen) _this.thumbnail.attr("src", cambios.imagen);
 	});
 	
-	var handler_desconexion = this.producto.alDesconectar(function(){
-		handler_cambio.quitar();
-		handler_desconexion.quitar();
+	this.producto.alQuitarDeLaBusqueda(function(){
 		_this.ui.remove();
 	});
 };

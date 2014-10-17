@@ -14,17 +14,18 @@ BusquedaEnContactos.prototype.load = function(filtro){
 	this.resultados = [];
 	
     if(filtro.idOwner){ 
-		_this.pedirAUnContacto(filtro, filtro.idOwner);
+		_this._pedirAUnContacto(filtro, filtro.idOwner);
 	}else{
 		BC.contactos.forEach(function(contacto){
-			_this.pedirAUnContacto(filtro, contacto.idContacto);
+			_this._pedirAUnContacto(filtro, contacto.idContacto);
 		});
 	}
        
-	_this.alCargar(_this.objetos);       
+	_this.alCargar(_this.resultados);       
 };
 BusquedaEnContactos.prototype._pedirAUnContacto = function(filtro, idContacto){
-	 vx.send({
+    var _this = this;
+    vx.send({
 		tipoDeMensaje: "vortex.persistencia.agregarPedido",
 		de: BC.idUsuario,
 		para: idContacto,
@@ -34,7 +35,8 @@ BusquedaEnContactos.prototype._pedirAUnContacto = function(filtro, idContacto){
 		_.forEach(respuesta.datoSeguro.objetos, function(objeto){
 			_this._agregar(objeto);
 		});
-
+        _this.alCargar();
+        
 		var pedido_objeto_agregado = vx.when({
 			tipoDeMensaje:"vortex.persistencia.avisoDeObjetoAgregadoAPedido",
 			de: idContacto,
@@ -67,19 +69,20 @@ BusquedaEnContactos.prototype._pedirAUnContacto = function(filtro, idContacto){
 			pedido_objeto_agregado.quitar();
 			pedido_objeto_quitado.quitar();
 			pedido_objeto_modificado.quitar();
+            Evento.limpiarHandlersDeEventosDe(_this);
 			vx.send({
 				tipoDeMensaje: "vortex.persistencia.quitarPedido",
 				de: BC.idUsuario,
 				para: idContacto,
 				datoSeguro: {idPedido: id_pedido}
-			}
+			});
 		});
 	});
 };
 
-BusquedaEnContactos.prototype.crear = function(valor_inicial){
-    if(!this.filtro.idOwner) return;
-    if(this.filtro.idOwner != BC.idUsuario) return;
+BusquedaEnContactos.prototype.insertar = function(valor_inicial){
+    if(!this.filtro.idOwner) throw("no se puede insertar sin idOwner");
+    if(this.filtro.idOwner != BC.idUsuario) throw("no se puede insertar en repositorios ajenos");
 	vx.send({
 		tipoDeMensaje: "vortex.persistencia.insert",
 		de: Usuario.id,
@@ -88,22 +91,25 @@ BusquedaEnContactos.prototype.crear = function(valor_inicial){
 	});
 };
 
+BusquedaEnContactos.prototype.apagar = function(){
+    this.alApagar();
+};
+    
 BusquedaEnContactos.prototype.forEach = function(iterador){
-	_.forEach(this.objetos, function(objeto){
+	_.forEach(this.resultados, function(objeto){
 		iterador(objeto);
 	})
 };
 
 BusquedaEnContactos.prototype._agregar = function(obj){
-	var _this = this;
-	if(_.findWhere(_this.objetos, {id: obj.id})) return;
-	var obj_bus = new ObjetoBuscado(obj);
-	this.objetos.push(obj_bus);
-	this.alAgregar(obj_bus);
+	var obj_enc = new ObjetoEncontradoEnBusqueda(obj);
+	this.resultados.push(obj_enc);
+	this.alAgregar(obj_enc);
 };
 
 BusquedaEnContactos.prototype._quitar = function(id_obj){
-	var obj_elim = _.findWhere(this.resultados, {id: id_obj});
-	this.resultados = _.without(this.resultados, obj_elim);
-    this.alEliminar(obj_elim);
+	var obj_quitado = _.findWhere(this.resultados, {id: id_obj});
+	this.resultados = _.without(this.resultados, obj_quitado);
+    obj_quitado.quitarDeLaBusqueda();
+    this.alQuitar(obj_quitado);
 };

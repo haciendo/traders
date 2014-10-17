@@ -17,6 +17,10 @@ Evento.prototype.removeHandler = function(id_handler){
 	this._handlers = _.reject(this._handlers, function(handler){return handler.id == id_handler;});
 };
 
+Evento.prototype.clearHandlers = function(){
+	this._handlers = [];
+};
+
 Evento.prototype.disparar = function(){
 	var args = arguments;
 	_.each(this._handlers, function(handler){
@@ -38,4 +42,12 @@ Evento.agregarEventoA = function(objeto_target, nombre_evento, evento_unico){
 			objeto_target["_"+nombre_evento].disparar.apply(objeto_target["_"+nombre_evento], arguments);
 		}	
 	}	
+};
+
+Evento.limpiarHandlersDeEventosDe = function(objeto_target){
+    for (var property in objeto_target) {
+        if (objeto_target.hasOwnProperty(property)) {
+            if(objeto_target[property] instanceof Evento) objeto_target[property].clearHandlers();
+        }
+    }
 };

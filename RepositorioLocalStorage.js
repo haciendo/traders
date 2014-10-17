@@ -27,6 +27,7 @@ var RepositorioLocalStorage = {
         this.objetosGuardados.push(objeto);
 		localStorage.setItem(Usuario.id+"_"+objeto.id, Encriptador.encriptarString(JSON.stringify(objeto), Usuario.id, Usuario.id));
 		this.onObjetoInsertado(objeto);
+        return objeto;
 	},
 	select: function(filtro){
 		return _.where(this.objetosGuardados, filtro);

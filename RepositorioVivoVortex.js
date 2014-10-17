@@ -134,6 +134,16 @@ var RepositorioVivoVortex = {
                         datoSeguro: {
                             idObjeto: obj.id
                         }
+                    });	 
+                    
+                    vx.send({
+                        tipoDeMensaje: "vortex.persistencia.avisoDeObjetoQuitadoDePedido",
+                        de: Usuario.id,
+                        para: pedido.idUsuario,
+                        idPedido: pedido.id,
+                        datoSeguro: {
+                            idObjeto: obj.id
+                        }
                     });	   
                 }
             });
@@ -195,6 +205,6 @@ var RepositorioVivoVortex = {
 		});
 	},
     elObjetoPasaElFiltro: function(objeto, filtro){
-        return _.findWhere([objeto], pedido.filtro) !== undefined
+        return _.findWhere([objeto], filtro) !== undefined
     }
 };

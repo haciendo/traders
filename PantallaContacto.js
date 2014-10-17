@@ -66,7 +66,7 @@ var PantallaContacto = {
 			_this.lbl_nombre_contacto.text(_this.datosContacto.nombre);
 			_this.img_avatar_contacto.attr("src", _this.datosContacto.avatar);			
 		});                
-		this.productosContacto.load({tipo: "Producto"}, idContacto);
+		this.productosContacto.load({tipo: "Producto", idOwner: idContacto});
     },
     render: function(){
         this.panel_contacto.show();  

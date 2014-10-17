@@ -114,7 +114,7 @@ var RepositorioVortex = {
         
         vx.send({
 			de:Usuario.id,
-			tipoDeMensaje: "vortex.avisoDeRepositorioOnline"
+			tipoDeMensaje: "vortex.persistencia.avisoDeRepositorioOnline"
 		});
 	}
 };

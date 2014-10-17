@@ -1,9 +1,15 @@
 var BusquedaEnContactos = function(filtro){
+    var _this = this;
     Evento.agregarEventoA(this, "alCargar", true);
 	Evento.agregarEventoA(this, "alAgregar");
 	Evento.agregarEventoA(this, "alCambiar");
 	Evento.agregarEventoA(this, "alQuitar");
 	Evento.agregarEventoA(this, "alApagar");
+    
+    this.resultados = [];
+    this._pedidosVx = [];
+    this._pedidosDeObjetos = [];
+
     this.load(filtro);
 };
 
@@ -11,7 +17,9 @@ BusquedaEnContactos.prototype.load = function(filtro){
     this.filtro = filtro;	
 	var _this = this;
     
-	this.resultados = [];
+    this._quitarPedidosVx();
+    this._quitarPedidosDeObjetos();
+    this._quitarResultados();	
 	
     if(filtro.idOwner){ 
 		_this._pedirAUnContacto(filtro, filtro.idOwner);
@@ -30,52 +38,55 @@ BusquedaEnContactos.prototype._pedirAUnContacto = function(filtro, idContacto){
 		datoSeguro: {filtro: this.filtro}
 	}, function(respuesta){
 		var id_pedido = respuesta.datoSeguro.idPedido;
+        _this._pedidosDeObjetos.push({idContacto: idContacto, idPedido: id_pedido});
 		_.forEach(respuesta.datoSeguro.objetos, function(objeto){
 			_this._agregar(objeto);
 		});
         _this.alCargar();
         
-		var pedido_objeto_agregado = vx.when({
-			tipoDeMensaje:"vortex.persistencia.avisoDeObjetoAgregadoAPedido",
-			de: idContacto,
-			para: BC.idUsuario,
-			idPedido: id_pedido,
-		}, function(aviso){
-			_this._agregar(aviso.datoSeguro.objeto);
-		});
+		_this._pedidosVx.push(
+            vx.when({
+                tipoDeMensaje:"vortex.persistencia.avisoDeObjetoAgregadoAPedido",
+                de: idContacto,
+                para: BC.idUsuario,
+                idPedido: id_pedido,
+            }, function(aviso){
+                _this._agregar(aviso.datoSeguro.objeto);
+            })
+        );
 
-		var pedido_objeto_quitado = vx.when({
-			tipoDeMensaje:"vortex.persistencia.avisoDeObjetoQuitadoDePedido",
-			de: idContacto,
-			para: BC.idUsuario,
-			idPedido: id_pedido,
-		}, function(aviso){
-			_this._quitar(aviso.datoSeguro.idObjeto);
-		});
-
-		var pedido_objeto_modificado = vx.when({
-			tipoDeMensaje:"vortex.persistencia.avisoDeObjetoModificadoEnPedido",
-			de: idContacto,
-			para: BC.idUsuario,
-			idPedido: id_pedido,
-		}, function(aviso){
-			var vxo = _.findWhere(_this.resultados, {id: aviso.datoSeguro.idObjeto});
-			vxo.modificarSinAvisarPorVx(aviso.datoSeguro.cambios);
-		});
-		
-		_this.alApagar(function(){
-			pedido_objeto_agregado.quitar();
-			pedido_objeto_quitado.quitar();
-			pedido_objeto_modificado.quitar();
-            Evento.limpiarHandlersDeEventosDe(_this);
-			vx.send({
-				tipoDeMensaje: "vortex.persistencia.quitarPedido",
-				de: BC.idUsuario,
-				para: idContacto,
-				datoSeguro: {idPedido: id_pedido}
-			});
-		});
+        _this._pedidosVx.push(
+            vx.when({
+                tipoDeMensaje:"vortex.persistencia.avisoDeObjetoQuitadoDePedido",
+                de: idContacto,
+                para: BC.idUsuario,
+                idPedido: id_pedido,
+            }, function(aviso){
+                _this._quitar(aviso.datoSeguro.idObjeto);
+            })
+        );
+        
+        _this._pedidosVx.push(
+            vx.when({
+                tipoDeMensaje:"vortex.persistencia.avisoDeObjetoModificadoEnPedido",
+                de: idContacto,
+                para: BC.idUsuario,
+                idPedido: id_pedido,
+            }, function(aviso){
+                var vxo = _.findWhere(_this.resultados, {id: aviso.datoSeguro.idObjeto});
+                vxo.modificarSinAvisarPorVx(aviso.datoSeguro.cambios);
+            })
+        );
 	});
+    
+    _this._pedidosVx.push(
+        vx.when({
+            tipoDeMensaje:"vortex.persistencia.avisoDeRepositorioOnline",
+            de: idContacto
+        }, function(aviso){
+            _this.load(filtro);
+        })
+    );
 };
 
 BusquedaEnContactos.prototype.insertar = function(valor_inicial){
@@ -90,6 +101,10 @@ BusquedaEnContactos.prototype.insertar = function(valor_inicial){
 };
 
 BusquedaEnContactos.prototype.apagar = function(){
+    this._quitarPedidosVx();
+    this._quitarPedidosDeObjetos();
+    this._quitarResultados();
+    Evento.limpiarHandlersDeEventosDe(this);
     this.alApagar();
 };
     
@@ -110,4 +125,32 @@ BusquedaEnContactos.prototype._quitar = function(id_obj){
 	this.resultados = _.without(this.resultados, obj_quitado);
     obj_quitado.quitarDeLaBusqueda();
     this.alQuitar(obj_quitado);
+};
+
+BusquedaEnContactos.prototype._quitarPedidosVx= function(){
+    _.forEach(this._pedidosVx, function(p){
+        p.quitar();
+    });
+    this._pedidosVx = [];
+};
+
+BusquedaEnContactos.prototype._quitarPedidosDeObjetos= function(){
+    _.forEach(this._pedidosDeObjetos, function(pedido){
+        vx.send({
+            tipoDeMensaje: "vortex.persistencia.quitarPedido",
+            de: BC.idUsuario,
+            para: pedido.idContacto,
+            datoSeguro: {idPedido: pedido.idPedido}
+        });
+    });
+    this._pedidosDeObjetos = [];
+};
+
+BusquedaEnContactos.prototype._quitarResultados= function(){
+    var _this = this;   
+    _.forEach(this.resultados, function(o){
+        o.quitarDeLaBusqueda();
+        _this.alQuitar(o);
+    });
+    this.resultados = [];
 };

@@ -201,7 +201,7 @@ var RepositorioVivoVortex = {
 		
         vx.send({
 			de:Usuario.id,
-			tipoDeMensaje: "vortex.avisoDeRepositorioOnline"
+			tipoDeMensaje: "vortex.persistencia.avisoDeRepositorioOnline"
 		});
 	},
     elObjetoPasaElFiltro: function(objeto, filtro){

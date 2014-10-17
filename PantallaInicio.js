@@ -25,12 +25,12 @@ var PantallaInicio = {
             RepositorioVivoVortex.start({
                 repositorio: RepositorioLocalStorage
             });
+			BC.start(Usuario.id);
             TradersServer.start({
                 repositorio: RepositorioLocalStorage,
                 usuario: Usuario
             });
 			//}
-			BC.start(Usuario.id);
             
             var busqueda_datos_usuario = BC.buscar({id: "DATOS_PERSONALES", idOwner: Usuario.id});
             busqueda_datos_usuario.alCargar(function(){

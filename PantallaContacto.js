@@ -59,7 +59,7 @@ var PantallaContacto = {
             });
 		});		
 		
-		if(this.busq_datosContacto) this.datosContacto.apagar();
+		if(this.busq_datosContacto) this.busq_datosContacto.apagar();
 		this.busq_datosContacto = BC.buscar({id: "DATOS_PERSONALES", idOwner: idContacto});
 		this.busq_datosContacto.alCargar(function(){
             _this.datosContacto = _this.busq_datosContacto.resultados[0];

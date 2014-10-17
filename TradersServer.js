@@ -57,7 +57,7 @@ TradersServer = {
 			para: Usuario.id,
 			tipoDeMensaje: "traders.solicitudDeAmistad"
 		}, function(msg){ 
-			var solicitud = misSolicitudesDeAmistad.crear({
+			var solicitud = misSolicitudesDeAmistad.insertar({
                 tipo: "SolicitudDeAmistad",
 				estado: "Recibida",
                 idContacto: msg.datoSeguro.idSolicitante

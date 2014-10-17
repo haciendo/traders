@@ -19,9 +19,7 @@ BusquedaEnContactos.prototype.load = function(filtro){
 		BC.contactos.forEach(function(contacto){
 			_this._pedirAUnContacto(filtro, contacto.idContacto);
 		});
-	}
-       
-	_this.alCargar(_this.resultados);       
+	}      
 };
 BusquedaEnContactos.prototype._pedirAUnContacto = function(filtro, idContacto){
     var _this = this;

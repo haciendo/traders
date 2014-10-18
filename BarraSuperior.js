@@ -26,11 +26,13 @@ var BarraSuperior = {
 		this.solapa_yo.click(function(e) {
 			PantallaUsuario.show();
 			PantallaContactos.hide();
+			PantallaProductos.hide();
 		});		
 		
 		this.solapa_contactos.click(function(e) {
-			PantallaContactos.show();
 			PantallaUsuario.hide();
+			PantallaContactos.show();
+			PantallaProductos.hide();
 		});	
 		
 		this.solapa_trueques.click(function(e) {
@@ -38,7 +40,9 @@ var BarraSuperior = {
 		});	
 		
 		this.solapa_productos.click(function(e) {
-			PantallaProductos.render();
+			PantallaUsuario.hide();
+			PantallaContactos.hide();
+			PantallaProductos.show();
 		});	
 
 		this.solapa_vortex.click(function(e) {

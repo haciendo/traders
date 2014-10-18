@@ -10,6 +10,9 @@ var PantallaContacto = {
         this.btn_trocar = this.ui.find("#btn_trocar");
 		this.btn_trocar.hide();
         
+		this.lbl_nombre_contacto.hide();
+		this.img_avatar_contacto.hide();
+		
         this.btn_trocar.click(function(e) {
             _this.ui.hide();
 			
@@ -29,44 +32,67 @@ var PantallaContacto = {
 		this.btn_aprobar.click(function(){
 			_this.solicitud.estado = "Aprobando";
 		});
-		
-		this.productosContacto = BC.buscar({tipo: "TUVIEJA", idOwner: 1111});         
-		this.inventarioContacto = new ListaProductos({
-            productos: this.productosContacto
-        });        
-        this.inventarioContacto.dibujarEn(this.panel_inventario_contacto);
+		this.btn_aprobar.hide();
     },
 	mostrarContacto: function(idContacto){
         var _this = this; 
-		this.btn_aprobar.show();
-		this.btn_trocar.hide();
-		if(this.busq_solicitud) this.busq_solicitud.apagar();
-		this.busq_solicitud = BC.buscar({tipo: "SolicitudDeAmistad", idOwner: BC.idUsuario, idContacto: idContacto});
-		this.busq_solicitud.alCargar(function(obj){
-			_this.solicitud = _this.busq_solicitud.resultados[0];
-			if(_this.solicitud.estado == "Recibida") _this.btn_aprobar.show();
-			if(_this.solicitud.estado == "Aprobada") _this.btn_trocar.show();
-            
-            _this.solicitud.alCambiar(function(cambios){
-                if(cambios.estado == "Recibida") {
-                    _this.btn_aprobar.show();
-                    _this.btn_trocar.hide();
-                }
-                if(cambios.estado == "Aprobada")  {
-                    _this.btn_aprobar.hide();
-                    _this.btn_trocar.show();
-                }
-            });
-		});		
 		
-		if(this.busq_datosContacto) this.busq_datosContacto.apagar();
-		this.busq_datosContacto = BC.buscar({id: "DATOS_PERSONALES", idOwner: idContacto});
-		this.busq_datosContacto.alCargar(function(){
-            _this.datosContacto = _this.busq_datosContacto.resultados[0];
-			_this.lbl_nombre_contacto.text(_this.datosContacto.nombre);
-			_this.img_avatar_contacto.attr("src", _this.datosContacto.avatar);			
-		});                
-		this.productosContacto.load({tipo: "Producto", idOwner: idContacto});
+		if(!this.busq_solicitud) {
+			this.busq_solicitud = BC.buscar({tipo: "SolicitudDeAmistad", idOwner: BC.idUsuario, idContacto: idContacto});
+			
+			this.busq_solicitud.alAgregar(function(solicitud){
+				_this.solicitud = solicitud;
+				_this.btn_trocar.hide();
+				_this.btn_aprobar.hide();
+				
+				if(solicitud.estado == "Recibida") _this.btn_aprobar.show();
+				if(solicitud.estado == "Aprobada") _this.btn_trocar.show();
+
+				solicitud.alCambiar(function(cambios){	
+					_this.btn_trocar.hide();
+					_this.btn_aprobar.hide();
+					if(cambios.estado == "Recibida") {
+						_this.btn_aprobar.show();
+					}
+					if(cambios.estado == "Aprobada")  {
+						_this.btn_trocar.show();
+					}
+				});
+			});	
+			this.busq_solicitud.alQuitar(function(solicitud){
+				_this.btn_trocar.hide();
+				_this.btn_aprobar.hide();
+			});	
+		}
+		else this.busq_solicitud.load({tipo: "SolicitudDeAmistad", idOwner: BC.idUsuario, idContacto: idContacto});
+		
+		
+		if(!this.busq_datosContacto) {
+			this.busq_datosContacto = BC.buscar({id: "DATOS_PERSONALES", idOwner: idContacto});
+			this.busq_datosContacto.alAgregar(function(datos_contacto){
+				_this.lbl_nombre_contacto.show();
+				_this.img_avatar_contacto.show();	
+				_this.lbl_nombre_contacto.text(datos_contacto.nombre);
+				_this.img_avatar_contacto.attr("src", datos_contacto.avatar);		
+				datos_contacto.alCambiar(function(cambios){	
+					if(cambios.nombre) _this.lbl_nombre_contacto.text(cambios.nombre);
+					if(cambios.avatar)_this.img_avatar_contacto.attr("src", cambios.avatar);		
+				});
+			}); 
+			this.busq_datosContacto.alQuitar(function(datos_contacto){
+				_this.lbl_nombre_contacto.hide();
+				_this.img_avatar_contacto.hide();			
+			}); 
+		}else this.busq_datosContacto.load({id: "DATOS_PERSONALES", idOwner: idContacto});
+		               
+		
+		if(!this.busq_productos_contacto){
+			this.busq_productos_contacto = BC.buscar({tipo: "Producto", idOwner: idContacto});         
+			this.inventarioContacto = new ListaProductos({
+				productos: this.busq_productos_contacto
+			});        
+			this.inventarioContacto.dibujarEn(this.panel_inventario_contacto);
+		}else this.busq_productos_contacto.load({tipo: "Producto", idOwner: idContacto});
     },
     render: function(){
         this.panel_contacto.show();  

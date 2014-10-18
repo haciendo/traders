@@ -1,5 +1,7 @@
 var VistaDeUnContactoEnLista = function(idContacto){
     var _this = this;	
+	this.idContacto = idContacto;
+	
 	Evento.agregarEventoA(this, "alSeleccionar");
 	
     this.ui = $("#plantillas .contacto_en_lista").clone();
@@ -14,8 +16,7 @@ var VistaDeUnContactoEnLista = function(idContacto){
 	});
 	
 	var busq_datos_contacto = BC.buscar({id: "DATOS_PERSONALES", idOwner: idContacto});
-	busq_datos_contacto.alCargar(function(){
-        var datos_contacto = busq_datos_contacto.resultados[0];
+	busq_datos_contacto.alAgregar(function(datos_contacto){
 		lbl_nombre.text(datos_contacto.nombre);
 		avatar.attr("src", datos_contacto.avatar);
         
@@ -26,8 +27,7 @@ var VistaDeUnContactoEnLista = function(idContacto){
 	});	
 	
 	var busq_solicitud = BC.buscar({tipo: "SolicitudDeAmistad", idOwner: BC.idUsuario, idContacto: idContacto});
-	busq_solicitud.alCargar(function(){
-		solicitud = busq_solicitud.resultados[0];
+	busq_solicitud.alAgregar(function(solicitud){
 		solicitud.alQuitarDeLaBusqueda(function(){
 			_this.ui.remove();
 		});
@@ -35,6 +35,10 @@ var VistaDeUnContactoEnLista = function(idContacto){
 			solicitud.eliminar();
 		});	
 	});	
+};
+
+VistaDeUnContactoEnLista.prototype.desSeleccionar = function(){
+   	this.ui.removeClass("contacto_seleccionado");
 };
 
 VistaDeUnContactoEnLista.prototype.dibujarEn = function(un_panel){

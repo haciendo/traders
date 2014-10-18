@@ -29,15 +29,23 @@ VistaDeUnProductoEnLista.prototype.start = function(){
     if(this.producto.imagen) this.thumbnail.attr("src", this.producto.imagen);
     else this.thumbnail.attr("src", "Gift-icon.png");
 	
-	if(this.mostrarPropietario){ 
-        this.avatar_propietario = this.ui.find("#avatar_propietario");
+	if(this.mostrarPropietario){ 	
+		this.avatar_propietario = this.ui.find("#avatar_propietario");
         this.avatar_propietario.click(function(){
             //TO DO: abrir pantalla de usuario o contacto segun corresponda
         });
-		if(this.propietario.avatar) this.avatar_propietario.attr("src", this.propietario.avatar);
-    	else this.avatar_propietario.attr("src", "avatar_default.png");
-		this.avatar_propietario.show();
-		this.avatar_propietario.opentip( this.propietario.nombre);
+		
+		var busq_datos_contacto = BC.buscar({id: "DATOS_PERSONALES", idOwner: this.producto.idOwner});
+		busq_datos_contacto.alAgregar(function(datos_contacto){
+			_this.avatar_propietario.opentip(datos_contacto.nombre);
+			_this.avatar_propietario.attr("src", datos_contacto.avatar);
+			
+			datos_contacto.alCambiar(function(cambios){
+				if(cambios.nombre) _this.avatar_propietario.opentip(datos_contacto.nombre);
+				if(cambios.avatar) _this.avatar_propietario.attr("src", datos_contacto.avatar);
+			});
+			_this.avatar_propietario.show();
+		});	        
 	}
 	
 	this.producto.alCambiar(function(cambios){

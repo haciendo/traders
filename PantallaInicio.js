@@ -49,6 +49,7 @@ var PantallaInicio = {
                 });				
                 PantallaUsuario.show();	
                 PantallaContactos.start();	
+                PantallaProductos.start();	
                 _this.ui.hide();
             });            
         });

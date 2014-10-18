@@ -6,6 +6,7 @@ var PantallaListaContactos = {
 		
         this.ui =  $("#pantalla_lista_contactos");     
         this.solicitudesDeAmistad = BC.buscar({tipo: "SolicitudDeAmistad", idOwner: Usuario.id});
+		this.vistas = [];
 		
         this.lista_contactos = this.ui.find("#lista_contactos");
 		
@@ -35,8 +36,12 @@ var PantallaListaContactos = {
         
 		var vista = new VistaDeUnContactoEnLista(idContacto);
 		vista.alSeleccionar(function(){
+			_.forEach(_this.vistas, function(v){
+				if(v.idContacto != idContacto) v.desSeleccionar();
+			});
 			_this.alSeleccionar(idContacto);
 		});
+		this.vistas.push(vista);
 		vista.dibujarEn(this.lista_contactos);
 	}
 };

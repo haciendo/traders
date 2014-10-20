@@ -26,10 +26,11 @@ PortalSeguro.prototype.send = function(){
 	if(opt.mensaje.datoSeguro){
 		opt.mensaje.datoSeguro = Encriptador.encriptarString(JSON.stringify(opt.mensaje.datoSeguro), opt.mensaje.para, opt.mensaje.de);
 	}	
+	var pedido;
 	if(opt.callback){
 		opt.mensaje.idRequest = this.id.toString() + "_" + randomString(32);
 		var portal_respuesta = new PortalSeguro();
-		var pedido = this.when({
+		pedido = this.when({
 			filtro: {
 				responseTo: opt.mensaje.idRequest,
 				para: opt.mensaje.de
@@ -43,6 +44,7 @@ PortalSeguro.prototype.send = function(){
 	}	
 	
 	this.portal.enviarMensaje(opt.mensaje);
+	return pedido;
 };
 
 PortalSeguro.prototype.when = function(){	

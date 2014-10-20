@@ -77,7 +77,7 @@ var Vortex = Vx = vX = vx = {
         this.router.conectarBidireccionalmenteCon(this.adaptadorArduino);
     },
 	send: function(mensaje, callback){
-		this._portal.send(mensaje, callback);
+		return this._portal.send(mensaje, callback);
 	},
     when: function(){
         var opt = getArguments(arguments, {

@@ -17,6 +17,8 @@ BusquedaEnContactos.prototype.load = function(filtro){
     this.filtro = filtro;	
 	var _this = this;
     
+	console.log("Load busqueda con: ", filtro);
+	
     this._quitarPedidosVx();
     this._quitarPedidosDeObjetos();
     this._quitarResultados();	
@@ -31,7 +33,7 @@ BusquedaEnContactos.prototype.load = function(filtro){
 };
 BusquedaEnContactos.prototype._pedirAUnContacto = function(filtro, idContacto){
     var _this = this;
-    vx.send({
+    this._pedidosVx.push(vx.send({
 		tipoDeMensaje: "vortex.persistencia.agregarPedido",
 		de: BC.idUsuario,
 		para: idContacto,
@@ -77,7 +79,7 @@ BusquedaEnContactos.prototype._pedirAUnContacto = function(filtro, idContacto){
                 vxo.modificarSinAvisarPorVx(aviso.datoSeguro.cambios);
             })
         );
-	});
+	}));
     
     _this._pedidosVx.push(
         vx.when({

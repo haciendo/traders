@@ -40,16 +40,14 @@ var PantallaInicio = {
             });          
             
             busqueda_datos_usuario.alAgregar(function(datos_usuario){
-                BarraSuperior.start({
-                    datosUsuario: datos_usuario
-                });
-                BarraSuperior.render();
-                PantallaUsuario.start({
-                    datosUsuario: datos_usuario
-                });				
+                PantallaUsuario.start();				
                 PantallaUsuario.show();	
                 PantallaContactos.start();	
                 PantallaProductos.start();	
+                PantallaTrueques.start();	
+				
+				BarraSuperior.start();
+                BarraSuperior.show();
                 _this.ui.hide();
             });            
         });

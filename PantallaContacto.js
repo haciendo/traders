@@ -14,17 +14,17 @@ var PantallaContacto = {
 		this.img_avatar_contacto.hide();
 		
         this.btn_trocar.click(function(e) {
-            _this.ui.hide();
-			
 			// TO DO: agregar los productos seleccionados al trueque
-			
-			var trueque = Traders.nuevoTrueque({
-				contacto: PantallaListaContactos.contacto_seleccionado
+			vx.send({
+				tipoDeMensaje: "vortex.persistencia.insert",
+				de: Usuario.id,
+				para: Usuario.id,
+				datoSeguro:{ objeto: {
+					idOwner: BC.idUsuario,
+					idContacto: _this.idContacto,
+					tipo: "traders.trueque"
+				}}
 			});
-			
-			PantallaListaTrueques.trueque_seleccionado = trueque;
-			PantallaListaTrueques.add(trueque);
-			
 			BarraSuperior.solapa_trueques.click();
 		});	
 		
@@ -37,6 +37,7 @@ var PantallaContacto = {
 	mostrarContacto: function(idContacto){
         var _this = this; 
 		
+		this.idContacto = idContacto;
 		if(!this.busq_solicitud) {
 			this.busq_solicitud = BC.buscar({tipo: "SolicitudDeAmistad", idOwner: BC.idUsuario, idContacto: idContacto});
 			

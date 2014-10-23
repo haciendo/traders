@@ -1,0 +1,60 @@
+#pantalla_lista_trueques
+{
+	position: absolute;
+	width: 200px;
+	bottom: 0px;
+	z-index: 1;
+	left: 0px;
+	border-right: 2px dashed #04c;
+	top: 0px;
+}
+
+@media screen and (max-width: 690px) {	
+    #pantalla_lista_trueques{
+		width: 100%;
+	}
+}
+
+
+#pantalla_lista_trueques
+	#lista_trueques
+{
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 60px;
+}
+
+
+#pantalla_lista_trueques
+	#panel_alta_trueque
+{
+	position: absolute;
+	top:0;
+	right:0;
+	
+}
+
+#pantalla_lista_trueques
+	#btn_add_trueque
+{
+	position: absolute;
+	top:3px;
+	right:3px;
+}
+
+#pantalla_lista_trueques
+	.trueque_en_lista
+		#nombre
+{
+    position: absolute;
+    left: 5px;
+    top: 8px;
+}
+
+#pantalla_lista_trueques
+	.trueque_seleccionado
+{
+    background-color: rgb(231, 231, 231);
+}

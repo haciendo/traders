@@ -76,7 +76,7 @@ TradersServer = {
 			para: Usuario.id,
 			tipoDeMensaje: "traders.aprobacionDeSolicitudDeAmistad"
 		}, function(msg){ 
-			var solicitud = _.findWhere(misSolicitudesDeAmistad.objetos, {idContacto: msg.de});
+			var solicitud = _.findWhere(misSolicitudesDeAmistad.resultados, {idContacto: msg.de});
             solicitud.estado = "Aprobada"; 
 			vx.send({
 				responseTo: msg.idRequest,

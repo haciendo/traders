@@ -17,8 +17,6 @@ BusquedaEnContactos.prototype.load = function(filtro){
     this.filtro = filtro;	
 	var _this = this;
     
-	console.log("Load busqueda con: ", filtro);
-	
     this._quitarPedidosVx();
     this._quitarPedidosDeObjetos();
     this._quitarResultados();	
@@ -77,6 +75,7 @@ BusquedaEnContactos.prototype._pedirAUnContacto = function(filtro, idContacto){
             }, function(aviso){
                 var vxo = _.findWhere(_this.resultados, {id: aviso.datoSeguro.idObjeto});
                 vxo.modificarSinAvisarPorVx(aviso.datoSeguro.cambios);
+				_this.alCambiar(vxo, aviso.datoSeguro.cambios);
             })
         );
 	}));

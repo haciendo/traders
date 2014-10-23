@@ -19,38 +19,48 @@ var BarraSuperior = {
 			$(this).addClass('solapa_selected',1000);
 		});
 		
-        this.datosUsuario.alCambiar(function(cambios){
-			if(cambios.avatar) _this.avatar_usuario.attr("src", cambios.avatar);
-		});
-				
+		var busq_datos_usuario = BC.buscar({id: "DATOS_PERSONALES", idOwner: BC.idUsuario});
+		busq_datos_usuario.alAgregar(function(datos_usuario){
+			_this.avatar_usuario.attr("src", datos_usuario.avatar);
+			datos_usuario.alCambiar(function(cambios){
+				if(cambios.avatar) _this.avatar_usuario.attr("src", cambios.avatar);
+			});
+		});	 
+	
 		this.solapa_yo.click(function(e) {
 			PantallaUsuario.show();
 			PantallaContactos.hide();
 			PantallaProductos.hide();
+			PantallaTrueques.hide();
 		});		
 		
 		this.solapa_contactos.click(function(e) {
 			PantallaUsuario.hide();
 			PantallaContactos.show();
 			PantallaProductos.hide();
+			PantallaTrueques.hide();
 		});	
 		
 		this.solapa_trueques.click(function(e) {
-			PantallaTrueques.render();
+			PantallaUsuario.hide();
+			PantallaContactos.hide();
+			PantallaProductos.hide();
+			PantallaTrueques.show();
 		});	
 		
 		this.solapa_productos.click(function(e) {
 			PantallaUsuario.hide();
 			PantallaContactos.hide();
 			PantallaProductos.show();
+			PantallaTrueques.hide();
 		});	
 
 		this.solapa_vortex.click(function(e) {
 			PantallaListaConexiones.render();
 		});	
-		
+		this.solapa_yo.click();		
     },
-	render: function(){
+	show: function(){
         this.ui.show();
     }
 };

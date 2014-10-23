@@ -10,13 +10,17 @@ var PantallaUsuario = {
 		
 		this.productos = BC.buscar({tipo:"Producto", idOwner: BC.idUsuario});
         
-        this.lbl_nombre_usuario.text(this.datosUsuario.nombre);
-		this.img_avatar_usuario.attr("src", this.datosUsuario.avatar);
-        
-		this.datosUsuario.alCambiar(function(cambios){
-			if(cambios.nombre) _this.lbl_nombre_usuario.text(cambios.nombre);
-			if(cambios.avatar) _this.img_avatar_usuario.attr("src", cambios.avatar);
-		});
+		var busq_datos_usuario = BC.buscar({id: "DATOS_PERSONALES", idOwner: BC.idUsuario});
+		busq_datos_usuario.alAgregar(function(datos_usuario){
+			_this.datosUsuario = datos_usuario;
+			_this.lbl_nombre_usuario.text(datos_usuario.nombre);
+			_this.img_avatar_usuario.attr("src", datos_usuario.avatar);
+			
+			datos_usuario.alCambiar(function(cambios){
+				if(cambios.nombre) _this.lbl_nombre_usuario.text(cambios.nombre);
+				if(cambios.avatar) _this.img_avatar_usuario.attr("src", cambios.avatar);
+			});
+		});	        
 		
         this.lbl_nombre_usuario.click(function(){
             vex.dialog.prompt({

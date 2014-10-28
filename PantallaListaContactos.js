@@ -17,7 +17,11 @@ var PantallaListaContactos = {
 				placeholder: 'Id del usuario',
 				callback: function(value) {
 					if(value){
-						_this.solicitudesDeAmistad.insertar({
+                        if(_this.solicitudesDeAmistad.findWhere({idContacto: value})){
+                            alertify.error("Solicitud ya enviada");
+                            return;
+                        }
+                        _this.solicitudesDeAmistad.insertar({
 							idContacto: value,
 							estado: "Enviando"
 						});

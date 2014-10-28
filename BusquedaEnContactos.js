@@ -115,6 +115,18 @@ BusquedaEnContactos.prototype.forEach = function(iterador){
 	})
 };
 
+BusquedaEnContactos.prototype.findWhere = function(condiciones){
+	return _.findWhere(this.resultados, condiciones);
+};
+
+BusquedaEnContactos.prototype.where = function(condiciones){
+	return _.where(this.resultados, condiciones);
+};
+
+BusquedaEnContactos.prototype.toArray = function(){
+	return this.resultados;
+};
+
 BusquedaEnContactos.prototype._agregar = function(obj){
 	var obj_enc = new ObjetoEncontradoEnBusqueda(obj);
 	this.resultados.push(obj_enc);

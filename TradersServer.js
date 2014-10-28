@@ -4,11 +4,10 @@ TradersServer = {
 		_.extend(this, opt);
 
 		if(!Usuario.id){
-			throw "El usuario debe estar loguado antes de inicializar el server de traders";
+			throw "El usuario debe estar logueado antes de inicializar el server de traders";
 		}
-		// pedidos    
 		
-		var misSolicitudesDeAmistad = BC.buscar({tipo: "SolicitudDeAmistad", idOwner: Usuario.id});
+		var misSolicitudesDeAmistad = BC.buscar({tipo: "SolicitudDeAmistad", idOwner: Usuario.id});        
 		misSolicitudesDeAmistad.alAgregar(function(solicitud){
 			if(solicitud.estado == "Enviando") {
 				vx.send({
@@ -57,11 +56,13 @@ TradersServer = {
 			para: Usuario.id,
 			tipoDeMensaje: "traders.solicitudDeAmistad"
 		}, function(msg){ 
-			var solicitud = misSolicitudesDeAmistad.insertar({
-                tipo: "SolicitudDeAmistad",
-				estado: "Recibida",
-                idContacto: msg.datoSeguro.idSolicitante
-            });
+            if(!_.findWhere(misSolicitudesDeAmistad.resultados, {idContacto: msg.datoSeguro.idSolicitante})){
+                misSolicitudesDeAmistad.insertar({
+                    tipo: "SolicitudDeAmistad",
+                    estado: "Recibida",
+                    idContacto: msg.datoSeguro.idSolicitante
+                });
+            }			
 			vx.send({
 				responseTo: msg.idRequest,
 				de: Usuario.id,
@@ -75,7 +76,7 @@ TradersServer = {
         vx.when({
 			para: Usuario.id,
 			tipoDeMensaje: "traders.aprobacionDeSolicitudDeAmistad"
-		}, function(msg){ 
+		}, function(msg){             
 			var solicitud = _.findWhere(misSolicitudesDeAmistad.resultados, {idContacto: msg.de});
             solicitud.estado = "Aprobada"; 
 			vx.send({

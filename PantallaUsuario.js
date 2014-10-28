@@ -26,6 +26,9 @@ var PantallaUsuario = {
             vex.dialog.prompt({
 				message: 'Ingresá tu nuevo alias',
 				value: _this.datosUsuario.nombre,
+                afterOpen: function($vexContent){
+                    console.log("abrio");
+                },
 				callback: function(value) {
 					if(value){
 						_this.datosUsuario.nombre = value;

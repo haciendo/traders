@@ -22,17 +22,17 @@ var PantallaInicio = {
 			
 			//if(window.isphone){
             RepositorioLocalStorage.start();
-            RepositorioVivoVortex.start({
+            RepositorioSocial.start({
                 repositorio: RepositorioLocalStorage
             });
-			BC.start(Usuario.id);
+			BS.start(Usuario.id);
             TradersServer.start({
                 repositorio: RepositorioLocalStorage,
                 usuario: Usuario
             });
 			//}
             
-            var busqueda_datos_usuario = BC.buscar({id: "DATOS_PERSONALES", idOwner: Usuario.id});
+            var busqueda_datos_usuario = BS.buscar({id: "DATOS_PERSONALES", idOwner: Usuario.id});
             busqueda_datos_usuario.alCargar(function(){
                 if(busqueda_datos_usuario.resultados.length == 0) {
                     busqueda_datos_usuario.insertar({nombre: nombre_usuario, avatar:"avatar_default.png"});

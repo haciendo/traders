@@ -1,4 +1,4 @@
-var RepositorioVivoVortex = {
+var RepositorioSocial = {
 	start: function(opt){
 		var _this = this;
 		_.extend(this, opt);	

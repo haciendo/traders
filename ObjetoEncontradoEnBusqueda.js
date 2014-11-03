@@ -23,7 +23,7 @@ ObjetoEncontradoEnBusqueda.prototype._vx_update_observer = function(changes){
     
     vx.send({
         tipoDeMensaje: "vortex.persistencia.update",
-        de: BC.idUsuario,
+        de: BS.idUsuario,
         para: this.idOwner,
         datoSeguro: {
             filtro: {id: this.id},
@@ -49,7 +49,7 @@ ObjetoEncontradoEnBusqueda.prototype.eliminar = function(){
     var _this = this;
 	vx.send({
 		tipoDeMensaje: "vortex.persistencia.delete",
-		de: BC.idUsuario,
+		de: BS.idUsuario,
 		para: this.idOwner,
 		datoSeguro:{ filtro:{ id: this.id}}
 	}, function(msg){

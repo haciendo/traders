@@ -35,7 +35,7 @@ VistaDeUnProductoEnLista.prototype.start = function(){
             //TO DO: abrir pantalla de usuario o contacto segun corresponda
         });
 		
-		var busq_datos_contacto = BC.buscar({id: "DATOS_PERSONALES", idOwner: this.producto.idOwner});
+		var busq_datos_contacto = BS.buscar({id: "DATOS_PERSONALES", idOwner: this.producto.idOwner});
 		busq_datos_contacto.alAgregar(function(datos_contacto){
 			_this.avatar_propietario.opentip(datos_contacto.nombre);
 			_this.avatar_propietario.attr("src", datos_contacto.avatar);

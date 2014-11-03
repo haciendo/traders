@@ -8,9 +8,9 @@ var PantallaUsuario = {
         this.lbl_nombre_usuario = this.ui.find("#lbl_nombre_usuario");        
 		this.img_avatar_usuario = this.ui.find("#avatar_usuario");		
 		
-		this.productos = BC.buscar({tipo:"Producto", idOwner: BC.idUsuario});
+		this.productos = BS.buscar({tipo:"Producto", idOwner: BS.idUsuario});
         
-		var busq_datos_usuario = BC.buscar({id: "DATOS_PERSONALES", idOwner: BC.idUsuario});
+		var busq_datos_usuario = BS.buscar({id: "DATOS_PERSONALES", idOwner: BS.idUsuario});
 		busq_datos_usuario.alAgregar(function(datos_usuario){
 			_this.datosUsuario = datos_usuario;
 			_this.lbl_nombre_usuario.text(datos_usuario.nombre);

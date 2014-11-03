@@ -1,4 +1,4 @@
-var BuscadorEnContactos = BC = {
+var BuscadorSocial = BS = {
     start: function(id_usuario){
         this.idUsuario = id_usuario;
         this.contactos = this.buscar({
@@ -6,6 +6,6 @@ var BuscadorEnContactos = BC = {
             tipo: "SolicitudDeAmistad"});
     },
     buscar: function(filtro){      	
-        return new BusquedaEnContactos(filtro);
+        return new BusquedaSocial(filtro);
     }
 };

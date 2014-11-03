@@ -19,7 +19,7 @@ var BarraSuperior = {
 			$(this).addClass('solapa_selected',1000);
 		});
 		
-		var busq_datos_usuario = BC.buscar({id: "DATOS_PERSONALES", idOwner: BC.idUsuario});
+		var busq_datos_usuario = BS.buscar({id: "DATOS_PERSONALES", idOwner: BS.idUsuario});
 		busq_datos_usuario.alAgregar(function(datos_usuario){
 			_this.avatar_usuario.attr("src", datos_usuario.avatar);
 			datos_usuario.alCambiar(function(cambios){

@@ -39,7 +39,7 @@ var PantallaContacto = {
 		
 		this.idContacto = idContacto;
 		if(!this.busq_solicitud) {
-			this.busq_solicitud = BC.buscar({tipo: "SolicitudDeAmistad", idOwner: BC.idUsuario, idContacto: idContacto});
+			this.busq_solicitud = BS.buscar({tipo: "SolicitudDeAmistad", idOwner: BS.idUsuario, idContacto: idContacto});
 			
 			this.busq_solicitud.alAgregar(function(solicitud){
 				_this.solicitud = solicitud;
@@ -65,11 +65,11 @@ var PantallaContacto = {
 				_this.btn_aprobar.hide();
 			});	
 		}
-		else this.busq_solicitud.load({tipo: "SolicitudDeAmistad", idOwner: BC.idUsuario, idContacto: idContacto});
+		else this.busq_solicitud.load({tipo: "SolicitudDeAmistad", idOwner: BS.idUsuario, idContacto: idContacto});
 		
 		
 		if(!this.busq_datosContacto) {
-			this.busq_datosContacto = BC.buscar({id: "DATOS_PERSONALES", idOwner: idContacto});
+			this.busq_datosContacto = BS.buscar({id: "DATOS_PERSONALES", idOwner: idContacto});
 			this.busq_datosContacto.alAgregar(function(datos_contacto){
 				_this.lbl_nombre_contacto.show();
 				_this.img_avatar_contacto.show();	
@@ -88,7 +88,7 @@ var PantallaContacto = {
 		               
 		
 		if(!this.busq_productos_contacto){
-			this.busq_productos_contacto = BC.buscar({tipo: "Producto", idOwner: idContacto});         
+			this.busq_productos_contacto = BS.buscar({tipo: "Producto", idOwner: idContacto});         
 			this.inventarioContacto = new ListaProductos({
 				productos: this.busq_productos_contacto
 			});        

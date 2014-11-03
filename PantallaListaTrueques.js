@@ -5,7 +5,7 @@ var PantallaListaTrueques = {
         this.ui =  $("#pantalla_lista_trueques");            
 		this.lista_trueques = this.ui.find("#lista_trueques");
 		
-		this.trueques = BC.buscar({tipo: "traders.trueque", idOwner: Usuario.id});
+		this.trueques = BS.buscar({tipo: "traders.trueque", idOwner: Usuario.id});
 		this.trueques.alAgregar(function(trueque){
 			_this.agregarVistaTrueque(trueque.idContacto);
 		});
@@ -31,7 +31,7 @@ var PantallaListaTrueques = {
 		});
 		
 		var lbl_nombre = $trueque_en_lista.find("#nombre");
-		var busq_datos_contacto = BC.buscar({id: "DATOS_PERSONALES", idOwner: trueque.idContacto});
+		var busq_datos_contacto = BS.buscar({id: "DATOS_PERSONALES", idOwner: trueque.idContacto});
 		busq_datos_contacto.alAgregar(function(datos_contacto){
 			lbl_nombre.text(datos_contacto.nombre);
         

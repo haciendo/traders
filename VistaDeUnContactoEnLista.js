@@ -15,7 +15,7 @@ var VistaDeUnContactoEnLista = function(idContacto){
 		_this.alSeleccionar(idContacto);
 	});
 	
-	var busq_datos_contacto = BC.buscar({id: "DATOS_PERSONALES", idOwner: idContacto});
+	var busq_datos_contacto = BS.buscar({id: "DATOS_PERSONALES", idOwner: idContacto});
 	busq_datos_contacto.alAgregar(function(datos_contacto){
 		lbl_nombre.text(datos_contacto.nombre);
 		avatar.attr("src", datos_contacto.avatar);
@@ -26,7 +26,7 @@ var VistaDeUnContactoEnLista = function(idContacto){
         });
 	});	
 	
-	var busq_solicitud = BC.buscar({tipo: "SolicitudDeAmistad", idOwner: BC.idUsuario, idContacto: idContacto});
+	var busq_solicitud = BS.buscar({tipo: "SolicitudDeAmistad", idOwner: BS.idUsuario, idContacto: idContacto});
 	busq_solicitud.alAgregar(function(solicitud){
 		solicitud.alQuitarDeLaBusqueda(function(){
 			_this.ui.remove();

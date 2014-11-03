@@ -1,4 +1,4 @@
-var BusquedaEnContactos = function(filtro){
+var BusquedaSocial = function(filtro){
     var _this = this;
     Evento.agregarEventoA(this, "alCargar", true);
 	Evento.agregarEventoA(this, "alAgregar");
@@ -13,7 +13,7 @@ var BusquedaEnContactos = function(filtro){
     this.load(filtro);
 };
 
-BusquedaEnContactos.prototype.load = function(filtro){
+BusquedaSocial.prototype.load = function(filtro){
     this.filtro = filtro;	
 	var _this = this;
     
@@ -24,16 +24,16 @@ BusquedaEnContactos.prototype.load = function(filtro){
     if(filtro.idOwner){ 
 		_this._pedirAUnContacto(filtro, filtro.idOwner);
 	}else{
-		BC.contactos.forEach(function(contacto){
+		BS.contactos.forEach(function(contacto){
 			_this._pedirAUnContacto(filtro, contacto.idContacto);
 		});
 	}      
 };
-BusquedaEnContactos.prototype._pedirAUnContacto = function(filtro, idContacto){
+BusquedaSocial.prototype._pedirAUnContacto = function(filtro, idContacto){
     var _this = this;
     this._pedidosVx.push(vx.send({
 		tipoDeMensaje: "vortex.persistencia.agregarPedido",
-		de: BC.idUsuario,
+		de: BS.idUsuario,
 		para: idContacto,
 		datoSeguro: {filtro: this.filtro}
 	}, function(respuesta){
@@ -48,7 +48,7 @@ BusquedaEnContactos.prototype._pedirAUnContacto = function(filtro, idContacto){
             vx.when({
                 tipoDeMensaje:"vortex.persistencia.avisoDeObjetoAgregadoAPedido",
                 de: idContacto,
-                para: BC.idUsuario,
+                para: BS.idUsuario,
                 idPedido: id_pedido,
             }, function(aviso){
                 _this._agregar(aviso.datoSeguro.objeto);
@@ -59,7 +59,7 @@ BusquedaEnContactos.prototype._pedirAUnContacto = function(filtro, idContacto){
             vx.when({
                 tipoDeMensaje:"vortex.persistencia.avisoDeObjetoQuitadoDePedido",
                 de: idContacto,
-                para: BC.idUsuario,
+                para: BS.idUsuario,
                 idPedido: id_pedido,
             }, function(aviso){
                 _this._quitar(aviso.datoSeguro.idObjeto);
@@ -90,9 +90,9 @@ BusquedaEnContactos.prototype._pedirAUnContacto = function(filtro, idContacto){
     );
 };
 
-BusquedaEnContactos.prototype.insertar = function(valor_inicial){
+BusquedaSocial.prototype.insertar = function(valor_inicial){
     if(!this.filtro.idOwner) throw("no se puede insertar sin idOwner");
-    if(this.filtro.idOwner != BC.idUsuario) throw("no se puede insertar en repositorios ajenos");
+    if(this.filtro.idOwner != BS.idUsuario) throw("no se puede insertar en repositorios ajenos");
 	vx.send({
 		tipoDeMensaje: "vortex.persistencia.insert",
 		de: Usuario.id,
@@ -101,7 +101,7 @@ BusquedaEnContactos.prototype.insertar = function(valor_inicial){
 	});
 };
 
-BusquedaEnContactos.prototype.apagar = function(){
+BusquedaSocial.prototype.apagar = function(){
     this._quitarPedidosVx();
     this._quitarPedidosDeObjetos();
     this._quitarResultados();
@@ -109,49 +109,49 @@ BusquedaEnContactos.prototype.apagar = function(){
     this.alApagar();
 };
     
-BusquedaEnContactos.prototype.forEach = function(iterador){
+BusquedaSocial.prototype.forEach = function(iterador){
 	_.forEach(this.resultados, function(objeto){
 		iterador(objeto);
 	})
 };
 
-BusquedaEnContactos.prototype.findWhere = function(condiciones){
+BusquedaSocial.prototype.findWhere = function(condiciones){
 	return _.findWhere(this.resultados, condiciones);
 };
 
-BusquedaEnContactos.prototype.where = function(condiciones){
+BusquedaSocial.prototype.where = function(condiciones){
 	return _.where(this.resultados, condiciones);
 };
 
-BusquedaEnContactos.prototype.toArray = function(){
+BusquedaSocial.prototype.toArray = function(){
 	return this.resultados;
 };
 
-BusquedaEnContactos.prototype._agregar = function(obj){
+BusquedaSocial.prototype._agregar = function(obj){
 	var obj_enc = new ObjetoEncontradoEnBusqueda(obj);
 	this.resultados.push(obj_enc);
 	this.alAgregar(obj_enc);
 };
 
-BusquedaEnContactos.prototype._quitar = function(id_obj){
+BusquedaSocial.prototype._quitar = function(id_obj){
 	var obj_quitado = _.findWhere(this.resultados, {id: id_obj});
 	this.resultados = _.without(this.resultados, obj_quitado);
     obj_quitado.quitarDeLaBusqueda();
     this.alQuitar(obj_quitado);
 };
 
-BusquedaEnContactos.prototype._quitarPedidosVx= function(){
+BusquedaSocial.prototype._quitarPedidosVx= function(){
     _.forEach(this._pedidosVx, function(p){
         p.quitar();
     });
     this._pedidosVx = [];
 };
 
-BusquedaEnContactos.prototype._quitarPedidosDeObjetos= function(){
+BusquedaSocial.prototype._quitarPedidosDeObjetos= function(){
     _.forEach(this._pedidosDeObjetos, function(pedido){
         vx.send({
             tipoDeMensaje: "vortex.persistencia.quitarPedido",
-            de: BC.idUsuario,
+            de: BS.idUsuario,
             para: pedido.idContacto,
             datoSeguro: {idPedido: pedido.idPedido}
         });
@@ -159,7 +159,7 @@ BusquedaEnContactos.prototype._quitarPedidosDeObjetos= function(){
     this._pedidosDeObjetos = [];
 };
 
-BusquedaEnContactos.prototype._quitarResultados= function(){
+BusquedaSocial.prototype._quitarResultados= function(){
     var _this = this;   
     _.forEach(this.resultados, function(o){
         o.quitarDeLaBusqueda();

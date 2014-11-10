@@ -70,7 +70,7 @@ BusquedaSocial.prototype._pedirAUnContacto = function(filtro, idContacto){
             vx.when({
                 tipoDeMensaje:"vortex.persistencia.avisoDeObjetoModificadoEnPedido",
                 de: idContacto,
-                para: BC.idUsuario,
+                para: BS.idUsuario,
                 idPedido: id_pedido,
             }, function(aviso){
                 var vxo = _.findWhere(_this.resultados, {id: aviso.datoSeguro.idObjeto});

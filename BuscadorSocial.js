@@ -3,7 +3,9 @@ var BuscadorSocial = BS = {
         this.idUsuario = id_usuario;
         this.contactos = this.buscar({
             idOwner: id_usuario,
-            tipo: "SolicitudDeAmistad"});
+            tipo: "Contacto",
+            estadoSolicitud: "Aceptada"
+        });
     },
     buscar: function(filtro){      	
         return new BusquedaSocial(filtro);

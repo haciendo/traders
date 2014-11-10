@@ -5,7 +5,7 @@ var PantallaListaContactos = {
 		Evento.agregarEventoA(this, "alSeleccionar");
 		
         this.ui =  $("#pantalla_lista_contactos");     
-        this.solicitudesDeAmistad = BC.buscar({tipo: "SolicitudDeAmistad", idOwner: Usuario.id});
+        this.contactos = BC.buscar({tipo: "Contacto", idOwner: Usuario.id});
 		this.vistas = [];
 		
         this.lista_contactos = this.ui.find("#lista_contactos");
@@ -17,21 +17,21 @@ var PantallaListaContactos = {
 				placeholder: 'Id del usuario',
 				callback: function(value) {
 					if(value){
-                        if(_this.solicitudesDeAmistad.findWhere({idContacto: value})){
+                        if(_this.contactos.findWhere({idContacto: value})){
                             alertify.error("Solicitud ya enviada");
                             return;
                         }
-                        _this.solicitudesDeAmistad.insertar({
+                        _this.contactos.insertar({
 							idContacto: value,
-							estado: "Enviando"
+							estadoSolicitud: "Enviando"
 						});
 					}
 				}
 			});			
 		});
         
-		this.solicitudesDeAmistad.alAgregar(function(solicitud){
-			_this.agregarVistaContacto(solicitud.idContacto);
+		this.contactos.alAgregar(function(contacto){
+			_this.agregarVistaContacto(contacto.idContacto);
 		});
     },
 	

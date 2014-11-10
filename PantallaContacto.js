@@ -30,7 +30,7 @@ var PantallaContacto = {
 		
 		this.btn_aprobar = this.ui.find("#btn_aprobar");    		
 		this.btn_aprobar.click(function(){
-			_this.solicitud.estado = "Aprobando";
+			_this.contacto.estadoSolicitud = "Aprobando";
 		});
 		this.btn_aprobar.hide();
     },
@@ -38,34 +38,34 @@ var PantallaContacto = {
         var _this = this; 
 		
 		this.idContacto = idContacto;
-		if(!this.busq_solicitud) {
-			this.busq_solicitud = BS.buscar({tipo: "SolicitudDeAmistad", idOwner: BS.idUsuario, idContacto: idContacto});
+		if(!this.busq_contacto) {
+			this.busq_contacto = BS.buscar({tipo: "Contacto", idOwner: BS.idUsuario, idContacto: idContacto});
 			
-			this.busq_solicitud.alAgregar(function(solicitud){
-				_this.solicitud = solicitud;
+			this.busq_contacto.alAgregar(function(contacto){
+				_this.contacto = contacto;
 				_this.btn_trocar.hide();
 				_this.btn_aprobar.hide();
 				
-				if(solicitud.estado == "Recibida") _this.btn_aprobar.show();
-				if(solicitud.estado == "Aprobada") _this.btn_trocar.show();
+				if(contacto.estadoSolicitud == "Recibida") _this.btn_aprobar.show();
+				if(contacto.estadoSolicitud == "Aprobada") _this.btn_trocar.show();
 
 				solicitud.alCambiar(function(cambios){	
 					_this.btn_trocar.hide();
 					_this.btn_aprobar.hide();
-					if(cambios.estado == "Recibida") {
+					if(cambios.estadoSolicitud == "Recibida") {
 						_this.btn_aprobar.show();
 					}
-					if(cambios.estado == "Aprobada")  {
+					if(cambios.estadoSolicitud == "Aprobada")  {
 						_this.btn_trocar.show();
 					}
 				});
 			});	
-			this.busq_solicitud.alQuitar(function(solicitud){
+			this.busq_contacto.alQuitar(function(solicitud){
 				_this.btn_trocar.hide();
 				_this.btn_aprobar.hide();
 			});	
 		}
-		else this.busq_solicitud.load({tipo: "SolicitudDeAmistad", idOwner: BS.idUsuario, idContacto: idContacto});
+		else this.busq_contacto.load({tipo: "Contacto", idOwner: BS.idUsuario, idContacto: idContacto});
 		
 		
 		if(!this.busq_datosContacto) {

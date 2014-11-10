@@ -26,13 +26,13 @@ var VistaDeUnContactoEnLista = function(idContacto){
         });
 	});	
 	
-	var busq_solicitud = BS.buscar({tipo: "SolicitudDeAmistad", idOwner: BS.idUsuario, idContacto: idContacto});
-	busq_solicitud.alAgregar(function(solicitud){
-		solicitud.alQuitarDeLaBusqueda(function(){
+	var busq_contacto = BS.buscar({tipo: "Contacto", idOwner: BS.idUsuario, idContacto: idContacto});
+	busq_contacto.alAgregar(function(contacto){
+		contacto.alQuitarDeLaBusqueda(function(){
 			_this.ui.remove();
 		});
 		btn_eliminar.click(function(e){
-			solicitud.eliminar();
+			contacto.eliminar();
 		});	
 	});	
 };

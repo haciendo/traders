@@ -10,9 +10,7 @@ var RepositorioSocial = {
 			throw "El usuario debe estar loguado antes de inicializar el repositorio vortez";
 		}
 		
-        this.pedidos = this.repositorio.select({
-            tipo: "vortex.persistencia.pedido"
-        });
+        this.pedidos = [];
         
 		vx.when({
 			de: Usuario.id,

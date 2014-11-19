@@ -5,7 +5,7 @@ var PantallaListaContactos = {
 		Evento.agregarEventoA(this, "alSeleccionar");
 		
         this.ui =  $("#pantalla_lista_contactos");     
-        this.contactos = BC.buscar({tipo: "Contacto", idOwner: Usuario.id});
+        this.contactos = BS.buscar({tipo: "Contacto", idOwner: Usuario.id});
 		this.vistas = [];
 		
         this.lista_contactos = this.ui.find("#lista_contactos");

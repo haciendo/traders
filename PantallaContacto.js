@@ -20,7 +20,7 @@ var PantallaContacto = {
 				de: Usuario.id,
 				para: Usuario.id,
 				datoSeguro:{ objeto: {
-					idOwner: BC.idUsuario,
+					idOwner: BS.idUsuario,
 					idContacto: _this.idContacto,
 					tipo: "traders.trueque"
 				}}

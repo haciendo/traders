@@ -3,7 +3,7 @@ var PantallaProductos = {
         var _this = this;
         this.ui =  $("#pantalla_productos");     		
 	
-		this.busq_productos = BC.buscar({tipo: "Producto"});         
+		this.busq_productos = BS.buscar({tipo: "Producto"});         
 		this.listaProductos = new ListaProductos({
 			productos: this.busq_productos,
 			mostrarPropietario:true

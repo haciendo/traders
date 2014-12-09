@@ -28,6 +28,22 @@ var VistaDeUnContactoEnLista = function(idContacto){
 	
 	var busq_contacto = BS.buscar({tipo: "Contacto", idOwner: BS.idUsuario, idContacto: idContacto});
 	busq_contacto.alAgregar(function(contacto){
+		if(contacto.online){
+			_this.ui.addClass("contacto_online");
+			_this.ui.removeClass("contacto_offline");
+		}else{
+			_this.ui.removeClass("contacto_online");
+			_this.ui.addClass("contacto_offline");
+		};
+		contacto.alCambiar(function(){
+			if(contacto.online){
+				_this.ui.addClass("contacto_online");
+				_this.ui.removeClass("contacto_offline");
+			}else{
+				_this.ui.removeClass("contacto_online");
+				_this.ui.addClass("contacto_offline");
+			};
+		});
 		contacto.alQuitarDeLaBusqueda(function(){
 			_this.ui.remove();
 		});

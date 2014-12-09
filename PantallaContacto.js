@@ -49,7 +49,7 @@ var PantallaContacto = {
 				if(contacto.estadoSolicitud == "Recibida") _this.btn_aprobar.show();
 				if(contacto.estadoSolicitud == "Aprobada") _this.btn_trocar.show();
 
-				solicitud.alCambiar(function(cambios){	
+				contacto.alCambiar(function(cambios){	
 					_this.btn_trocar.hide();
 					_this.btn_aprobar.hide();
 					if(cambios.estadoSolicitud == "Recibida") {
